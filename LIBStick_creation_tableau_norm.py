@@ -30,10 +30,10 @@ sys.path.insert(0,"./dossier_mes_modules/")
 ###############################################################################
 # 1- fonction qui liste des fichiers *.tsv d'un répertoire
 ###############################################################################
-def repertoire_de_travail_0(rep_script):
-    rep_travail=rep_script+"/test_python_Zone_1/528_543/"
-    #rep_travail=rep_travail+"/test_python_Zone_1/592_608/"
-    return rep_travail
+#def repertoire_de_travail_0(rep_script):
+#    rep_travail=rep_script+"/test_python_Zone_1/528_543/"
+#    #rep_travail=rep_travail+"/test_python_Zone_1/592_608/"
+#    return rep_travail
 
 def repertoire_de_travail(rep_script,rep_travail_relatif):
     rep_travail=rep_script+"/"+rep_travail_relatif
@@ -52,21 +52,6 @@ def creation_liste_fichiers(rep_travail):
 # 2- fonction qui ouvre chaque fichier de la liste, sépare les données en liste de listes,
 #    extrait la seconde colonne et l'ajoute à un tableau numpy
 ###############################################################################
-#def creer_tableau_0(liste):
-#    tableau=numpy.array(object)
-#    i=0
-#    for fichier in liste :
-#        if i==0:
-#            fentree=open(fichier,"r")
-#            tableau=numpy.genfromtxt(fentree, delimiter="\t")
-#        else :            
-#            fentree=open(fichier,"r")
-#            tableau2=numpy.genfromtxt(fentree, delimiter="\t")
-#            tableau=numpy.insert(tableau,tableau.shape[1],tableau2[:,1],axis=1)
-#        i=i+1
-#    tableau=numpy.delete(tableau,0,axis=1)
-#    return tableau
-
 def creer_tableau(liste):
     i=0
     for fichier in liste :
@@ -80,16 +65,16 @@ def creer_tableau(liste):
         i=i+1
     return tableau
 
+def creer_tableau_abscisses(liste):
+    fichier0=numpy.loadtxt(liste[0], delimiter="\t", usecols=[0])
+    tableau_abscisses=numpy.zeros((fichier0.shape[0],0))
+    tableau_abscisses=numpy.column_stack((tableau_abscisses,fichier0))
+    print(tableau_abscisses)
+    return tableau_abscisses
+    
 ###############################################################################
 # 3- fonction normalise les colonnes du tableau
 ###############################################################################
-#def normalise_tableau_maxi(tableau):
-#    for colonne in range(tableau.shape[1]):
-#        minimum=tableau[:,colonne].min()
-#        maximum=tableau[:,colonne].max()
-#        tableau[:,colonne] = (tableau[:,colonne] - minimum)/(maximum - minimum)
-#    return tableau
-
 def normalise_tableau_aire(tableau):
     for colonne in range(tableau.shape[1]):
         minimum=tableau[:,colonne].min()
@@ -102,15 +87,6 @@ def normalise_tableau_aire(tableau):
 ###############################################################################
 # 4- fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###############################################################################
-#def enregistre_fichier_0(repertoire, tableau, nom_fichier):
-#    os.chdir(repertoire)
-#    nom_fichier=nom_fichier[0:-4] + "_" + repertoire[-7:] +".tsv"
-#    fsortie=open(nom_fichier,"w")
-#    fsortie.write(tableau)
-#    fsortie.close()
-#    #ecrit_tsv=csv.writer(fsortie, delimiter = '\t')
-#    #ecrit_tsv.writerow(document)
-
 def enregistre_fichier(tableau,nom_fichier):
     numpy.savetxt(nom_fichier,tableau,delimiter="\t", newline="\n")
     
@@ -118,6 +94,9 @@ def enregistre_fichier_virgule(tableau,nom_fichier):
     tableau=tableau.astype(str)
     tableau=numpy.char.replace(tableau, ".", ",")
     numpy.savetxt(nom_fichier,tableau,delimiter="\t", newline="\n", fmt="%s")
+    
+def enregistre_tableau_abscisses(tableau_abscisses):
+    numpy.savetxt("tableau_abscisses.txt", tableau_abscisses, newline="\n")
     
 ###############################################################################
 # 5- fonctions qui affiche et sauvegarde des graphes
@@ -176,32 +155,20 @@ def graphique_sauvegarde(tableau8bits) :
 ###############################################################################
 # programme principal
 ###############################################################################
-def main_commun(rep_travail,nom_echantillon,bornes) :  
+def main (rep_travail,nom_echantillon,bornes) :
+    global tableau_norm
     liste_fichiers=creation_liste_fichiers(rep_travail)
+    tableau_abscisses=creer_tableau_abscisses(liste_fichiers)
+    enregistre_tableau_abscisses(tableau_abscisses)
     tableau=creer_tableau(liste_fichiers)
-    #tableau_norm=normalise_tableau_maxi(tableau)
     tableau_norm=normalise_tableau_aire(tableau)
-    #enregistre_fichier_0(rep_travail, tableau_norm,"tableau_normalisé.txt")
     enregistre_fichier(tableau_norm,"tableau_normalisé.txt")
     enregistre_fichier_virgule(tableau_norm,"tableau_normalisé_virgules.txt")
     tableau8bits=tableau_transpose_256gris(tableau_norm)
-    graphique_creation(tableau8bits,nom_echantillon,bornes)
     graphique_sauvegarde(tableau8bits)
-    if LIBStick_echange_vars.flag_3D == 1 :
-        graphique_3D_creation(tableau8bits,nom_echantillon,bornes)
-    
+    if LIBStick_echange_vars.L_ext_flag_2D :
+        graphique_creation(tableau8bits,nom_echantillon,bornes)
+    if LIBStick_echange_vars.L_ext_flag_3D == 1 :
+        graphique_3D_creation(tableau8bits,nom_echantillon,bornes)   
 
-def main (rep_travail,nom_echantillon,bornes) :
-    main_commun(rep_travail,nom_echantillon,bornes)
-   
-if __name__=='__main__':
-    #rep_travail=repertoire_de_travail_0(rep_script)
-    nom_echantillon="Spectres LIBS"
-    bornes=[0,100]
-    if (len(sys.argv)) <= 1 :
-        rep_travail_relatif="/"
-    else :
-        rep_travail_relatif=sys.argv[1]
-    rep_script=os.getcwd()  
-    rep_travail=repertoire_de_travail(rep_script,rep_travail_relatif)
-    main_commun(rep_travail,nom_echantillon,bornes)
+
