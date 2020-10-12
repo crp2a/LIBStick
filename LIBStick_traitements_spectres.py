@@ -179,12 +179,12 @@ def SNIP_fonction (spectre, iterations, LLS_flag) :
 ###############################################################################
 # 6- fonctions de traitement des spectres
 ###############################################################################
-def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordre):
+def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordre, deriv):
     spectre_filtre = creation_spectre_bornes(spectre_entier, tableau_bornes)
     if filtre == "Aucun" :
         pass
     if filtre == "Savitzky-Golay" :
-        spectre_filtre[:,1] = scipy.signal.savgol_filter(spectre_filtre[:,1], taille, ordre, deriv=0, delta=1.0, axis=-1, mode='interp', cval=0.0)
+        spectre_filtre[:,1] = scipy.signal.savgol_filter(spectre_filtre[:,1], taille, ordre, deriv, delta=1.0, axis=-1, mode='interp', cval=0.0)
     if filtre == "Median" :
         spectre_filtre[:,1] = scipy.signal.medfilt(spectre_filtre[:,1], taille)
     if filtre == "Passe-bas" :
@@ -221,12 +221,12 @@ def execute(rep_travail, spectre_corrige, nom_fichier):
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
 
-def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, type_fond, param1, param2, param3) :
+def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, deriv, type_fond, param1, param2, param3) :
     liste_fichiers = creation_liste_fichiers(rep_travail, type_fichier)
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     for nom_fichier in liste_fichiers :
         spectre = lit_spectre(nom_fichier, type_fichier)
-        spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre)
+        spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
         fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
         spectre= creation_spectre_corrige(spectre, fond_continu)
         enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)

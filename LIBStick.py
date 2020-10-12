@@ -176,7 +176,8 @@ def visualisation_L_trait():
                                                                                           tableau_bornes_L_trait,
                                                                                           type_filtre_L_trait.get(),
                                                                                           taille_filtre_L_trait.get(),
-                                                                                          ordre_filtre_L_trait.get())
+                                                                                          ordre_filtre_L_trait.get(),
+                                                                                          derivee_filtre_L_trait.get())
     fond_continu_L_trait = LIBStick_traitements_spectres.creation_fond(spectre_filtre_L_trait,
                                                                        type_fond_L_trait.get(),
                                                                        param1_fond_L_trait.get(),
@@ -200,7 +201,7 @@ def execute_L_trait():
         LIBStick_traitements_spectres.execute(rep_travail_L_trait, spectre_corrige_L_trait, nom_fichier_seul_L_trait)
     if flag == True :
         LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(), tableau_bornes_L_trait,
-                                                      type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(),
+                                                      type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(), derivee_filtre_L_trait.get(),
                                                       type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
     
 ###############################################################################
@@ -384,15 +385,19 @@ def change_options_filtre_L_trait(event) :
     if filtre == "Aucun" :
         entree4_L_trait.configure(state="disable")
         entree5_L_trait.configure(state="disable")
+        entree5_2_L_trait.configure(state="disable")
     if filtre == "Savitzky-Golay" :
         entree4_L_trait.configure(state="normal")
         entree5_L_trait.configure(state="normal")
+        entree5_2_L_trait.configure(state="normal")
     if filtre == "Median" :
         entree4_L_trait.configure(state="normal")
         entree5_L_trait.configure(state="disable")
+        entree5_2_L_trait.configure(state="disable")
     if filtre == "Passe-bas" :
         entree4_L_trait.configure(state="normal")
         entree5_L_trait.configure(state="disable")
+        entree5_2_L_trait.configure(state="disable")
         
 def change_options_fond_L_trait(event) :
     fond = type_fond_L_trait.get()
@@ -406,14 +411,14 @@ def change_options_fond_L_trait(event) :
         text8_L_trait.configure(text="Lissage :")
         entree8_L_trait.configure(state="normal")
         entree8bis_L_trait.grid_forget()
-        entree8_L_trait.grid(row=4, column=6)
+        entree8_L_trait.grid(row=5, column=6)
     if fond == "SNIP" :
         text7_L_trait.configure(text="Itérations :")
         entree7_L_trait.configure(state="normal")
         text8_L_trait.configure(text="LLS :")
         entree8bis_L_trait.configure(state="normal")
         entree8_L_trait.grid_forget()
-        entree8bis_L_trait.grid(row=4, column=6)
+        entree8bis_L_trait.grid(row=5, column=6)
 
 def affiche_fond_L_trait():
     global fond_continu_L_trait
@@ -1609,7 +1614,7 @@ class case_classification(tkinter.Button) :
 # 7- Interface graphique : création fenêtre principale avec scrolls et onglets
 ###############################################################################
 fenetre_principale=tkinter.Tk()
-fenetre_principale.title("LIBStick v1.1")
+fenetre_principale.title("LIBStick v1.2")
 fenetre_principale.geometry("1150x850+100+50")
 fenetre_principale.maxsize(width=1160, height=850)
 
@@ -1723,28 +1728,33 @@ entree2_L_trait.grid(row=2, column=4)
 text3_L_trait=tkinter.Label(frame1_L_trait, text="Filtre :", bg=couleur_interface)
 text4_L_trait=tkinter.Label(frame1_L_trait, text="Taille :", bg=couleur_interface)
 text5_L_trait = tkinter.Label(frame1_L_trait, text="Ordre :", bg=couleur_interface)
+text5_2_L_trait = tkinter.Label(frame1_L_trait, text="Dérivée :", bg=couleur_interface)
 text3_L_trait.grid(row=3, column=1, sticky=tkinter.W)
 text4_L_trait.grid(row=3, column=3, sticky=tkinter.W)
-text5_L_trait.grid(row=3, column=5, sticky=tkinter.W)
+text5_L_trait.grid(row=4, column=3, sticky=tkinter.W)
+text5_2_L_trait.grid(row=4, column=5, sticky=tkinter.W)
 type_filtre_L_trait=tkinter.StringVar(value="Savitzky-Golay")
 taille_filtre_L_trait=tkinter.IntVar(value=5)
 ordre_filtre_L_trait=tkinter.IntVar(value=2)
+derivee_filtre_L_trait=tkinter.IntVar(value=0)
 #entree3_L_trait=tkinter.ttk.Combobox(frame1_L_trait, textvariable=type_filtre_L_trait,
 #                                     values=["Aucun", "Savitzky-Golay", "Median", "Passe-bas"])
 entree3_L_trait=tkinter.ttk.Combobox(frame1_L_trait, textvariable=type_filtre_L_trait,
                                      values=["Aucun", "Savitzky-Golay", "Median"])
 entree4_L_trait=tkinter.Spinbox(frame1_L_trait, from_=3, to=199, increment=2, textvariable = taille_filtre_L_trait)
 entree5_L_trait=tkinter.Spinbox(frame1_L_trait, from_=2, to=3, textvariable = ordre_filtre_L_trait)
+entree5_2_L_trait=tkinter.Spinbox(frame1_L_trait, from_=0, to=2, textvariable = derivee_filtre_L_trait)
 entree3_L_trait.grid(row=3, column=2, columnspan=1)
 entree4_L_trait.grid(row=3, column=4)
-entree5_L_trait.grid(row=3, column=6)
+entree5_L_trait.grid(row=4, column=4)
+entree5_2_L_trait.grid(row=4, column=6)
 
 text6_L_trait=tkinter.Label(frame1_L_trait, text="Fond :", bg=couleur_interface)
 text7_L_trait=tkinter.Label(frame1_L_trait, text="Itérations :", bg=couleur_interface)
 text8_L_trait=tkinter.Label(frame1_L_trait, text="LLS :", bg=couleur_interface)
-text6_L_trait.grid(row=4, column=1, sticky=tkinter.W)
-text7_L_trait.grid(row=4, column=3, sticky=tkinter.W)
-text8_L_trait.grid(row=4, column=5, sticky=tkinter.W)
+text6_L_trait.grid(row=5, column=1, sticky=tkinter.W)
+text7_L_trait.grid(row=5, column=3, sticky=tkinter.W)
+text8_L_trait.grid(row=5, column=5, sticky=tkinter.W)
 type_fond_L_trait=tkinter.StringVar(value="SNIP")
 param1_fond_L_trait=tkinter.IntVar(value=20)
 param2_fond_L_trait=tkinter.IntVar(value=10)
@@ -1756,11 +1766,11 @@ entree6_L_trait=tkinter.ttk.Combobox(frame1_L_trait, textvariable=type_fond_L_tr
 entree7_L_trait=tkinter.Spinbox(frame1_L_trait, from_=3, to=100, textvariable=param1_fond_L_trait)
 entree8_L_trait=tkinter.Spinbox(frame1_L_trait, from_=1, to=100, textvariable=param2_fond_L_trait)
 entree8bis_L_trait=tkinter.Checkbutton(frame1_L_trait, text="LLS", variable=param3_fond_L_trait, bg=couleur_interface)
-entree6_L_trait.grid(row=4, column=2, columnspan=1)
-entree7_L_trait.grid(row=4, column=4)
-entree8_L_trait.grid(row=4, column=6)
+entree6_L_trait.grid(row=5, column=2, columnspan=1)
+entree7_L_trait.grid(row=5, column=4)
+entree8_L_trait.grid(row=5, column=6)
 entree8_L_trait.grid_remove()
-entree8bis_L_trait.grid(row=4, column=6)
+entree8bis_L_trait.grid(row=5, column=6)
 
 frame1_1_L_trait=tkinter.Frame(frame1_L_trait, bg=couleur_interface)
 frame1_1_L_trait.grid(row=1, column=7, rowspan=4, sticky=tkinter.N+tkinter.S)
