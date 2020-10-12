@@ -40,7 +40,7 @@ def affiche_tableau_periodique(DataFrame_tableau_periodique):
         ligne=ligne_tableau[5]
         colonne=ligne_tableau[6]
         couleur=ligne_tableau[8]
-        boutton = case_classification(frame1, nom, symbole,  Z, ligne, colonne, couleur)
+        bouton = case_classification(frame1, nom, symbole,  Z, ligne, colonne, couleur)
 
 
 fenetre=tkinter.Tk()

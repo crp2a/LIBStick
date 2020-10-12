@@ -18,11 +18,6 @@ Created on Thu Feb 11 2020
 import sys,os,numpy
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as plt3d
-import LIBStick_echange_vars
-
-#import matplotlib.ticker as tck
-#import matplotlib.image as mpimg
-#import LIBStick_interface
 
 sys.path.insert(0,os.path.join(os.path.expanduser("~"),"Desktop"))
 sys.path.insert(0,"./dossier_mes_modules/")
@@ -69,7 +64,6 @@ def creer_tableau_abscisses(liste):
     fichier0=numpy.loadtxt(liste[0], delimiter="\t", usecols=[0])
     tableau_abscisses=numpy.zeros((fichier0.shape[0],0))
     tableau_abscisses=numpy.column_stack((tableau_abscisses,fichier0))
-#    print(tableau_abscisses)
     return tableau_abscisses
     
 ###############################################################################
@@ -164,7 +158,7 @@ def graphique_sauvegarde(tableau8bits) :
 ###############################################################################
 # programme principal
 ###############################################################################
-def main (rep_travail,nom_echantillon,bornes) :
+def main (rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) :
     global tableau_norm
     liste_fichiers=creation_liste_fichiers(rep_travail)
     
@@ -181,9 +175,9 @@ def main (rep_travail,nom_echantillon,bornes) :
     tableau8bits_norm=tableau_transpose_256gris(tableau_norm)
     graphique_sauvegarde(tableau8bits_norm)
     
-    if LIBStick_echange_vars.L_ext_flag_2D :
+    if flag_2D == 1 :
         graphique_creation(tableau8bits_norm,nom_echantillon,bornes)
-    if LIBStick_echange_vars.L_ext_flag_3D == 1 :
+    if flag_3D == 1 :
         graphique_3D_creation(tableau8bits_norm,nom_echantillon,bornes)   
 
 
