@@ -15,11 +15,11 @@ import scipy.signal
 def creation_liste_fichiers(rep_travail, type_fichier):
     os.chdir(rep_travail)
     liste=[]
-    if type_fichier == "IVEA" :
+    if type_fichier == ".asc" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-3:] == "asc") :
                 liste.append(fichier)
-    if type_fichier == "LIBStick" :
+    if type_fichier == ".tsv" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-3:] == "tsv") :
                 liste.append(fichier)
@@ -35,13 +35,15 @@ def creation_liste_fichiers(rep_travail, type_fichier):
 # 2- fonction qui ouvre un fichier
 ###############################################################################
 def lit_spectre(fichier, type_fichier):
-    if type_fichier == "IVEA" :
+#    if type_fichier == "IVEA" :
+    if type_fichier == ".asc" :
         document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
         spectre=numpy.zeros((0,2))
         for ligne in document :
             if (ligne[0]<=1013) :
                 spectre=numpy.row_stack((spectre,ligne))
-    if type_fichier == "LIBStick" :
+#    if type_fichier == "LIBStick" :
+    if type_fichier == ".tsv" :
         spectre=numpy.loadtxt(fichier,delimiter="\t",usecols=[0,1],dtype=float,encoding="Latin-1")
     return spectre
 
@@ -182,7 +184,6 @@ def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordr
     if filtre == "Aucun" :
         pass
     if filtre == "Savitzky-Golay" :
-        #print(spectre_limite_bornes[:,1])
         spectre_filtre[:,1] = scipy.signal.savgol_filter(spectre_filtre[:,1], taille, ordre, deriv=0, delta=1.0, axis=-1, mode='interp', cval=0.0)
     if filtre == "Median" :
         spectre_filtre[:,1] = scipy.signal.medfilt(spectre_filtre[:,1], taille)

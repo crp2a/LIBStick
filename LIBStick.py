@@ -11,7 +11,7 @@ Created on Wed Apr  8 12:32:41 2020
 
 import tkinter, tkinter.filedialog, tkinter.ttk
 import tkinter.font, tkinter.messagebox
-import os, configparser
+import os, configparser, pathlib
 import math, numpy, pandas
 import PIL.Image, PIL.ImageTk
 
@@ -28,7 +28,6 @@ import LIBStick_comp_spectres
 #couleur_interface="linen"
 couleur_interface="light grey"
 rep_LIBStick=os.getcwd()
-#print(rep_LIBStick)
 largeur_lignes=2
 taille_case = [3,2]
 
@@ -95,7 +94,8 @@ def ecrit_fichier_ini() :
     dico_sauvegarde_L_comp = {"flag_denominateur_L_comp": "flag_denominateur_L_comp.get()",
                              "flag_2D_L_comp" : "flag_2D_L_comp.get()",
                              "flag_3D_L_comp" : "flag_3D_L_comp.get()",
-                             "type_extension_L_comp" : "type_extension_L_comp.get()",                             
+                             "flag_traitement_L_comp" : "flag_traitement_L_comp.get()",
+                             "flag_stat_L_comp" : "flag_stat_L_comp.get()",
                              "borne_zone1_inf_L_comp" : "tableau_bornes_L_comp[0,0]",
                              "borne_zone1_sup_L_comp" : "tableau_bornes_L_comp[0,1]",
                              "borne_zone2_inf_L_comp" : "tableau_bornes_L_comp[1,0]",
@@ -125,6 +125,13 @@ def __________L_trait__________():pass
 ###############################################################################
 # 0- initialisations
 ###############################################################################
+def charge_param_L_trait() :
+    dictionnaire_ini_L_trait=lit_section_fichier_ini("LIBStick_traitement")
+    rep_travail_L_trait = dictionnaire_ini_L_trait["rep_travail_L_trait"]
+    return rep_travail_L_trait
+    
+rep_travail_L_trait=charge_param_L_trait()
+
 limites_spectre_L_trait=numpy.array([198.0,1013.0])
 limites_affichage_spectre_L_trait=numpy.array([198.0,1013.0])
 coord_zoom_L_trait=numpy.array([198,0,1013,0])
@@ -149,12 +156,13 @@ def choix_fichier_L_trait():
     global nom_fichier_seul_L_trait
     global rep_travail_L_trait
     #global nbr_fichier_L_trait
-    nom_fichier_L_trait = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_comp,
+    nom_fichier_L_trait = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_trait,
                                                                  title='Choisissez un fichier spectre',
                                                                  filetypes=(("fichiers IVEA","*.asc"), 
                                                                             ("fichiers LIBStick","*.tsv"),
                                                                             ("tous","*.*"))   )
     nom_fichier_seul_L_trait=os.path.basename(nom_fichier_L_trait)
+    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
     rep_travail_L_trait = os.path.dirname(nom_fichier_L_trait)
     lit_affiche_spectre_L_trait()
     bouton_visualisation_L_trait.configure(state="normal")
@@ -164,7 +172,6 @@ def visualisation_L_trait():
     global spectre_corrige_L_trait
     global tableau_bornes_L_trait
     tableau_bornes_L_trait=creation_tab_bornes_L_trait()
-    #print(spectre_entier_L_trait)
     spectre_filtre_L_trait = LIBStick_traitements_spectres.creation_spectre_filtre(spectre_entier_L_trait,
                                                                                           tableau_bornes_L_trait,
                                                                                           type_filtre_L_trait.get(),
@@ -520,11 +527,20 @@ def reset_tableau_L_ext() :
     variable_L_ext_4.set(tableau_bornes_L_ext[1,1])
     deplace_lignes_L_ext()
 
-def choix_rep_L_ext():
+def choix_fichier_L_ext():
+    global nom_fichier_L_ext
+    global nom_fichier_seul_L_ext
     global rep_travail_L_ext
     global nombre_fichiers_L_ext
     global liste_fichiers_L_ext
-    rep_travail_L_ext = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_ext,title='Choisissez un repertoire')   
+    nom_fichier_L_ext = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_ext,
+                                                                 title='Choisissez un fichier spectre',
+                                                                 filetypes=(("fichiers IVEA","*.asc"), 
+                                                                            ("fichiers LIBStick","*.tsv"),
+                                                                            ("tous","*.*"))   )
+    nom_fichier_seul_L_ext=os.path.basename(nom_fichier_L_ext)
+    type_fichier_L_ext.set(pathlib.Path(nom_fichier_seul_L_ext).suffix)
+    rep_travail_L_ext = os.path.dirname(nom_fichier_L_ext)
     liste_fichiers_L_ext=LIBStick_extraction_spectres.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
     nombre_fichiers_L_ext=len(liste_fichiers_L_ext)    
     lit_affiche_spectre_L_ext()
@@ -534,6 +550,21 @@ def choix_rep_L_ext():
     entree8_L_ext.configure(to=nombre_fichiers_L_ext)
     entree9_L_ext.configure(to=nombre_fichiers_L_ext)
     entree10_L_ext.configure(to=nombre_fichiers_L_ext)
+    
+#def choix_rep_L_ext():
+#    global rep_travail_L_ext
+#    global nombre_fichiers_L_ext
+#    global liste_fichiers_L_ext
+#    rep_travail_L_ext = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_ext,title='Choisissez un repertoire')   
+#    liste_fichiers_L_ext=LIBStick_extraction_spectres.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
+#    nombre_fichiers_L_ext=len(liste_fichiers_L_ext)    
+#    lit_affiche_spectre_L_ext()
+#    bouton_execute_L_ext.configure(state="normal")
+#    bouton_extraction_L_ext.configure(state="disable")
+#    entree6_L_ext.configure(to=nombre_fichiers_L_ext)
+#    entree8_L_ext.configure(to=nombre_fichiers_L_ext)
+#    entree9_L_ext.configure(to=nombre_fichiers_L_ext)
+#    entree10_L_ext.configure(to=nombre_fichiers_L_ext)
     
 def execute_scripts_L_ext():
     global liste_fichiers_L_ext
@@ -666,9 +697,9 @@ def zoom_clic_release_L_ext(event):
     affiche_spectre_L_ext()
          
 def lit_affiche_spectre_L_ext():
-    global spectre_entier 
+    global spectre_entier_L_ext
     os.chdir(rep_travail_L_ext)
-    spectre_entier=LIBStick_extraction_spectres.lit_spectre(liste_fichiers_L_ext[0], type_fichier_L_ext.get())
+    spectre_entier_L_ext=LIBStick_extraction_spectres.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
 
 def affiche_lambda_L_ext(event):
@@ -702,13 +733,13 @@ def affiche_position_souris_motion_L_ext(event):
 def affiche_spectre_L_ext():
     global limites_affichage_spectre_L_ext
     global delta_limites_L_ext
-    global spectre_entier
+    global spectre_entier_L_ext
     limites_affichage_spectre_L_ext[0]=variable_L_ext_zoom_inf.get()
     limites_affichage_spectre_L_ext[1]=variable_L_ext_zoom_sup.get()
     delta_limites_L_ext=limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
     canevas0_L_ext.delete("all")
-    spectre=numpy.zeros((0,2))
-    for ligne in spectre_entier :
+    spectre=numpy.zeros((0,2))   
+    for ligne in spectre_entier_L_ext :
         if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]) :
             spectre=numpy.row_stack((spectre,ligne))
     minimum=spectre[:,1].min()
@@ -954,9 +985,11 @@ def charge_param_L_comp() :
     flag_denominateur_init_L_comp = dictionnaire_ini_L_comp["flag_denominateur_L_comp"]
     flag_2D_init_L_comp = dictionnaire_ini_L_comp["flag_2D_L_comp"]
     flag_3D_init_L_comp = dictionnaire_ini_L_comp["flag_3D_L_comp"]
-    return tableau_bornes_init_L_comp,tableau_bornes_L_comp,rep_travail_L_comp,flag_denominateur_init_L_comp,flag_2D_init_L_comp,flag_3D_init_L_comp
+    flag_traitement_init_L_comp=dictionnaire_ini_L_comp["flag_traitement_L_comp"]
+    flag_stat_init_L_comp=dictionnaire_ini_L_comp["flag_stat_L_comp"]
+    return tableau_bornes_init_L_comp,tableau_bornes_L_comp,rep_travail_L_comp,flag_denominateur_init_L_comp,flag_2D_init_L_comp,flag_3D_init_L_comp,flag_traitement_init_L_comp,flag_stat_init_L_comp
 
-tableau_bornes_init_L_comp,tableau_bornes_L_comp,rep_travail_L_comp,flag_denominateur_init_L_comp,flag_2D_init_L_comp,flag_3D_init_L_comp= charge_param_L_comp()
+tableau_bornes_init_L_comp,tableau_bornes_L_comp,rep_travail_L_comp,flag_denominateur_init_L_comp,flag_2D_init_L_comp,flag_3D_init_L_comp,flag_traitement_init_L_comp,flag_stat_init_L_comp= charge_param_L_comp()
 
 x1_L_comp=250.0
 y1_L_comp=100.0
@@ -985,24 +1018,45 @@ def reset_tableau_L_comp() :
     variable_4_L_comp.set(tableau_bornes_L_comp[1,1])
     deplace_lignes_L_comp()
 
-def choix_rep_L_comp():
+def choix_fichier_L_comp():
+    global nom_fichier_L_comp
+    global nom_fichier_seul_L_comp
     global rep_travail_L_comp
+    global nombre_fichiers_L_comp
     global liste_fichiers_L_comp
-    global nombre_fichier_L_comp
-    rep_travail_L_comp = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_comp,title='Choisissez un repertoire')
-    liste_fichiers_L_comp=LIBStick_comp_spectres.creation_liste_fichiers(rep_travail_L_comp, type_extension_L_comp.get())
-    nombre_fichier_L_comp=len(liste_fichiers_L_comp)
+    nom_fichier_L_comp = tkinter.filedialog.askopenfilename(title='Choisissez un fichier spectre',
+                                                            initialdir=rep_travail_L_comp,
+                                                            filetypes=(("fichiers LIBStick moyen","*.mean"),
+                                                                       ("fichiers LIBStick","*.tsv"), 
+                                                                       ("tous","*.*")),
+                                                           multiple=False)
+    nom_fichier_seul_L_comp=os.path.basename(nom_fichier_L_comp)
+    type_fichier_L_comp.set(pathlib.Path(nom_fichier_seul_L_comp).suffix)
+    rep_travail_L_comp = os.path.dirname(nom_fichier_L_comp)
+    liste_fichiers_L_comp=LIBStick_comp_spectres.creation_liste_fichiers(rep_travail_L_comp, type_fichier_L_comp.get())
+    nombre_fichiers_L_comp=len(liste_fichiers_L_comp)    
     lit_affiche_spectre_L_comp()
     bouton_execute_L_comp.configure(state="normal")
-    entree6_L_comp.configure(to=nombre_fichier_L_comp)
+    entree6_L_comp.configure(from_=1, to=nombre_fichiers_L_comp)
+    
+#def choix_rep_L_comp():
+#    global rep_travail_L_comp
+#    global liste_fichiers_L_comp
+#    global nombre_fichier_L_comp
+#    rep_travail_L_comp = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_comp,title='Choisissez un repertoire')
+#    liste_fichiers_L_comp=LIBStick_comp_spectres.creation_liste_fichiers(rep_travail_L_comp, type_fichier_L_comp.get())
+#    nombre_fichier_L_comp=len(liste_fichiers_L_comp)
+#    lit_affiche_spectre_L_comp()
+#    bouton_execute_L_comp.configure(state="normal")
+#    entree6_L_comp.configure(to=nombre_fichier_L_comp)
 
 def lit_affiche_spectre_L_comp():
     global spectre_entier_L_comp 
     global limites_spectre_L_comp
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(liste_fichiers_L_comp[0], type_extension_L_comp.get())
+#    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(liste_fichiers_L_comp[0], type_fichier_L_comp.get())
+    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())    
     limites_spectre_L_comp=lit_limites_abscisses_L_comp(spectre_entier_L_comp)
-    #print (spectre_entier_L_comp)
     affiche_spectre_L_comp()
 
 def lit_limites_abscisses_L_comp(spectre):
@@ -1023,8 +1077,10 @@ def lit_limites_abscisses_L_comp(spectre):
 def execute_scripts_L_comp():
     global DataFrame_resultats_L_comp
     tableau_bornes_L_comp=creation_tab_bornes_L_comp()
-    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, tableau_bornes_L_comp, type_extension_L_comp.get(),
+    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, tableau_bornes_L_comp, flag_traitement_L_comp.get(),
                                 flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
+#    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, tableau_bornes_L_comp, type_traitement_L_comp.get(),
+#                                flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
     global photo
     fichier=rep_travail_L_comp+"/figure.png"
     image_zoom=PIL.Image.open(fichier)    
@@ -1032,11 +1088,17 @@ def execute_scripts_L_comp():
     photo=PIL.ImageTk.PhotoImage(image_zoom)
     canevas1_L_comp.create_image(500 ,100 ,image=photo)
     affiche_tableau_resultats_L_comp()
-    if type_extension_L_comp.get() == "*.tsv" :
+    if flag_stat_L_comp.get() == 0 :
+        texte_statistiques_L_comp.grid_forget()
+    if flag_stat_L_comp.get() == 1 :
         texte_statistiques_L_comp.grid(row=1, column=3, sticky=tkinter.N)
         calcule_moyenne_ecarttype_L_comp()
-    if type_extension_L_comp.get() == "*.mean" :
-        texte_statistiques_L_comp.grid_forget()
+        
+#    if type_traitement_L_comp.get() == "Même échantillon" :
+#        texte_statistiques_L_comp.grid(row=1, column=3, sticky=tkinter.N)
+#        calcule_moyenne_ecarttype_L_comp()
+#    if type_traitement_L_comp.get() == "Echantillons différents" :
+#        texte_statistiques_L_comp.grid_forget()
 
 ###############################################################################
 # 2- fonctions graphiques du caneva du spectre (frame1_L_comp)
@@ -1274,13 +1336,20 @@ def deplace_cible1_L_comp():
 #    canevas1_L_comp.coords(ligne1_hori_L_comp, 0,y1_L_comp,400,y1_L_comp)
     
 def coord1_to_vars_5_6_L_comp(x,y):
+    global spectre_entier_L_comp
     variable_5_L_comp.set(format(limites_spectre_L_comp[0] + (x * (limites_spectre_L_comp[1]-limites_spectre_L_comp[0]) / 1000), "4.1f"))
-    variable_6_L_comp.set(math.ceil(y * nombre_fichier_L_comp / 200))
+    variable_6_L_comp.set(math.ceil(y * nombre_fichiers_L_comp / 200))
+    child_id = tree_resultats_L_comp.get_children()[variable_6_L_comp.get()-1]
+    tree_resultats_L_comp.selection_set(child_id)
+    selection=tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
+    os.chdir(rep_travail_L_comp)
+    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(selection[1], type_fichier_L_comp.get())
+    affiche_spectre_L_comp()
 
 def vars_5_6_to_coord1_L_comp():
     global x1_L_comp,y1_L_comp
     x1_L_comp=round( ((variable_5_L_comp.get()-limites_spectre_L_comp[0])*1000) / (limites_spectre_L_comp[1]-limites_spectre_L_comp[0])) 
-    y1_L_comp= round(200*(variable_6_L_comp.get()-0.5)/nombre_fichier_L_comp)
+    y1_L_comp= round(200*(variable_6_L_comp.get()-0.5)/nombre_fichiers_L_comp)
     deplace_cible1_L_comp()
     
 def vars_5_6_to_coord1_return_L_comp(event):
@@ -1301,13 +1370,11 @@ def affiche_tableau_resultats_L_comp():
         tree_resultats_L_comp.heading(3, text="Rapport zone1/zone2")
         for ligne_tableau in DataFrame_resultats_L_comp.iterrows() :
             ID_L_comp=tree_resultats_L_comp.insert("","end", values=(num_ligne, ligne_tableau[0], DataFrame_resultats_L_comp.iloc[num_ligne-1, 2]))
-            #print(ID)
             num_ligne=num_ligne+1
     if flag_denominateur_L_comp.get() == 0 :
         tree_resultats_L_comp.heading(3, text="Aire zone 1")
         for ligne_tableau in DataFrame_resultats_L_comp.iterrows() :
             ID_L_comp=tree_resultats_L_comp.insert("","end", values=(num_ligne, ligne_tableau[0], DataFrame_resultats_L_comp.iloc[num_ligne-1, 0]))
-            #print(ID)
             num_ligne=num_ligne+1
         
 def efface_tableau_resultats_L_comp():
@@ -1315,26 +1382,33 @@ def efface_tableau_resultats_L_comp():
         tree_resultats_L_comp.delete(i)
 
 def selectionne_spectre_L_comp(event):
+    global spectre_entier_L_comp
     selection=tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
     variable_6_L_comp.set(selection[0])
     vars_5_6_to_coord1_L_comp()
+    os.chdir(rep_travail_L_comp)
+    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(selection[1], type_fichier_L_comp.get())
+    affiche_spectre_L_comp()
 
 def calcule_moyenne_ecarttype_L_comp() :
     if flag_denominateur_L_comp.get() == 1 :
+        median_L_comp=DataFrame_resultats_L_comp["Rapport"].median()
         moyenne_L_comp=DataFrame_resultats_L_comp["Rapport"].mean()
         ecarttype_L_comp=DataFrame_resultats_L_comp["Rapport"].std()
         min_L_comp=DataFrame_resultats_L_comp["Rapport"].min()
         max_L_comp=DataFrame_resultats_L_comp["Rapport"].max()
     if flag_denominateur_L_comp.get() == 0 :
+        median_L_comp=DataFrame_resultats_L_comp["Somme zone 1"].median()
         moyenne_L_comp=DataFrame_resultats_L_comp["Somme zone 1"].mean()
         ecarttype_L_comp=DataFrame_resultats_L_comp["Somme zone 1"].std()
         min_L_comp=DataFrame_resultats_L_comp["Somme zone 1"].min()
         max_L_comp=DataFrame_resultats_L_comp["Somme zone 1"].max()
+    texte_median="Median :\n" +str(format(median_L_comp, "3.4f"))
     texte_moyenne= "Moyenne :\n" + str(format(moyenne_L_comp, "3.4f"))
     texte_ecarttype= "Ecart type :\n" + str(format(ecarttype_L_comp,"3.4f"))
     texte_min= "Minimum :\n" +  str(format(min_L_comp,"3.4f"))
     texte_max= "Maximum :\n" +  str(format(max_L_comp,"3.4f"))
-    texte_statistiques_L_comp.configure(text= texte_moyenne +"\n\n"+texte_ecarttype +"\n\n"+ texte_min +"\n\n"+ texte_max)
+    texte_statistiques_L_comp.configure(text= texte_median +"\n" +texte_moyenne +"\n"+texte_ecarttype +"\n"+ texte_min +"\n"+ texte_max)
 
 
 
@@ -1386,7 +1460,6 @@ def affiches_lignes_element_L_ele(DataFrame_element_L_ele, limites_affichage_spe
             delta_limites= limites_affichage_spectre[1]-limites_affichage_spectre[0]
             long_onde=ligne_tableau[2]
             intensite_relative=ligne_tableau[5]
-            #print (intensite_relative)
             if intensite_relative >= 10 and flag_sup10_L_ele.get() == 1 :
                 #affiche_ligne_element(long_onde, canevas0_L_ext)
                 x_ligne=((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
@@ -1536,7 +1609,7 @@ class case_classification(tkinter.Button) :
 # 7- Interface graphique : création fenêtre principale avec scrolls et onglets
 ###############################################################################
 fenetre_principale=tkinter.Tk()
-fenetre_principale.title("LIBStick v1.0")
+fenetre_principale.title("LIBStick v1.1")
 fenetre_principale.geometry("1150x850+100+50")
 fenetre_principale.maxsize(width=1160, height=850)
 
@@ -1584,19 +1657,19 @@ menu_fichier.add_command(label="Restaure les paramètres par défaut au prochain
 menu_fichier.add_command(label="Quitter", command=fenetre_principale.quit)
 
 barre_menus.add_cascade(label="Traitement", menu=menu_traitement)
-type_fichier_L_trait=tkinter.StringVar(value="IVEA")
-menu_traitement.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_trait)
-menu_traitement.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_trait)
+#type_fichier_L_trait=tkinter.StringVar(value="IVEA")
+#menu_traitement.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_trait, state="disable")
+#menu_traitement.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_trait, state="disable")
 
 barre_menus.add_cascade(label="Extraction", menu=menu_extraction)
-type_fichier_L_ext=tkinter.StringVar(value="IVEA")
-menu_extraction.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_ext)
-menu_extraction.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_ext)
+#type_fichier_L_ext=tkinter.StringVar(value="IVEA")
+#menu_extraction.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_ext)
+#menu_extraction.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_ext)
 
 barre_menus.add_cascade(label="Comparaison", menu=menu_comparaison)
-type_fichier_L_comp=tkinter.StringVar(value="LIBStick")
-menu_comparaison.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_comp)
-menu_comparaison.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_comp)
+#type_fichier_L_comp=tkinter.StringVar(value="LIBStick")
+#menu_comparaison.add_radiobutton(label="LIBS IVEA (*.asc)", value="IVEA", variable=type_fichier_L_comp, state="disable")
+#menu_comparaison.add_radiobutton(label="LIBStick (*.tsv)", value="LIBStick", variable=type_fichier_L_comp, state="disable")
 
 fenetre_principale.config(menu=barre_menus)
 
@@ -1705,6 +1778,7 @@ entree_zoom_sup_L_trait=tkinter.Spinbox(frame1_1_L_trait, from_=198, to=1013, in
 entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tkinter.N)
 entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tkinter.N)
 
+type_fichier_L_trait=tkinter.StringVar(value=".asc")
 bouton_rep_L_trait=tkinter.Button(frame1_1_L_trait, text="Fichier",
                                   command=choix_fichier_L_trait, width=9, bg=couleur_interface)
 bouton_visualisation_L_trait=tkinter.Button(frame1_1_L_trait, text="Visualisation",
@@ -1730,9 +1804,9 @@ frame2_1_L_trait.grid(row=1, column=5, rowspan=3, sticky=tkinter.N)
 
 flag_tous_fichiers_init_L_trait=False
 flag_tous_fichiers_L_trait=tkinter.BooleanVar(value=flag_tous_fichiers_init_L_trait)
-coche_image_brute_L_ext=tkinter.Checkbutton(frame2_1_L_trait, text="Appliquer sur\ntous les fichiers\ndu répertoire",
+coche_image_brute_L_trait=tkinter.Checkbutton(frame2_1_L_trait, text="Appliquer sur\ntous les fichiers\ndu répertoire",
                                             variable=flag_tous_fichiers_L_trait, bg=couleur_interface)
-coche_image_brute_L_ext.grid(row=1, column=1)
+coche_image_brute_L_trait.grid(row=1, column=1)
 
 bouton_execute_L_trait=tkinter.Button(frame2_1_L_trait, text="Executer", state="disable",
                                       command = execute_L_trait , width=9, bg=couleur_interface)
@@ -1856,7 +1930,9 @@ entree_zoom_sup_L_ext=tkinter.Spinbox(frame1_1_L_ext, from_=198, to=1013, increm
 entree_zoom_inf_L_ext.grid(row=2, column=1)
 entree_zoom_sup_L_ext.grid(row=3, column=1)
 
-bouton_rep_L_ext=tkinter.Button(frame1_1_L_ext, text="Repertoire\nde travail" ,command=choix_rep_L_ext, width=9, bg=couleur_interface)
+type_fichier_L_ext=tkinter.StringVar(value=".asc")
+#bouton_rep_L_ext=tkinter.Button(frame1_1_L_ext, text="Repertoire\nde travail" ,command=choix_rep_L_ext, width=9, bg=couleur_interface)
+bouton_rep_L_ext=tkinter.Button(frame1_1_L_ext, text="Fichier" ,command=choix_fichier_L_ext, width=9, bg=couleur_interface)
 bouton_execute_L_ext=tkinter.Button(frame1_1_L_ext, text="Exécute", command=execute_scripts_L_ext, state="disable", width=9, bg=couleur_interface)
 bouton_rep_L_ext.grid(row=4, column=1)
 bouton_execute_L_ext.grid(row=5, column=1)
@@ -2079,7 +2155,9 @@ entree_zoom_sup_L_comp=tkinter.Spinbox(frame1_1_L_comp, from_=198, to=1013, incr
 entree_zoom_inf_L_comp.grid(row=2, column=1)
 entree_zoom_sup_L_comp.grid(row=3, column=1)
 
-bouton_rep_L_comp=tkinter.Button(frame1_1_L_comp, text="Repertoire\nde travail" ,command=choix_rep_L_comp, width=9, bg=couleur_interface)
+type_fichier_L_comp=tkinter.StringVar(value=".mean")
+#bouton_rep_L_comp=tkinter.Button(frame1_1_L_comp, text="Repertoire\nde travail" ,command=choix_rep_L_comp, width=9, bg=couleur_interface)
+bouton_rep_L_comp=tkinter.Button(frame1_1_L_comp, text="Fichier" ,command=choix_fichier_L_comp, width=9, bg=couleur_interface)
 bouton_execute_L_comp=tkinter.Button(frame1_1_L_comp, text="Exécute", command=execute_scripts_L_comp, state="disable", width=9, bg=couleur_interface)
 bouton_rep_L_comp.grid(row=4, column=1)
 bouton_execute_L_comp.grid(row=5, column=1)
@@ -2119,15 +2197,23 @@ text6_L_comp.grid(row=3, column=2)
 frame2_2_L_comp=tkinter.Frame(frame2_L_comp)
 frame2_2_L_comp.grid(row=1, column=5, rowspan=3, sticky=tkinter.N)
 
-text7_L_comp=tkinter.Label(frame2_2_L_comp, text="Type de\nfichiers à\ncomparer :")
-text7_L_comp.grid(row=1, column=1)
+#text7_L_comp=tkinter.Label(frame2_2_L_comp, text="Type de\nfichiers à\ncomparer :")
+#text7_L_comp.grid(row=1, column=1)
 
-type_extension_L_comp=tkinter.StringVar(value="*.tsv")
-type_extension_combobox_L_comp=tkinter.ttk.Combobox(frame2_2_L_comp, textvariable=type_extension_L_comp, width=10, values=["*.mean", "*.tsv"])
-type_extension_combobox_L_comp.grid(row=2, column=1)
+flag_traitement_L_comp=tkinter.IntVar(value=flag_traitement_init_L_comp)
+coche_traitement_L_comp=tkinter.Checkbutton(frame2_2_L_comp, text="Normalisation\ndes spectres", variable=flag_traitement_L_comp, bg=couleur_interface)
+coche_traitement_L_comp.grid(row=1, column=1)
 
-text8_L_comp=tkinter.Label(frame2_2_L_comp, text="\n*.mean :\nspectres moyens\nd'échantillons\ndifférents\n\n*.tsv :\nspectres du même\néchantillon")
-text8_L_comp.grid(row=3, column=1)
+#type_traitement_L_comp=tkinter.StringVar(value="Echantillons différents")
+#type_traitement_combobox_L_comp=tkinter.ttk.Combobox(frame2_2_L_comp, textvariable=type_traitement_L_comp, width=10, values=["Echantillons différents", "Même échantillon"])
+#type_traitement_combobox_L_comp.grid(row=2, column=1)
+
+#text8_L_comp=tkinter.Label(frame2_2_L_comp, text="\nEchantillons différents :\nspectres moyens\nd'échantillons\ndifférents\n\nMême échantillon :\nspectres du même\néchantillon")
+#text8_L_comp.grid(row=3, column=1)
+
+flag_stat_L_comp=tkinter.IntVar(value=flag_stat_init_L_comp)
+coche_stat_L_comp=tkinter.Checkbutton(frame2_2_L_comp, text="Statistiques", variable=flag_stat_L_comp, bg=couleur_interface)
+coche_stat_L_comp.grid(row=2, column=1)
 
 ligne1_vert_L_comp=canevas1_L_comp.create_line(x1_L_comp,0,x1_L_comp,200, fill="white")
 ligne1_hori_L_comp=canevas1_L_comp.create_line(0,y1_L_comp,500,y1_L_comp, fill="white")
@@ -2198,7 +2284,8 @@ entree5_L_comp.bind("<Tab>", vars_5_6_to_coord1_return_L_comp)
 entree6_L_comp.bind("<Tab>", vars_5_6_to_coord1_return_L_comp)
 
 tree_resultats_L_comp.bind("<ButtonRelease-1>", selectionne_spectre_L_comp)
-
+tree_resultats_L_comp.bind("<Up>", selectionne_spectre_L_comp)
+tree_resultats_L_comp.bind("<Down>", selectionne_spectre_L_comp)
 
 
 
@@ -2207,6 +2294,8 @@ tree_resultats_L_comp.bind("<ButtonRelease-1>", selectionne_spectre_L_comp)
 ###############################################################################
 # Interface graphique LIBStick : classification périodique
 ###############################################################################
+###############################################################################
+def __________IHM_tableau_periodique__________():pass
 ###############################################################################
 flag_neutres_ions_L_ele=tkinter.IntVar(value=1)
 
@@ -2223,7 +2312,7 @@ flag_inf1_L_ele=tkinter.IntVar(value=0)
 # LIBStick : interface principale
 ###############################################################################
 ###############################################################################
-
+def __________IHM_divers__________():pass
 ###############################################################################
 #  Interface graphique : gestion du redimentionnement de la fenêtre principale
 ###############################################################################

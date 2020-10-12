@@ -29,11 +29,11 @@ sys.path.insert(0,"./dossier_mes_modules/")
 def creation_liste_fichiers(rep_travail, type_fichier):
     os.chdir(rep_travail)
     liste=[]
-    if type_fichier == "IVEA" :
+    if type_fichier == ".asc" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-3:] == "asc") :
                 liste.append(fichier)
-    if type_fichier == "LIBStick" :
+    if type_fichier == ".tsv" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-3:] == "tsv") :
                 liste.append(fichier)
@@ -57,13 +57,13 @@ def lit_fichier(fichier, bas, haut, type_fichier):
     return document_tronc
 
 def lit_spectre(fichier, type_fichier):
-    if type_fichier == "IVEA" :
+    if type_fichier == ".asc" :
         document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
         spectre=numpy.zeros((0,2))
         for ligne in document :
             if (ligne[0]<=1013) :
                 spectre=numpy.row_stack((spectre,ligne))
-    if type_fichier == "LIBStick" :
+    if type_fichier == ".tsv" :
         spectre=numpy.loadtxt(fichier,delimiter="\t",usecols=[0,1],dtype=float,encoding="Latin-1")
     return spectre
 
@@ -89,7 +89,7 @@ def creation_sous_repertoire(rep_travail,tableau_bornes, flag_zone2):
 ###############################################################################
 def enregistre_fichier(document,repertoire,nom_fichier):
     os.chdir(repertoire)
-    nom_fichier=nom_fichier[0:-4] + "_" + repertoire[-7:] +".tsv"
+    nom_fichier=nom_fichier[0:-4] + "_" + repertoire[-11:] +".tsv"
     numpy.savetxt(nom_fichier,document, delimiter="\t")
      
 ###############################################################################

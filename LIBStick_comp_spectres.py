@@ -21,29 +21,40 @@ def repertoire_de_travail(rep_script,rep_travail_relatif):
     rep_travail=rep_script+"/"+rep_travail_relatif
     return rep_travail
 
-def creation_liste_fichiers(rep_travail,type_extension):
+def creation_liste_fichiers(rep_travail,type_fichier):
     os.chdir(rep_travail)
     liste=[]
-    if type_extension == "*.mean" :
+    if type_fichier == ".mean" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-4:] == "mean") :
                 liste.append(fichier)
-    if type_extension == "*.tsv" :
+    if type_fichier == ".tsv" :
         for fichier in os.listdir():
             if (os.path.isfile(fichier) and fichier[-3:] == "tsv") :
+                liste.append(fichier)
+    if type_fichier == ".asc" :
+        for fichier in os.listdir():
+            if (os.path.isfile(fichier) and fichier[-3:] == "asc") :
                 liste.append(fichier)
     liste.sort()
     return liste
 
-def lit_spectre(fichier,type_extension):
-    if type_extension == "*.mean" :
+def lit_spectre(fichier,type_fichier):
+    if type_fichier == ".mean" :
         spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
-    if type_extension == "*.tsv" :
+    if type_fichier == ".tsv" :
         spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
+    if type_fichier == ".asc" :
+        document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
+        spectre=numpy.zeros((0,2))
+        for ligne in document :
+            if (ligne[0]<=1013) :
+                spectre=numpy.row_stack((spectre,ligne))
     return spectre
 
-def creer_tableau(liste,type_extension):
-    if type_extension == "*.mean" :
+def creer_tableau(liste,type_traitement):
+#    if type_traitement == "Echantillons différents" :
+    if type_traitement == 0 :   # On ne normalise pas les spectres
         i=0
         for nom_fichier in liste :
             if i==0 :
@@ -55,7 +66,8 @@ def creer_tableau(liste,type_extension):
                 fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
                 tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
             i=i+1
-    if type_extension == "*.tsv" :
+#    if type_traitement == "Même échantillon" :
+    if type_traitement == 1 :   # On normalise tous les spectres
         i=0
         for nom_fichier in liste :
             if i==0 :
@@ -76,7 +88,7 @@ def normalise_tableau_aire(tableau):
         tableau[ligne,:] = (tableau[ligne,:] - minimum)
         aire=tableau[ligne,:].sum()
         tableau[ligne,:] = (tableau[ligne,:] /aire)
-    tableau=tableau/tableau.max()
+    #tableau=tableau/tableau.max() #A ne pas faire car dépend de la liste à un instant t !!!
     return tableau
 
 def creer_DataFrame(tableau_comparatif,liste,tableau_abscisses):
@@ -104,7 +116,7 @@ def Convertir_Dataframe_tableau(DataFrame_comparatif):
 
 def enregistre_DataFrame_resultats(DataFrame_resultats):
     DataFrame_resultats.to_csv("Resultat_fichiers_classes.csv")
-    DataFrame_resultats.to_csv("Resultat_fichiers_classes.txt", sep='\t')
+    DataFrame_resultats.to_csv("Resultat_fichiers_classes.txt", sep='\t', decimal=",")
 
 ###############################################################################
 # 2- fonction d'affichage graphique du tableau de résultats
@@ -119,8 +131,6 @@ def graphique_creation(tableau8bits,nom_echantillon,limites_spectre):
     fig, ax=plt.subplots()
     #plt.imshow(tableau8bits, cmap="gray", extent=[limites_spectre[0],limites_spectre[1],tableau8bits.shape[0],0], aspect="auto")
     plt.imshow(tableau8bits, cmap="inferno", extent=[limites_spectre[0],limites_spectre[1],tableau8bits.shape[0],0], aspect="auto")
-    #print(tableau8bits.shape[0])
-    #print(tableau8bits.shape[1])
     
     #imageplot=plt.imshow(tableau8bits, cmap="hot")
     #imageplot=plt.imshow(tableau8bits, cmap="nipy_spectral")
@@ -167,9 +177,9 @@ def graphique_lit_tableau():
 ###############################################################################
 # programme principal
 ###############################################################################
-def main(rep_travail, liste_fichiers, tableau_bornes,type_extension,flag_denominateur, flag_2D, flag_3D):
+def main(rep_travail, liste_fichiers, tableau_bornes,type_traitement,flag_denominateur, flag_2D, flag_3D):
     os.chdir(rep_travail)
-    tableau_comparatif, tableau_abscisses = creer_tableau(liste_fichiers,type_extension)
+    tableau_comparatif, tableau_abscisses = creer_tableau(liste_fichiers,type_traitement)
     DataFrame_comparatif=creer_DataFrame(tableau_comparatif,liste_fichiers,tableau_abscisses)
     limites_zone1[0]=tableau_bornes[0,0]
     limites_zone1[1]=tableau_bornes[0,1]
