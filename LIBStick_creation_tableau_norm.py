@@ -69,7 +69,7 @@ def creer_tableau_abscisses(liste):
     fichier0=numpy.loadtxt(liste[0], delimiter="\t", usecols=[0])
     tableau_abscisses=numpy.zeros((fichier0.shape[0],0))
     tableau_abscisses=numpy.column_stack((tableau_abscisses,fichier0))
-    print(tableau_abscisses)
+#    print(tableau_abscisses)
     return tableau_abscisses
     
 ###############################################################################
@@ -101,6 +101,15 @@ def enregistre_tableau_abscisses(tableau_abscisses):
 ###############################################################################
 # 5- fonctions qui affiche et sauvegarde des graphes
 ###############################################################################
+def tableau_brut_transpose_256gris(tableau_brut):
+    tableau8bits_brut=tableau_brut*255
+    tableau8bits_brut=tableau8bits_brut.transpose()
+    tableau8bits_brut=tableau8bits_brut.astype(int) 
+    return tableau8bits_brut
+
+def graphique_brut_sauvegarde(tableau8bits_brut) :
+    plt.imsave("figure_brute.png",tableau8bits_brut, cmap="inferno")
+
 def tableau_transpose_256gris(tableau_norm):
     tableau8bits=tableau_norm*255
     tableau8bits=tableau8bits.transpose()
@@ -112,8 +121,8 @@ def graphique_creation(tableau8bits,nom_echantillon,bornes):
     fig, ax=plt.subplots()
     #plt.imshow(tableau8bits, cmap="gray", extent=[bornes[0],bornes[1],tableau8bits.shape[0],0], aspect="auto")
     plt.imshow(tableau8bits, cmap="inferno", extent=[bornes[0],bornes[1],tableau8bits.shape[0],0], aspect="auto")
-    print(tableau8bits.shape[0])
-    print(tableau8bits.shape[1])
+#    print(tableau8bits.shape[0])
+#    print(tableau8bits.shape[1])
     #imageplot=plt.imshow(tableau8bits, cmap="hot")
     #imageplot=plt.imshow(tableau8bits, cmap="nipy_spectral")
     #plt.colorbar()
@@ -158,17 +167,23 @@ def graphique_sauvegarde(tableau8bits) :
 def main (rep_travail,nom_echantillon,bornes) :
     global tableau_norm
     liste_fichiers=creation_liste_fichiers(rep_travail)
+    
     tableau_abscisses=creer_tableau_abscisses(liste_fichiers)
     enregistre_tableau_abscisses(tableau_abscisses)
-    tableau=creer_tableau(liste_fichiers)
-    tableau_norm=normalise_tableau_aire(tableau)
+    
+    tableau_brut=creer_tableau(liste_fichiers)
+    tableau8bits_brut=tableau_brut_transpose_256gris(tableau_brut)
+    graphique_brut_sauvegarde(tableau8bits_brut)
+    
+    tableau_norm=normalise_tableau_aire(tableau_brut)
     enregistre_fichier(tableau_norm,"tableau_normalisé.txt")
     enregistre_fichier_virgule(tableau_norm,"tableau_normalisé_virgules.txt")
-    tableau8bits=tableau_transpose_256gris(tableau_norm)
-    graphique_sauvegarde(tableau8bits)
+    tableau8bits_norm=tableau_transpose_256gris(tableau_norm)
+    graphique_sauvegarde(tableau8bits_norm)
+    
     if LIBStick_echange_vars.L_ext_flag_2D :
-        graphique_creation(tableau8bits,nom_echantillon,bornes)
+        graphique_creation(tableau8bits_norm,nom_echantillon,bornes)
     if LIBStick_echange_vars.L_ext_flag_3D == 1 :
-        graphique_3D_creation(tableau8bits,nom_echantillon,bornes)   
+        graphique_3D_creation(tableau8bits_norm,nom_echantillon,bornes)   
 
 

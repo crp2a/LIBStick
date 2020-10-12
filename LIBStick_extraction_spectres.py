@@ -87,8 +87,8 @@ def enregistre_fichier(document,repertoire,nom_fichier):
 ###############################################################################
 def main(rep_travail, tableau_bornes) :
     rep_script=os.getcwd()
-    print ("Flag 2 spectre : ")
-    print (LIBStick_echange_vars.L_ext_flag_zone2)
+#    print ("Flag 2 spectre : ")
+#    print (LIBStick_echange_vars.L_ext_flag_zone2)
     if LIBStick_echange_vars.L_ext_flag_zone2 == 0 :
         tableau_bornes=numpy.delete(tableau_bornes, (1), axis=0)
     creation_sous_repertoire(rep_travail,tableau_bornes)

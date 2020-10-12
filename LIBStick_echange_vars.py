@@ -44,3 +44,11 @@ L_comp_flag_denominateur=1
 L_comp_limites_spectre=[]
 L_comp_DataFrame_resultats=pandas.DataFrame()
 
+
+###############################################################################
+# 3- variables pour LIBStick_tableau_periodique
+###############################################################################
+tableau_periodique_ouvert= False
+DataFrame_element=pandas.DataFrame()
+L_ele_symbole=""
+

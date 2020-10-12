@@ -1,0 +1,119 @@
+Z	Symbole	Nom francais	Nom anglais	ligne	colonne	Masse atomique	couleur bloc	Type
+1	H	Hydrogène	Hydrogen	1	1	1.007	light blue	Nonmetal
+2	He	Hélium	Helium	1	18	4.002	light blue	Noble Gas
+3	Li	Lithium	Lithium	2	1	6.941	light blue	Alkali Metal
+4	Be	Béryllium	Beryllium	2	2	9.012	light blue	Alkaline Earth Metal
+5	B	Bore	Boron	2	13	10.811	DarkSeaGreen1	Metalloid
+6	C	Carbone	Carbon	2	14	12.011	DarkSeaGreen1	Nonmetal
+7	N	Azote	Nitrogen	2	15	14.007	DarkSeaGreen1	Nonmetal
+8	O	Oxygène	Oxygen	2	16	15.999	DarkSeaGreen1	Nonmetal
+9	F	Fluor	Fluorine	2	17	18.998	DarkSeaGreen1	Halogen
+10	Ne	Néon	Neon	2	18	20.18	DarkSeaGreen1	Noble Gas
+11	Na	Sodium	Sodium	3	1	22.99	light blue	Alkali Metal
+12	Mg	Magnésium	Magnesium	3	2	24.305	light blue	Alkaline Earth Metal
+13	Al	Aluminium	Aluminum	3	13	26.982	DarkSeaGreen1	Metal
+14	Si	Silicium	Silicon	3	14	28.086	DarkSeaGreen1	Metalloid
+15	P	Phosphore	Phosphorus	3	15	30.974	DarkSeaGreen1	Nonmetal
+16	S	Soufre	Sulfur	3	16	32.065	DarkSeaGreen1	Nonmetal
+17	Cl	Chlore	Chlorine	3	17	35.453	DarkSeaGreen1	Halogen
+18	Ar	Argon	Argon	3	18	39.948	DarkSeaGreen1	Noble Gas
+19	K	Potassium	Potassium	4	1	39.098	light blue	Alkali Metal
+20	Ca	Calcium	Calcium	4	2	40.078	light blue	Alkaline Earth Metal
+21	Sc	Scandium	Scandium	4	3	44.956	light yellow	Transition Metal
+22	Ti	Titane	Titanium	4	4	47.867	light yellow	Transition Metal
+23	V	Vanadium	Vanadium	4	5	50.942	light yellow	Transition Metal
+24	Cr	Chrome	Chromium	4	6	51.996	light yellow	Transition Metal
+25	Mn	Manganèse	Manganese	4	7	54.938	light yellow	Transition Metal
+26	Fe	Fer	Iron	4	8	55.845	light yellow	Transition Metal
+27	Co	Cobalt	Cobalt	4	9	58.933	light yellow	Transition Metal
+28	Ni	Nickel	Nickel	4	10	58.693	light yellow	Transition Metal
+29	Cu	Cuivre	Copper	4	11	63.546	light yellow	Transition Metal
+30	Zn	Zinc	Zinc	4	12	65.38	light yellow	Transition Metal
+31	Ga	Gallium	Gallium	4	13	69.723	DarkSeaGreen1	Metal
+32	Ge	Germanium	Germanium	4	14	72.64	DarkSeaGreen1	Metalloid
+33	As	Arsenic	Arsenic	4	15	74.922	DarkSeaGreen1	Metalloid
+34	Se	Sélénium	Selenium	4	16	78.96	DarkSeaGreen1	Nonmetal
+35	Br	Brome	Bromine	4	17	79.904	DarkSeaGreen1	Halogen
+36	Kr	Krypton	Krypton	4	18	83.798	DarkSeaGreen1	Noble Gas
+37	Rb	Rubidium	Rubidium	5	1	85.468	light blue	Alkali Metal
+38	Sr	Strontium	Strontium	5	2	87.62	light blue	Alkaline Earth Metal
+39	Y	Yttrium	Yttrium	5	3	88.906	light yellow	Transition Metal
+40	Zr	Zirconium	Zirconium	5	4	91.224	light yellow	Transition Metal
+41	Nb	Niobium	Niobium	5	5	92.906	light yellow	Transition Metal
+42	Mo	Molybdène	Molybdenum	5	6	95.96	light yellow	Transition Metal
+43	Tc	Technétium	Technetium	5	7	98	light yellow	Transition Metal
+44	Ru	Ruthénium	Ruthenium	5	8	101.07	light yellow	Transition Metal
+45	Rh	Rhodium	Rhodium	5	9	102.906	light yellow	Transition Metal
+46	Pd	Palladium	Palladium	5	10	106.42	light yellow	Transition Metal
+47	Ag	Argent	Silver	5	11	107.868	light yellow	Transition Metal
+48	Cd	Cadmium	Cadmium	5	12	112.411	light yellow	Transition Metal
+49	In	Indium	Indium	5	13	114.818	DarkSeaGreen1	Metal
+50	Sn	Étain	Tin	5	14	118.71	DarkSeaGreen1	Metal
+51	Sb	Antimoine	Antimony	5	15	121.76	DarkSeaGreen1	Metalloid
+52	Te	Tellure	Tellurium	5	16	127.6	DarkSeaGreen1	Metalloid
+53	I	Iode	Iodine	5	17	126.904	DarkSeaGreen1	Halogen
+54	Xe	Xénon	Xenon	5	18	131.293	DarkSeaGreen1	Noble Gas
+55	Cs	Césium	Cesium	6	1	132.905	light blue	Alkali Metal
+56	Ba	Baryum	Barium	6	2	137.327	light blue	Alkaline Earth Metal
+57	La	Lanthane	Lanthanum	6	3	138.905	pink	Lanthanide
+58	Ce	Cérium	Cerium	8	4	140.116	pink	Lanthanide
+59	Pr	Praséodyme	Praseodymium	8	5	140.908	pink	Lanthanide
+60	Nd	Néodyme	Neodymium	8	6	144.242	pink	Lanthanide
+61	Pm	Prométhium	Promethium	8	7	145	pink	Lanthanide
+62	Sm	Samarium	Samarium	8	8	150.36	pink	Lanthanide
+63	Eu	Europium	Europium	8	9	151.964	pink	Lanthanide
+64	Gd	Gadolinium	Gadolinium	8	10	157.25	pink	Lanthanide
+65	Tb	Terbium	Terbium	8	11	158.925	pink	Lanthanide
+66	Dy	Dysprosium	Dysprosium	8	12	162.5	pink	Lanthanide
+67	Ho	Holmium	Holmium	8	13	164.93	pink	Lanthanide
+68	Er	Erbium	Erbium	8	14	167.259	pink	Lanthanide
+69	Tm	Thulium	Thulium	8	15	168.934	pink	Lanthanide
+70	Yb	Ytterbium	Ytterbium	8	16	173.054	pink	Lanthanide
+71	Lu	Lutécium	Lutetium	8	17	174.967	pink	Lanthanide
+72	Hf	Hafnium	Hafnium	6	4	178.49	light yellow	Transition Metal
+73	Ta	Tantale	Tantalum	6	5	180.948	light yellow	Transition Metal
+74	W	Tungstène	Wolfram	6	6	183.84	light yellow	Transition Metal
+75	Re	Rhénium	Rhenium	6	7	186.207	light yellow	Transition Metal
+76	Os	Osmium	Osmium	6	8	190.23	light yellow	Transition Metal
+77	Ir	Iridium	Iridium	6	9	192.217	light yellow	Transition Metal
+78	Pt	Platine	Platinum	6	10	195.084	light yellow	Transition Metal
+79	Au	Or	Gold	6	11	196.967	light yellow	Transition Metal
+80	Hg	Mercure	Mercury	6	12	200.59	light yellow	Transition Metal
+81	Tl	Thallium	Thallium	6	13	204.383	DarkSeaGreen1	Metal
+82	Pb	Plomb	Lead	6	14	207.2	DarkSeaGreen1	Metal
+83	Bi	Bismuth	Bismuth	6	15	208.98	DarkSeaGreen1	Metal
+84	Po	Polonium	Polonium	6	16	210	DarkSeaGreen1	Metalloid
+85	At	Astate	Astatine	6	17	210	DarkSeaGreen1	Noble Gas
+86	Rn	Radon	Radon	6	18	222	DarkSeaGreen1	Alkali Metal
+87	Fr	Francium	Francium	7	1	223	light blue	Alkaline Earth Metal
+88	Ra	Radium	Radium	7	2	226	light blue	Actinide
+89	Ac	Actinium	Actinium	7	3	227	pink	Actinide
+90	Th	Thorium	Thorium	9	4	232.038	pink	Actinide
+91	Pa	Protactinium	Protactinium	9	5	231.036	pink	Actinide
+92	U	Uranium	Uranium	9	6	238.029	pink	Actinide
+93	Np	Neptunium	Neptunium	9	7	237	pink	Actinide
+94	Pu	Plutonium	Plutonium	9	8	244	pink	Actinide
+95	Am	Américium	Americium	9	9	243	pink	Actinide
+96	Cm	Curium	Curium	9	10	247	pink	Actinide
+97	Bk	Berkélium	Berkelium	9	11	247	pink	Actinide
+98	Cf	Californium	Californium	9	12	251	pink	Actinide
+99	Es	Einsteinium	Einsteinium	9	13	252	pink	Actinide
+100	Fm	Fermium	Fermium	9	14	257	pink	Actinide
+101	Md	Mendélévium	Mendelevium	9	15	258	pink	Actinide
+102	No	Nobélium	Nobelium	9	16	259	pink	Actinide
+103	Lr	Lawrencium	Lawrencium	9	17	262	pink	Actinide
+104	Rf	Rutherfordium	Rutherfordium	7	4	261	light yellow	Transactinide
+105	Db	Dubnium	Dubnium	7	5	262	light yellow	Transactinide
+106	Sg	Seaborgium	Seaborgium	7	6	266	light yellow	Transactinide
+107	Bh	Bohrium	Bohrium	7	7	264	light yellow	Transactinide
+108	Hs	Hassium	Hassium	7	8	267	light yellow	Transactinide
+109	Mt	Meitnérium	Meitnerium	7	9	268	light yellow	Transactinide
+110	Ds 	Darmstadtium	Darmstadtium 	7	10	271	light yellow	Transactinide
+111	Rg 	Roentgenium	Roentgenium 	7	11	272	light yellow	Transactinide
+112	Cn 	Copernicium	Copernicium 	7	12	285	light yellow	Transactinide
+113	Nh	Ununtrium	Nihonium	7	13	284	DarkSeaGreen1	
+114	Fl	Flérovium	Flerovium	7	14	289	DarkSeaGreen1	Transactinide
+115	Mc	Ununpentium	Moscovium	7	15	288	DarkSeaGreen1	
+116	Lv	Livermorium	Livermorium	7	16	292	DarkSeaGreen1	Transactinide
+117	Ts	Ununseptium	Tennessine	7	17	295	DarkSeaGreen1	
+118	Og	Ununoctium	Oganesson	7	18	294	DarkSeaGreen1	Noble Gas
