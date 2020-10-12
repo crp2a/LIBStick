@@ -47,41 +47,56 @@ def creation_liste_fichiers(rep_travail):
 # 2- fonction qui ouvre chaque fichier de la liste, sépare les données en liste de listes,
 #    extrait la seconde colonne et l'ajoute à un tableau numpy
 ###############################################################################
-def creer_tableau(liste):
+def creer_tableau_avec_x(liste):
     i=0
     for fichier in liste :
         if i==0 :
-            fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
+            fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[0])
             tableau=numpy.zeros((fentree.shape[0],0))
+            tableau=numpy.column_stack((tableau,fentree))
+            fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
             tableau=numpy.column_stack((tableau,fentree))
         else :
             fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
             tableau=numpy.column_stack((tableau,fentree))
         i=i+1
-    return tableau
+    return tableau    
 
-def creer_tableau_abscisses(liste):
-    fichier0=numpy.loadtxt(liste[0], delimiter="\t", usecols=[0])
-    tableau_abscisses=numpy.zeros((fichier0.shape[0],0))
-    tableau_abscisses=numpy.column_stack((tableau_abscisses,fichier0))
-    return tableau_abscisses
+#def creer_tableau_sans_x(liste):
+#    i=0
+#    for fichier in liste :
+#        if i==0 :
+#            fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
+#            tableau=numpy.zeros((fentree.shape[0],0))
+#            tableau=numpy.column_stack((tableau,fentree))
+#        else :
+#            fentree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
+#            tableau=numpy.column_stack((tableau,fentree))
+#        i=i+1
+#    return tableau
+
+#def creer_tableau_abscisses(liste):
+#    fichier0=numpy.loadtxt(liste[0], delimiter="\t", usecols=[0])
+#    tableau_abscisses=numpy.zeros((fichier0.shape[0],0))
+#    tableau_abscisses=numpy.column_stack((tableau_abscisses,fichier0))
+#    return tableau_abscisses
     
 ###############################################################################
 # 3- fonction normalise les colonnes du tableau
 ###############################################################################
 def normalise_tableau_aire(tableau):
-    for colonne in range(tableau.shape[1]):
+    for colonne in range(1,tableau.shape[1]):
         minimum=tableau[:,colonne].min()
         tableau[:,colonne] = (tableau[:,colonne] - minimum)
         aire=tableau[:,colonne].sum()
         tableau[:,colonne] = (tableau[:,colonne] /aire)
-    tableau=tableau/tableau.max()
+    tableau[:,1:]=tableau[:,1:]/tableau[:,1:].max()
     return tableau
         
 ###############################################################################
 # 4- fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###############################################################################
-def enregistre_fichier(tableau,nom_fichier):
+def enregistre_fichier_point(tableau,nom_fichier):
     numpy.savetxt(nom_fichier,tableau,delimiter="\t", newline="\n")
     
 def enregistre_fichier_virgule(tableau,nom_fichier):
@@ -89,14 +104,12 @@ def enregistre_fichier_virgule(tableau,nom_fichier):
     tableau=numpy.char.replace(tableau, ".", ",")
     numpy.savetxt(nom_fichier,tableau,delimiter="\t", newline="\n", fmt="%s")
     
-def enregistre_tableau_abscisses(tableau_abscisses):
-    numpy.savetxt("tableau_abscisses.txt", tableau_abscisses, newline="\n")
-    
 ###############################################################################
 # 5- fonctions qui affiche et sauvegarde des graphes
 ###############################################################################
 def tableau_brut_transpose_256gris(tableau_brut):
-    tableau8bits_brut=tableau_brut*255
+    tableau8bits_brut=tableau_brut[:,1:]
+    tableau8bits_brut=tableau8bits_brut*255
     tableau8bits_brut=tableau8bits_brut.transpose()
     tableau8bits_brut=tableau8bits_brut.astype(int) 
     return tableau8bits_brut
@@ -105,7 +118,8 @@ def graphique_brut_sauvegarde(tableau8bits_brut) :
     plt.imsave("figure_brute.png",tableau8bits_brut, cmap="inferno")
 
 def tableau_transpose_256gris(tableau_norm):
-    tableau8bits=tableau_norm*255
+    tableau8bits=tableau_norm[:,1:]
+    tableau8bits=tableau8bits*255
     tableau8bits=tableau8bits.transpose()
     tableau8bits=tableau8bits.astype(int) 
     return tableau8bits
@@ -161,16 +175,12 @@ def graphique_sauvegarde(tableau8bits) :
 def main (rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) :
     global tableau_norm
     liste_fichiers=creation_liste_fichiers(rep_travail)
-    
-    tableau_abscisses=creer_tableau_abscisses(liste_fichiers)
-    enregistre_tableau_abscisses(tableau_abscisses)
-    
-    tableau_brut=creer_tableau(liste_fichiers)
+    tableau_brut=creer_tableau_avec_x(liste_fichiers)
     tableau8bits_brut=tableau_brut_transpose_256gris(tableau_brut)
     graphique_brut_sauvegarde(tableau8bits_brut)
     
     tableau_norm=normalise_tableau_aire(tableau_brut)
-    enregistre_fichier(tableau_norm,"tableau_normalisé.txt")
+    enregistre_fichier_point(tableau_norm,"tableau_normalisé_points.txt")
     enregistre_fichier_virgule(tableau_norm,"tableau_normalisé_virgules.txt")
     tableau8bits_norm=tableau_transpose_256gris(tableau_norm)
     graphique_sauvegarde(tableau8bits_norm)
@@ -178,6 +188,7 @@ def main (rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) :
     if flag_2D == 1 :
         graphique_creation(tableau8bits_norm,nom_echantillon,bornes)
     if flag_3D == 1 :
-        graphique_3D_creation(tableau8bits_norm,nom_echantillon,bornes)   
+        graphique_3D_creation(tableau8bits_norm,nom_echantillon,bornes)
+
 
 

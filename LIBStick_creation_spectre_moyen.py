@@ -11,26 +11,15 @@ import numpy,os
 ###############################################################################
 # 1- fonctions
 ###############################################################################
-def extraction_spectres(tableau_norm, nombre_fichiers, bornes_moyenne_spectres):
-    tableau_extrait=tableau_norm.copy()
+def creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres):
+    tableau_abscisses=tableau_norm[:,0]
+    tableau_extrait=tableau_norm[:,1:]
     indice_premier=(bornes_moyenne_spectres[0]-1)
-    indice_dernier=(bornes_moyenne_spectres[1]-1)
-    cols_supprime_debut=list()
-    cols_supprime_fin=list()
-    if indice_premier > 0 :
-        for i in range(0,indice_premier) :
-            cols_supprime_debut.append(i)
-    if indice_dernier < nombre_fichiers :
-        for i in range(indice_dernier+1, nombre_fichiers):
-            cols_supprime_fin.append(i)
-    cols_supprime=cols_supprime_debut+cols_supprime_fin
-    
-    tableau_extrait=numpy.delete(tableau_extrait, cols_supprime, axis=1)    
-    return tableau_extrait
-
-def creation_spectre_moyen(tableau_extrait):
+    indice_dernier=(bornes_moyenne_spectres[1])
+    tableau_extrait=tableau_extrait[:,indice_premier:indice_dernier]
     spectre_moyen=tableau_extrait.sum(axis=1)
     spectre_moyen=spectre_moyen/tableau_extrait.shape[1]
+    spectre_moyen=numpy.column_stack((tableau_abscisses,spectre_moyen))
     return spectre_moyen
 
 def enregistre_fichier(spectre_moyen, nom_echantillon, bornes):
@@ -41,10 +30,9 @@ def enregistre_fichier(spectre_moyen, nom_echantillon, bornes):
 ###############################################################################
 # programme principal
 ###############################################################################
-def main (rep_travail,nom_echantillon, bornes, nombre_fichiers, bornes_moyenne_spectres) :
+def main (rep_travail,nom_echantillon, bornes, bornes_moyenne_spectres) :
     os.chdir(rep_travail)
-    tableau_norm=numpy.loadtxt("tableau_normalisé.txt",delimiter="\t",dtype=float,encoding="Latin-1")
-    tableau_extrait=extraction_spectres(tableau_norm, nombre_fichiers, bornes_moyenne_spectres)
-    spectre_moyen=creation_spectre_moyen(tableau_extrait)
+    tableau_norm=numpy.loadtxt("tableau_normalisé_points.txt",delimiter="\t",dtype=float,encoding="Latin-1")
+    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
     enregistre_fichier(spectre_moyen, nom_echantillon, bornes)
     return spectre_moyen

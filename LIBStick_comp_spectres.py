@@ -35,51 +35,40 @@ def creation_liste_fichiers(rep_travail,type_extension):
     liste.sort()
     return liste
 
-def lit_spectre(fichier,tableau_abscisses,type_extension):
+def lit_spectre(fichier,type_extension):
     if type_extension == "*.mean" :
-        spectre=numpy.loadtxt(fichier,delimiter="\t",usecols=[0],dtype=float,encoding="Latin-1")
-        #tableau_abscisses=lit_tableau_abscisses()
-        spectre=numpy.vstack((tableau_abscisses,spectre))
-    #    spectre=numpy.zeros((0,document.shape[0]))
-    #    for ligne in document :
-    #        spectre=numpy.row_stack((spectre,ligne))
+        spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
     if type_extension == "*.tsv" :
-        spectre=numpy.loadtxt(fichier,delimiter="\t",usecols=[1],dtype=float,encoding="Latin-1")
-        spectre=numpy.vstack((tableau_abscisses,spectre))
+        spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
     return spectre
-
-def lit_tableau_abscisses():
-    global tableau_abscisses
-    tableau_abscisses=numpy.loadtxt("tableau_abscisses.txt", delimiter="\t", usecols=[0])
-    return tableau_abscisses
 
 def creer_tableau(liste,type_extension):
     if type_extension == "*.mean" :
         i=0
         for nom_fichier in liste :
             if i==0 :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t", usecols=[0])
-                #print(fichier_entree)
+                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")                
+                tableau_abscisses=fichier_entree[:,0]
                 tableau_comparatif=numpy.zeros((0,fichier_entree.shape[0]))
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree))
+                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
             else :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t", usecols=[0])
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree))
+                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
+                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
             i=i+1
     if type_extension == "*.tsv" :
         i=0
         for nom_fichier in liste :
             if i==0 :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t", usecols=[1])
-                #print(fichier_entree)
+                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
+                tableau_abscisses=fichier_entree[:,0]
                 tableau_comparatif=numpy.zeros((0,fichier_entree.shape[0]))
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree))
+                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
             else :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t", usecols=[1])
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree))
+                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
+                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
             i=i+1
         tableau_comparatif=normalise_tableau_aire(tableau_comparatif)
-    return tableau_comparatif
+    return tableau_comparatif, tableau_abscisses
 
 def normalise_tableau_aire(tableau):
     for ligne in range(tableau.shape[0]):
@@ -90,12 +79,11 @@ def normalise_tableau_aire(tableau):
     tableau=tableau/tableau.max()
     return tableau
 
-def creer_DataFrame(tableau_comparatif,liste, tableau_abscisses):
+def creer_DataFrame(tableau_comparatif,liste,tableau_abscisses):
     DataFrame_comparatif=pandas.DataFrame(data=tableau_comparatif, index=liste, columns=tableau_abscisses)
     return DataFrame_comparatif
 
 def creer_DataFrame_resultats(DataFrame_comparatif, limites_zone1,limites_zone2,flag_denominateur):
-    print(DataFrame_comparatif)
     if flag_denominateur == 1 :
         DataFrame_tableau_calculs=pandas.DataFrame()
         Sous_DataFrame = DataFrame_comparatif.loc[ : , limites_zone1[0]:limites_zone1[1]]
@@ -181,10 +169,8 @@ def graphique_lit_tableau():
 ###############################################################################
 def main(rep_travail, liste_fichiers, tableau_bornes,type_extension,flag_denominateur, flag_2D, flag_3D):
     os.chdir(rep_travail)
-    tableau_comparatif=creer_tableau(liste_fichiers,type_extension)
-    #tableau_abscisses=lit_tableau_abscisses()
+    tableau_comparatif, tableau_abscisses = creer_tableau(liste_fichiers,type_extension)
     DataFrame_comparatif=creer_DataFrame(tableau_comparatif,liste_fichiers,tableau_abscisses)
-    print(DataFrame_comparatif)
     limites_zone1[0]=tableau_bornes[0,0]
     limites_zone1[1]=tableau_bornes[0,1]
     limites_zone2[0]=tableau_bornes[1,0]

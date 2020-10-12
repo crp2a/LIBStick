@@ -172,8 +172,9 @@ def visualisation_L_trait():
                                                                                           ordre_filtre_L_trait.get())
     fond_continu_L_trait = LIBStick_traitements_spectres.creation_fond(spectre_filtre_L_trait,
                                                                        type_fond_L_trait.get(),
-                                                                       taille_fond_L_trait.get(),
-                                                                       iterations_fond_L_trait.get())
+                                                                       param1_fond_L_trait.get(),
+                                                                       param2_fond_L_trait.get(),
+                                                                       param3_fond_L_trait.get())
     spectre_corrige_L_trait=LIBStick_traitements_spectres.creation_spectre_corrige(spectre_filtre_L_trait, fond_continu_L_trait)
     affiche_spectre_L_trait()
     affiche_fond_L_trait()
@@ -193,7 +194,7 @@ def execute_L_trait():
     if flag == True :
         LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(), tableau_bornes_L_trait,
                                                       type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(),
-                                                      type_fond_L_trait.get(), taille_fond_L_trait.get(), iterations_fond_L_trait.get())
+                                                      type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
     
 ###############################################################################
 # 2- fonctions graphiques du caneva du spectre (frame1_L_trait)
@@ -365,15 +366,14 @@ def deplace_ligne0_2_L_trait():
         variable_L_trait_1.set(variable_L_trait_2.get())
         deplace_ligne0_1_L_trait()
 
-def deplace_ligne0_1_return_L_trait() :
+def deplace_ligne0_1_return_L_trait(event) :
     deplace_ligne0_1_L_trait()
     
-def deplace_ligne0_2_return_L_trait() :
+def deplace_ligne0_2_return_L_trait(event) :
     deplace_ligne0_2_L_trait()
     
 def change_options_filtre_L_trait(event) :
     filtre = type_filtre_L_trait.get()
-    print(filtre)
     if filtre == "Aucun" :
         entree4_L_trait.configure(state="disable")
         entree5_L_trait.configure(state="disable")
@@ -385,7 +385,28 @@ def change_options_filtre_L_trait(event) :
         entree5_L_trait.configure(state="disable")
     if filtre == "Passe-bas" :
         entree4_L_trait.configure(state="normal")
-        entree5_L_trait.configure(state="disable")      
+        entree5_L_trait.configure(state="disable")
+        
+def change_options_fond_L_trait(event) :
+    fond = type_fond_L_trait.get()
+    if fond == "Aucun" :
+        entree7_L_trait.configure(state="disable")
+        entree8_L_trait.configure(state="disable")
+        entree8bis_L_trait.configure(state="disable")
+    if fond == "Rolling ball" :
+        text7_L_trait.configure(text="Taille :")
+        entree7_L_trait.configure(state="normal")
+        text8_L_trait.configure(text="Lissage :")
+        entree8_L_trait.configure(state="normal")
+        entree8bis_L_trait.grid_forget()
+        entree8_L_trait.grid(row=4, column=6)
+    if fond == "SNIP" :
+        text7_L_trait.configure(text="Itérations :")
+        entree7_L_trait.configure(state="normal")
+        text8_L_trait.configure(text="LLS :")
+        entree8bis_L_trait.configure(state="normal")
+        entree8_L_trait.grid_forget()
+        entree8bis_L_trait.grid(row=4, column=6)
 
 def affiche_fond_L_trait():
     global fond_continu_L_trait
@@ -538,27 +559,27 @@ def creation_spectre_moyen_L_ext():
         canevas4_L_ext.delete("all")
     for bornes in tableau_bornes_copy_L_ext :
         repertoire=rep_travail_L_ext+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/"
-        spectre=LIBStick_creation_spectre_moyen.main(repertoire,nom_echantillon_L_ext,bornes, nombre_fichiers_L_ext, bornes_moyenne_spectres_L_ext)
+        spectre=LIBStick_creation_spectre_moyen.main(repertoire,nom_echantillon_L_ext,bornes, bornes_moyenne_spectres_L_ext)
         if i==3 :
             canevas3_L_ext.delete("all")
-            minimum=spectre[:].min()
-            maximum=spectre[:].max()
-            spectre[:] = (200-(spectre[:] - minimum)*200/(maximum - minimum))
-            for j in range(len(spectre) - 1) :
-                dx=500/len(spectre)
+            minimum=spectre[:,1].min()
+            maximum=spectre[:,1].max()
+            spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
+            for j in range(spectre.shape[0] - 1) :
+                dx=500/spectre.shape[0]
                 x=j*dx
-                canevas3_L_ext.create_line(x,spectre[j],x+dx,spectre[j+1], width=1, fill="red", smooth=1)
+                canevas3_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="red", smooth=1)
         if i==4 :
             canevas4_L_ext.delete("all")
-            minimum=spectre[:].min()
-            maximum=spectre[:].max()
-            spectre[:] = (200-(spectre[:] - minimum)*200/(maximum - minimum))
-            for j in range(len(spectre) - 1) :
-                dx=500/len(spectre)
+            minimum=spectre[:,1].min()
+            maximum=spectre[:,1].max()
+            spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
+            for j in range(spectre.shape[0] - 1) :
+                dx=500/spectre.shape[0]
                 x=j*dx
-                canevas4_L_ext.create_line(x,spectre[j],x+dx,spectre[j+1], width=1, fill="blue", smooth=1)
+                canevas4_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="blue", smooth=1)
         i=i+1
-
+        
 ###############################################################################
 # 2- fonctions graphiques du caneva du spectre (frame1_L_ext)
 ###############################################################################
@@ -974,21 +995,21 @@ def choix_rep_L_comp():
     lit_affiche_spectre_L_comp()
     bouton_execute_L_comp.configure(state="normal")
     entree6_L_comp.configure(to=nombre_fichier_L_comp)
-         
+
 def lit_affiche_spectre_L_comp():
     global spectre_entier_L_comp 
+    global limites_spectre_L_comp
     os.chdir(rep_travail_L_comp)
-    tableau_abscisses=lit_fichier_abscisses_L_comp()
-    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(liste_fichiers_L_comp[0], tableau_abscisses,type_extension_L_comp.get())
-    spectre_entier_L_comp=numpy.transpose(spectre_entier_L_comp)
+    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(liste_fichiers_L_comp[0], type_extension_L_comp.get())
+    limites_spectre_L_comp=lit_limites_abscisses_L_comp(spectre_entier_L_comp)
+    #print (spectre_entier_L_comp)
     affiche_spectre_L_comp()
 
-def lit_fichier_abscisses_L_comp():
-    global tableau_abscisses
-    global limites_spectre_L_comp
-    tableau_abscisses=LIBStick_comp_spectres.lit_tableau_abscisses()
-    limites_spectre_L_comp[0]=limites_affichage_spectre_L_comp[0]=tableau_abscisses[0]
-    limites_spectre_L_comp[1]=limites_affichage_spectre_L_comp[1]=tableau_abscisses[-1]
+def lit_limites_abscisses_L_comp(spectre):
+    tableau_abscisses=spectre[:,0]
+    limites_spectre=numpy.zeros((2))
+    limites_spectre[0]=limites_affichage_spectre_L_comp[0]=tableau_abscisses[0]
+    limites_spectre[1]=limites_affichage_spectre_L_comp[1]=tableau_abscisses[-1]
     variable_zoom_inf_L_comp.set(limites_affichage_spectre_L_comp[0])
     variable_zoom_sup_L_comp.set(limites_affichage_spectre_L_comp[1])
     entree_zoom_inf_L_comp.configure(from_=limites_spectre_L_comp[0], to=limites_spectre_L_comp[1])
@@ -997,8 +1018,8 @@ def lit_fichier_abscisses_L_comp():
     entree2_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
     entree3_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
     entree4_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
-    return tableau_abscisses
-   
+    return limites_spectre
+       
 def execute_scripts_L_comp():
     global DataFrame_resultats_L_comp
     tableau_bornes_L_comp=creation_tab_bornes_L_comp()
@@ -1515,7 +1536,7 @@ class case_classification(tkinter.Button) :
 # 7- Interface graphique : création fenêtre principale avec scrolls et onglets
 ###############################################################################
 fenetre_principale=tkinter.Tk()
-fenetre_principale.title("LIBStick v2.0")
+fenetre_principale.title("LIBStick v1.0")
 fenetre_principale.geometry("1150x850+100+50")
 fenetre_principale.maxsize(width=1160, height=850)
 
@@ -1646,23 +1667,27 @@ entree4_L_trait.grid(row=3, column=4)
 entree5_L_trait.grid(row=3, column=6)
 
 text6_L_trait=tkinter.Label(frame1_L_trait, text="Fond :", bg=couleur_interface)
-text7_L_trait=tkinter.Label(frame1_L_trait, text="Taille :", bg=couleur_interface)
-text8_L_trait=tkinter.Label(frame1_L_trait, text="Itérations :", bg=couleur_interface)
+text7_L_trait=tkinter.Label(frame1_L_trait, text="Itérations :", bg=couleur_interface)
+text8_L_trait=tkinter.Label(frame1_L_trait, text="LLS :", bg=couleur_interface)
 text6_L_trait.grid(row=4, column=1, sticky=tkinter.W)
 text7_L_trait.grid(row=4, column=3, sticky=tkinter.W)
 text8_L_trait.grid(row=4, column=5, sticky=tkinter.W)
 type_fond_L_trait=tkinter.StringVar(value="SNIP")
-taille_fond_L_trait=tkinter.IntVar(value=10)
-iterations_fond_L_trait=tkinter.IntVar(value=20)
+param1_fond_L_trait=tkinter.IntVar(value=20)
+param2_fond_L_trait=tkinter.IntVar(value=10)
+param3_fond_L_trait=tkinter.BooleanVar(value=True)
 #entree6_L_trait=tkinter.ttk.Combobox(frame1_L_trait, textvariable=type_fond_L_trait,
 #                                     values=["Aucun", "Rolling ball", "SNIP", "Top-hat", "Peak filling"])
 entree6_L_trait=tkinter.ttk.Combobox(frame1_L_trait, textvariable=type_fond_L_trait,
                                      values=["Aucun", "Rolling ball", "SNIP"])
-entree7_L_trait=tkinter.Spinbox(frame1_L_trait, from_=3, to=100, textvariable=taille_fond_L_trait)
-entree8_L_trait=tkinter.Spinbox(frame1_L_trait, from_=1, to=100, textvariable=iterations_fond_L_trait)
+entree7_L_trait=tkinter.Spinbox(frame1_L_trait, from_=3, to=100, textvariable=param1_fond_L_trait)
+entree8_L_trait=tkinter.Spinbox(frame1_L_trait, from_=1, to=100, textvariable=param2_fond_L_trait)
+entree8bis_L_trait=tkinter.Checkbutton(frame1_L_trait, text="LLS", variable=param3_fond_L_trait, bg=couleur_interface)
 entree6_L_trait.grid(row=4, column=2, columnspan=1)
 entree7_L_trait.grid(row=4, column=4)
 entree8_L_trait.grid(row=4, column=6)
+entree8_L_trait.grid_remove()
+entree8bis_L_trait.grid(row=4, column=6)
 
 frame1_1_L_trait=tkinter.Frame(frame1_L_trait, bg=couleur_interface)
 frame1_1_L_trait.grid(row=1, column=7, rowspan=4, sticky=tkinter.N+tkinter.S)
@@ -1722,8 +1747,8 @@ entree_zoom_inf_L_trait.bind("<KP_Enter>", change_zoom_inf_return_L_trait)
 entree_zoom_sup_L_trait.bind("<KP_Enter>", change_zoom_sup_return_L_trait)
 entree_zoom_inf_L_trait.bind("<Tab>", change_zoom_inf_return_L_trait)
 entree_zoom_sup_L_trait.bind("<Tab>", change_zoom_sup_return_L_trait)
-entree_zoom_inf_L_trait.bind("<Shift-Tab>", change_zoom_inf_return_L_trait)
-entree_zoom_sup_L_trait.bind("<Shift-Tab>", change_zoom_sup_return_L_trait)
+#entree_zoom_inf_L_trait.bind("<Shift-ISO_Left_Tab>", change_zoom_inf_return_L_trait)
+#entree_zoom_sup_L_trait.bind("<Shift-ISO_Left_Tab>", change_zoom_sup_return_L_trait)
 
 canevas0_L_trait.bind("<ButtonRelease-1>", affiche_lambda_L_trait)
 canevas0_L_trait.bind("<Motion>", affiche_position_souris_L_trait)
@@ -1745,13 +1770,18 @@ entree1_L_trait.bind("<KP_Enter>", deplace_ligne0_1_return_L_trait)
 entree2_L_trait.bind("<KP_Enter>", deplace_ligne0_2_return_L_trait)
 entree1_L_trait.bind("<Tab>", deplace_ligne0_1_return_L_trait)
 entree2_L_trait.bind("<Tab>", deplace_ligne0_2_return_L_trait)
-entree1_L_trait.bind("<Shift-Tab>", deplace_ligne0_1_return_L_trait)
-entree2_L_trait.bind("<Shift-Tab>", deplace_ligne0_2_return_L_trait)
+#entree1_L_trait.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_1_return_L_trait)
+#entree2_L_trait.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_2_return_L_trait)
 
 entree3_L_trait.bind("<<ComboboxSelected>>", change_options_filtre_L_trait)
 entree3_L_trait.bind("<Return>", change_options_filtre_L_trait)
 entree3_L_trait.bind("<KP_Enter>", change_options_filtre_L_trait)
 entree3_L_trait.bind("<Tab>", change_options_filtre_L_trait)
+
+entree6_L_trait.bind("<<ComboboxSelected>>", change_options_fond_L_trait)
+entree6_L_trait.bind("<Return>", change_options_fond_L_trait)
+entree6_L_trait.bind("<KP_Enter>", change_options_fond_L_trait)
+entree6_L_trait.bind("<Tab>", change_options_fond_L_trait)
 
 
 
@@ -1930,8 +1960,8 @@ entree_zoom_inf_L_ext.bind("<KP_Enter>", change_zoom_inf_return_L_ext)
 entree_zoom_sup_L_ext.bind("<KP_Enter>", change_zoom_sup_return_L_ext)
 entree_zoom_inf_L_ext.bind("<Tab>", change_zoom_inf_return_L_ext)
 entree_zoom_sup_L_ext.bind("<Tab>", change_zoom_sup_return_L_ext)
-entree_zoom_inf_L_ext.bind("<Shift-Tab>", change_zoom_inf_return_L_ext)
-entree_zoom_sup_L_ext.bind("<Shift-Tab>", change_zoom_sup_return_L_ext)
+#entree_zoom_inf_L_ext.bind("<Shift-ISO_Left_Tab>", change_zoom_inf_return_L_ext)
+#entree_zoom_sup_L_ext.bind("<Shift-ISO_Left_Tab>", change_zoom_sup_return_L_ext)
 
 canevas1_L_ext.bind("<ButtonRelease-1>", coordonnees1_L_ext)
 canevas2_L_ext.bind("<ButtonRelease-1>", coordonnees2_L_ext)
@@ -1948,10 +1978,10 @@ entree1_L_ext.bind("<Tab>", deplace_ligne0_1_return_L_ext)
 entree2_L_ext.bind("<Tab>", deplace_ligne0_2_return_L_ext)
 entree3_L_ext.bind("<Tab>", deplace_ligne0_3_return_L_ext)
 entree4_L_ext.bind("<Tab>", deplace_ligne0_4_return_L_ext)
-entree1_L_ext.bind("<Shift-Tab>", deplace_ligne0_1_return_L_ext)
-entree2_L_ext.bind("<Shift-Tab>", deplace_ligne0_2_return_L_ext)
-entree3_L_ext.bind("<Shift-Tab>", deplace_ligne0_3_return_L_ext)
-entree4_L_ext.bind("<Shift-Tab>", deplace_ligne0_4_return_L_ext)
+#entree1_L_ext.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_1_return_L_ext)
+#entree2_L_ext.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_2_return_L_ext)
+#entree3_L_ext.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_3_return_L_ext)
+#entree4_L_ext.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_4_return_L_ext)
 
 
 entree5_L_ext.bind("<Return>", vars_5_6_to_coord1_return_L_ext)
@@ -1973,8 +2003,8 @@ entree9_L_ext.bind("<KP_Enter>", change_entree9_L_ext)
 entree10_L_ext.bind("<KP_Enter>", change_entree10_L_ext)
 entree9_L_ext.bind("<Tab>", change_entree9_L_ext)
 entree10_L_ext.bind("<Tab>", change_entree10_L_ext)
-entree9_L_ext.bind("<Shift-Tab>", change_entree9_L_ext)
-entree10_L_ext.bind("<Shift-Tab>", change_entree10_L_ext)
+#entree9_L_ext.bind("<Shift-ISO_Left_Tab>", change_entree9_L_ext)
+#entree10_L_ext.bind("<Shift-ISO_Left_Tab>", change_entree10_L_ext)
 
 
 
@@ -2138,8 +2168,8 @@ entree_zoom_inf_L_comp.bind("<KP_Enter>", change_zoom_inf_return_L_comp)
 entree_zoom_sup_L_comp.bind("<KP_Enter>", change_zoom_sup_return_L_comp)
 entree_zoom_inf_L_comp.bind("<Tab>", change_zoom_inf_return_L_comp)
 entree_zoom_sup_L_comp.bind("<Tab>", change_zoom_sup_return_L_comp)
-entree_zoom_inf_L_comp.bind("<Shift-Tab>", change_zoom_inf_return_L_comp)
-entree_zoom_sup_L_comp.bind("<Shift-Tab>", change_zoom_sup_return_L_comp)
+#entree_zoom_inf_L_comp.bind("<Shift-ISO_Left_Tab>", change_zoom_inf_return_L_comp)
+#entree_zoom_sup_L_comp.bind("<Shift-ISO_Left_Tab>", change_zoom_sup_return_L_comp)
 
 canevas1_L_comp.bind("<ButtonRelease-1>", coordonnees1_L_comp)
 
@@ -2155,10 +2185,10 @@ entree1_L_comp.bind("<Tab>", deplace_ligne0_1_return_L_comp)
 entree2_L_comp.bind("<Tab>", deplace_ligne0_2_return_L_comp)
 entree3_L_comp.bind("<Tab>", deplace_ligne0_3_return_L_comp)
 entree4_L_comp.bind("<Tab>", deplace_ligne0_4_return_L_comp)
-entree1_L_comp.bind("<Shift-Tab>", deplace_ligne0_1_return_L_comp)
-entree2_L_comp.bind("<Shift-Tab>", deplace_ligne0_2_return_L_comp)
-entree3_L_comp.bind("<Shift-Tab>", deplace_ligne0_3_return_L_comp)
-entree4_L_comp.bind("<Shift-Tab>", deplace_ligne0_4_return_L_comp)
+#entree1_L_comp.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_1_return_L_comp)
+#entree2_L_comp.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_2_return_L_comp)
+#entree3_L_comp.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_3_return_L_comp)
+#entree4_L_comp.bind("<Shift-ISO_Left_Tab>", deplace_ligne0_4_return_L_comp)
 
 entree5_L_comp.bind("<Return>", vars_5_6_to_coord1_return_L_comp)
 entree6_L_comp.bind("<Return>", vars_5_6_to_coord1_return_L_comp)

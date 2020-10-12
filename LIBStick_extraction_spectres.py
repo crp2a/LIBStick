@@ -108,6 +108,6 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
             enregistre_fichier(document,rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1]) ,liste_fichiers[i])
     for bornes in tableau_bornes :
         os.chdir(rep_script)
-        LIBStick_creation_tableau_norm.main(rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/", nom_echantillon,bornes, flag_2D, flag_3D)
+        tableau_abscisses = LIBStick_creation_tableau_norm.main(rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/", nom_echantillon,bornes, flag_2D, flag_3D)
     return nom_echantillon
     

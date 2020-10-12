@@ -157,7 +157,6 @@ def rolling_ball_fonction(spectre, wm, ws) :
 def SNIP_fonction (spectre, iterations, LLS_flag) :
     ########## LLS ##########
     if LLS_flag == True :
-        print ("LLS")
         spectre[:,1] = numpy.log(numpy.log(numpy.sqrt(spectre[:,1] + 1) + 1) + 1)  
     ########## SNIP ##########
     dim_spectre = spectre.shape[0]
@@ -170,7 +169,6 @@ def SNIP_fonction (spectre, iterations, LLS_flag) :
         spectre[:,1] = fond[:,1]            
     ########## inverse LLS ##########
     if LLS_flag == True :
-        print ("inverse LLS")
         fond[:,1] = (numpy.exp(numpy.exp(fond[:,1]) - 1) - 1)**2 - 1
     ########## retour ##########
     return fond
@@ -194,23 +192,23 @@ def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordr
         pass
     return spectre_filtre
 
-def creation_fond(spectre_filtre, fond, taille, iterations):
+def creation_fond(spectre_filtre, fond, param1, param2, param3):
     if fond =="Aucun" :
         fond_continu = numpy.zeros((spectre_filtre.shape[0],2))
     if fond == "Rolling ball" :
         fond_continu = spectre_filtre.copy()
-        fond_continu = rolling_ball_fonction(fond_continu, taille, iterations)
+        fond_continu = rolling_ball_fonction(fond_continu, param1, param2)
     if fond =="SNIP" :
         fond_continu = spectre_filtre.copy()
-        fond_continu = SNIP_fonction (fond_continu, iterations, True)
+        fond_continu = SNIP_fonction (fond_continu, param1, param3)
     if fond == "Top-hat" :
         fond_continu = spectre_filtre.copy()
-        str_el = numpy.repeat([1], taille)
+        str_el = numpy.repeat([1], param1)
         fond_continu[:,1] = scipy.ndimage.white_tophat(fond_continu[:,1], None, str_el)
     if fond == "Peak filling" :
         print ("Pas encore codé")
         fond_continu = spectre_filtre.copy()
-        fond_continu[:,1] = scipy.signal.medfilt(fond_continu[:,1], taille)
+        fond_continu[:,1] = scipy.signal.medfilt(fond_continu[:,1], param1)
     return fond_continu
 
 def creation_spectre_corrige(spectre_filtre, fond_continu):
@@ -222,13 +220,13 @@ def execute(rep_travail, spectre_corrige, nom_fichier):
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
 
-def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, type_fond, taille_fond, iterations) :
+def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, type_fond, param1, param2, param3) :
     liste_fichiers = creation_liste_fichiers(rep_travail, type_fichier)
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     for nom_fichier in liste_fichiers :
         spectre = lit_spectre(nom_fichier, type_fichier)
         spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre)
-        fond_continu = creation_fond(spectre, type_fond, taille_fond, iterations)
+        fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
         spectre= creation_spectre_corrige(spectre, fond_continu)
         enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
         
