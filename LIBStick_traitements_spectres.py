@@ -8,45 +8,26 @@ Created on Wed May 13 14:41:09 2020
 
 import os, numpy, math
 import scipy.signal
-
-###############################################################################
-# 1- fonction qui liste des fichiers *.asc ou *.tsv d'un répertoire
-###############################################################################
-def creation_liste_fichiers(rep_travail, type_fichier):
-    os.chdir(rep_travail)
-    liste=[]
-    if type_fichier == ".asc" :
-        for fichier in os.listdir():
-            if (os.path.isfile(fichier) and fichier[-3:] == "asc") :
-                liste.append(fichier)
-    if type_fichier == ".tsv" :
-        for fichier in os.listdir():
-            if (os.path.isfile(fichier) and fichier[-3:] == "tsv") :
-                liste.append(fichier)
-    liste.sort()
-    return liste
-
-#def creation_nom_echantillon(liste_fichiers):
-#    nom_echantillon=LIBStick_echange_vars.L_ext_liste_fichiers[0][0:-6]
-#    return nom_echantillon
+import LIBStick_outils
 
 
 ###############################################################################
-# 2- fonction qui ouvre un fichier
+# fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###############################################################################
-def lit_spectre(fichier, type_fichier):
-#    if type_fichier == "IVEA" :
-    if type_fichier == ".asc" :
-        document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
-        spectre=numpy.zeros((0,2))
-        for ligne in document :
-            if (ligne[0]<=1013) :
-                spectre=numpy.row_stack((spectre,ligne))
-#    if type_fichier == "LIBStick" :
-    if type_fichier == ".tsv" :
-        spectre=numpy.loadtxt(fichier,delimiter="\t",usecols=[0,1],dtype=float,encoding="Latin-1")
-    return spectre
-
+def creation_sous_repertoire(rep_travail):
+    repertoire_sauvegarde = rep_travail + "/traitement"
+    if os.path.isdir(repertoire_sauvegarde) == False :
+        os.mkdir(repertoire_sauvegarde)
+    return repertoire_sauvegarde
+    
+def enregistre_fichier(spectre,repertoire,nom_fichier):
+    nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_corrige.tsv"
+    numpy.savetxt(nom_fichier,spectre, delimiter="\t")
+  
+    
+###############################################################################
+# fonction qui limite le traitement aux bornes
+###############################################################################
 def creation_spectre_bornes(spectre_entier, tableau_bornes):
     spectre_limite_bornes = numpy.zeros((0,2))
     for ligne in spectre_entier :
@@ -54,31 +35,9 @@ def creation_spectre_bornes(spectre_entier, tableau_bornes):
             spectre_limite_bornes = numpy.row_stack((spectre_limite_bornes,ligne))
     return spectre_limite_bornes
 
-
+   
 ###############################################################################
-# 3- fonction qui crée un sous répertoire d'un certain nom passé en argument
-###############################################################################
-def repertoire_de_travail(rep_script,rep_travail_relatif):
-    rep_travail=rep_script+"/"+rep_travail_relatif
-    return rep_travail
-
-def creation_sous_repertoire(rep_travail):
-    repertoire_sauvegarde = rep_travail + "/traitement"
-    if os.path.isdir(repertoire_sauvegarde) == False :
-        os.mkdir(repertoire_sauvegarde)
-    return repertoire_sauvegarde
-  
-          
-###############################################################################
-# 4- fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
-###############################################################################
-def enregistre_fichier(spectre,repertoire,nom_fichier):
-    nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_corrige.tsv"
-    numpy.savetxt(nom_fichier,spectre, delimiter="\t")
-  
-    
-###############################################################################
-# 5- fonctions de filtres
+# fonctions de filtres
 ###############################################################################
 def rolling_ball_fonction(spectre, wm, ws) :
     ########## initialisations
@@ -177,7 +136,7 @@ def SNIP_fonction (spectre, iterations, LLS_flag) :
 
 
 ###############################################################################
-# 6- fonctions de traitement des spectres
+# fonctions de traitement des spectres
 ###############################################################################
 def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordre, deriv):
     spectre_filtre = creation_spectre_bornes(spectre_entier, tableau_bornes)
@@ -222,10 +181,10 @@ def execute(rep_travail, spectre_corrige, nom_fichier):
     enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
 
 def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, deriv, type_fond, param1, param2, param3) :
-    liste_fichiers = creation_liste_fichiers(rep_travail, type_fichier)
+    liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, type_fichier)
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     for nom_fichier in liste_fichiers :
-        spectre = lit_spectre(nom_fichier, type_fichier)
+        spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
         spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
         fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
         spectre= creation_spectre_corrige(spectre, fond_continu)

@@ -15,9 +15,9 @@ import os, configparser, pathlib
 import math, numpy, pandas
 import PIL.Image, PIL.ImageTk
 
+import LIBStick_outils
 import LIBStick_traitements_spectres
 import LIBStick_extraction_spectres
-import LIBStick_creation_spectre_moyen
 import LIBStick_comp_spectres
 
 
@@ -30,6 +30,7 @@ couleur_interface="light grey"
 rep_LIBStick=os.getcwd()
 largeur_lignes=2
 taille_case = [3,2]
+nom_fichier_seul_L_trait=nom_fichier_seul_L_ext=nom_fichier_seul_L_comp=""
 
 class CaseConfigParser(configparser.ConfigParser):
     def optionxform(self, optionstr):
@@ -132,40 +133,49 @@ def charge_param_L_trait() :
     
 rep_travail_L_trait=charge_param_L_trait()
 
-limites_spectre_L_trait=numpy.array([198.0,1013.0])
-limites_affichage_spectre_L_trait=numpy.array([198.0,1013.0])
+limites_spectre_L_trait=numpy.array([198.0,1013.0])             # limites min et max de l'affichage du spectre
+limites_affichage_spectre_L_trait=numpy.array([198.0,1013.0])   # limites de l'affichage du spectre à l'écran
 coord_zoom_L_trait=numpy.array([198,0,1013,0])
 delta_limites_L_trait=limites_affichage_spectre_L_trait[1]-limites_affichage_spectre_L_trait[0]
 flag_premier_lamda_L_trait=True
 #flag_premier_fond_L_trait=True
 l_L_trait=0.0
 spectre_entier_L_trait=numpy.zeros((0,2))
+spectre_corrige_L_trait=numpy.zeros((0,2))
 tableau_bornes_L_trait=numpy.array([300.0, 608.0])
+
+def affiche_nom_spectre_onglet1() :
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_trait)
 
 ###############################################################################
 # 1- fonctions traitement des données
 ###############################################################################
 def creation_tab_bornes_L_trait() :
-    #global tableau_bornes_L_ext
     tableau_bornes_L_trait[0]=variable_L_trait_1.get()
     tableau_bornes_L_trait[1]=variable_L_trait_2.get()
     return tableau_bornes_L_trait
 
 def choix_fichier_L_trait():
-    global nom_fichier_L_trait
     global nom_fichier_seul_L_trait
+    global type_fichier_L_trait
     global rep_travail_L_trait
-    #global nbr_fichier_L_trait
+    global liste_fichiers_L_trait
+    global nombre_fichiers_L_trait
     nom_fichier_L_trait = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_trait,
                                                                  title='Choisissez un fichier spectre',
                                                                  filetypes=(("fichiers IVEA","*.asc"), 
                                                                             ("fichiers LIBStick","*.tsv"),
                                                                             ("tous","*.*"))   )
-    nom_fichier_seul_L_trait=os.path.basename(nom_fichier_L_trait)
-    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
+    nom_fichier_seul_L_trait=os.path.basename(nom_fichier_L_trait)    
+    type_fichier_L_trait=pathlib.Path(nom_fichier_seul_L_trait).suffix
+#    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
     rep_travail_L_trait = os.path.dirname(nom_fichier_L_trait)
+    liste_fichiers_L_trait=LIBStick_outils.creation_liste_fichiers(rep_travail_L_trait, type_fichier_L_trait)
+    nombre_fichiers_L_trait=len(liste_fichiers_L_trait)  
+    entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
     lit_affiche_spectre_L_trait()
     bouton_visualisation_L_trait.configure(state="normal")
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_trait)
     
 def visualisation_L_trait():
     global fond_continu_L_trait
@@ -190,96 +200,42 @@ def visualisation_L_trait():
     bouton_execute_L_trait.configure(state="normal")
     
 def execute_L_trait():
-    global rep_travail_L_trait
-    #global nbr_fichier_L_trait
-    #global fond_continu_L_trait
-    global spectre_corrige_L_trait    
-    global tableau_bornes_L_trait
-    tableau_bornes_L_trait=creation_tab_bornes_L_trait()
     flag = flag_tous_fichiers_L_trait.get()
     if flag == False :
         LIBStick_traitements_spectres.execute(rep_travail_L_trait, spectre_corrige_L_trait, nom_fichier_seul_L_trait)
     if flag == True :
-        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(), tableau_bornes_L_trait,
+        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait, tableau_bornes_L_trait,
                                                       type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(), derivee_filtre_L_trait.get(),
                                                       type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
+#        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(), tableau_bornes_L_trait,
+#                                                      type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(), derivee_filtre_L_trait.get(),
+#                                                      type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
     
 ###############################################################################
-# 2- fonctions graphiques du caneva du spectre (frame1_L_trait)
+# fonctions graphiques du caneva du spectre (frame1_L_trait)
 ###############################################################################
-def change_zoom_inf_L_trait() :
-#    global limites_affichage_spectre_L_trait
-    if variable_L_trait_zoom_inf.get() >= variable_L_trait_zoom_sup.get() :
-        variable_L_trait_zoom_sup.set(variable_L_trait_zoom_inf.get())
-    affiche_spectre_L_trait()
-    affiche_spectre_corrige_L_trait()
-    affiche_fond_L_trait()
-    
-def change_zoom_sup_L_trait():
-#    global limites_affichage_spectre_L_trait
-    if variable_L_trait_zoom_sup.get() <= variable_L_trait_zoom_inf.get() :
-        variable_L_trait_zoom_inf.set(variable_L_trait_zoom_sup.get())
-#    limites_affichage_spectre_L_trait[0]=variable_L_trait_zoom_inf.get()
-#    limites_affichage_spectre_L_trait[1]=variable_L_trait_zoom_sup.get()
-    affiche_spectre_L_trait()
-    affiche_spectre_corrige_L_trait()
-    affiche_fond_L_trait()
-
-def change_zoom_inf_return_L_trait(event):
-    change_zoom_inf_L_trait()
-    
-def change_zoom_sup_return_L_trait(event):
-    change_zoom_sup_L_trait()
-
-def zoom_clic_L_trait(event):
-    global coord_zoom_L_trait
-    coord_zoom_L_trait[0]=event.x
-    coord_zoom_L_trait[1]=event.y
-    
-def zoom_drag_and_drop_L_trait(event):
-    global ligne_position_0_L_trait
-    global ligne_position_1_L_trait
-    global coord_zoom_L_trait
-    global limites_affichage_spectre_L_trait
-    global lambda_texte_spectre_0_L_trait
-    global lambda_texte_spectre_1_L_trait
-    global flag_premier_lamda_L_trait
-    canevas0_L_trait.delete(ligne_position_0_L_trait)
-    ligne_position_0_L_trait=canevas0_L_trait.create_line(event.x,0,event.x,200, fill="green")
-    canevas1_L_trait.delete(ligne_position_1_L_trait)
-    ligne_position_1_L_trait=canevas1_L_trait.create_line(event.x,0,event.x,200, fill="green")
-    coord_zoom_L_trait[2]=event.x
-    coord_zoom_L_trait[3]=event.y
-    if coord_zoom_L_trait[2] > coord_zoom_L_trait[0] :
-        debut= coord_zoom_L_trait[0]*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
-        fin = coord_zoom_L_trait[2]*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
-        variable_L_trait_zoom_inf.set(format(debut, "4.1f"))
-        variable_L_trait_zoom_sup.set(format(fin, "4.1f"))
-        #affiche la longueur d'onde :
-        if flag_premier_lamda_L_trait == False :
-            canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
-            canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
-        l= event.x*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
-        lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm" ))
-        flag_premier_lamda_L_trait=False
-    if coord_zoom_L_trait[2] < coord_zoom_L_trait[0] :
-        variable_L_trait_zoom_inf.set(limites_spectre_L_trait[0])
-        variable_L_trait_zoom_sup.set(limites_spectre_L_trait[1])
-        limites_affichage_spectre_L_trait[0]=variable_L_trait_zoom_inf.get()
-        limites_affichage_spectre_L_trait[1]=variable_L_trait_zoom_sup.get()
-
-def zoom_clic_release_L_trait(event):
-    affiche_spectre_L_trait()
-    affiche_spectre_corrige_L_trait()
-    affiche_fond_L_trait()
-         
 def lit_affiche_spectre_L_trait():
-    global spectre_entier_L_trait 
+    global spectre_entier_L_trait
+    global limites_spectre_L_trait
     os.chdir(rep_travail_L_trait)
-    spectre_entier_L_trait=LIBStick_traitements_spectres.lit_spectre(nom_fichier_L_trait, type_fichier_L_trait.get())
+    spectre_entier_L_trait=LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait, type_fichier_L_trait)
+    limites_spectre_L_trait=lit_limites_abscisses_L_trait(spectre_entier_L_trait)
     affiche_spectre_L_trait()
+    
+def lit_limites_abscisses_L_trait(spectre):
+    tableau_abscisses=spectre[:,0]
+    limites_spectre=numpy.zeros((2))
+    limites_spectre[0]=tableau_abscisses[0]             # lit le valeurs min et max du spectre
+    limites_spectre[1]=tableau_abscisses[-1]
+    variable_zoom_inf_L_trait.set(limites_spectre[0])   # fixe les valeurs du zoom à ces valeurs min et max
+    variable_zoom_sup_L_trait.set(limites_spectre[1])
+    entree_zoom_inf_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])  #fixe les valeurs limites pour le zoom et la zone de selection
+    entree_zoom_sup_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree_zoom_inf_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree_zoom_sup_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree1_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree2_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    return limites_spectre
 
 def affiche_lambda_L_trait(event):
     global lambda_texte_spectre_0_L_trait
@@ -324,11 +280,10 @@ def affiche_position_souris_motion_L_trait(event):
 def affiche_spectre_L_trait():
     global limites_affichage_spectre_L_trait
     global delta_limites_L_trait
-    global spectre_entier_L_trait
     global minimum_spectre_L_trait
     global maximum_spectre_L_trait
-    limites_affichage_spectre_L_trait[0]=variable_L_trait_zoom_inf.get()
-    limites_affichage_spectre_L_trait[1]=variable_L_trait_zoom_sup.get()
+    limites_affichage_spectre_L_trait[0]=variable_zoom_inf_L_trait.get()
+    limites_affichage_spectre_L_trait[1]=variable_zoom_sup_L_trait.get()
     delta_limites_L_trait=limites_affichage_spectre_L_trait[1]-limites_affichage_spectre_L_trait[0]
     canevas0_L_trait.delete("all")
     spectre=numpy.zeros((0,2))
@@ -421,7 +376,7 @@ def change_options_fond_L_trait(event) :
         entree8bis_L_trait.grid(row=5, column=6)
 
 def affiche_fond_L_trait():
-    global fond_continu_L_trait
+#    global fond_continu_L_trait
 #    global dessin_fond_continu_L_trait
 #    global flag_premier_fond_L_trait
 #    if flag_premier_fond_L_trait == False :
@@ -435,19 +390,33 @@ def affiche_fond_L_trait():
     spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
     spectre[:,0] = (spectre[:,0] - limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait
     for i in range(len(spectre) - 1) :
-        dessin_fond_continu_L_trait = canevas0_L_trait.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1], fill="blue")
+        canevas0_L_trait.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1], fill="blue")
+#        dessin_fond_continu_L_trait = canevas0_L_trait.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1], fill="blue")
     #flag_premier_fond_L_trait = False
     
 ###############################################################################
-# 3- fonctions graphiques du caneva du spectre corrigé (frame2_L_trait)
+# fonctions graphiques du caneva du spectre corrigé (frame2_L_trait)
 ###############################################################################  
-  
+def lit_affiche_spectre_numero_L_trait():
+    global spectre_entier_L_trait
+    global nom_fichier_seul_L_trait
+    numero=numero_spectre_L_trait.get()-1
+    nom_fichier_seul_L_trait=liste_fichiers_L_trait[numero]
+    os.chdir(rep_travail_L_trait)
+    spectre_entier_L_trait=LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait, type_fichier_L_trait)
+    affiche_spectre_L_trait()
+    visualisation_L_trait()
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_trait)
+    
+def lit_affiche_spectre_numero_event_L_trait(event):
+    lit_affiche_spectre_numero_L_trait()
+    
 def affiche_spectre_corrige_L_trait():
     #global limites_affichage_spectre_L_trait
     #global delta_limites_L_trait
-    global spectre_corrige_L_trait
-    #limites_affichage_spectre_L_trait[0]=variable_L_trait_zoom_inf.get()
-    #limites_affichage_spectre_L_trait[1]=variable_L_trait_zoom_sup.get()
+    #global spectre_corrige_L_trait
+    #limites_affichage_spectre_L_trait[0]=variable_zoom_inf_L_trait.get()
+    #limites_affichage_spectre_L_trait[1]=variable_zoom_sup_L_trait.get()
     #delta_limites_L_trait=limites_affichage_spectre_L_trait[1]-limites_affichage_spectre_L_trait[0]
     canevas1_L_trait.delete("all")
     spectre=numpy.zeros((0,2))
@@ -461,6 +430,75 @@ def affiche_spectre_corrige_L_trait():
     spectre[:,0] = (spectre[:,0] - limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait
     for i in range(len(spectre) - 1) :
         canevas1_L_trait.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1])
+
+###############################################################################
+# fonctions graphiques de zoom des deux canevas (frame1_L_trait et frame2_L_trait)
+###############################################################################
+def change_zoom_inf_L_trait() :
+    if variable_zoom_inf_L_trait.get() >= variable_zoom_sup_L_trait.get() :
+        variable_zoom_sup_L_trait.set(variable_zoom_inf_L_trait.get())
+    affiche_spectre_L_trait()
+    affiche_spectre_corrige_L_trait()
+    affiche_fond_L_trait()
+    
+def change_zoom_sup_L_trait():
+    if variable_zoom_sup_L_trait.get() <= variable_zoom_inf_L_trait.get() :
+        variable_zoom_inf_L_trait.set(variable_zoom_sup_L_trait.get())
+#    limites_affichage_spectre_L_trait[0]=variable_zoom_inf_L_trait.get()
+#    limites_affichage_spectre_L_trait[1]=variable_zoom_sup_L_trait.get()
+    affiche_spectre_L_trait()
+    affiche_spectre_corrige_L_trait()
+    affiche_fond_L_trait()
+
+def change_zoom_inf_return_L_trait(event):
+    change_zoom_inf_L_trait()
+    
+def change_zoom_sup_return_L_trait(event):
+    change_zoom_sup_L_trait()
+
+def zoom_clic_L_trait(event):
+    global coord_zoom_L_trait
+    coord_zoom_L_trait[0]=event.x
+    coord_zoom_L_trait[1]=event.y
+    
+def zoom_drag_and_drop_L_trait(event):
+    global ligne_position_0_L_trait
+    global ligne_position_1_L_trait
+    global coord_zoom_L_trait
+    global limites_affichage_spectre_L_trait
+    global lambda_texte_spectre_0_L_trait
+    global lambda_texte_spectre_1_L_trait
+    global flag_premier_lamda_L_trait
+    canevas0_L_trait.delete(ligne_position_0_L_trait)
+    ligne_position_0_L_trait=canevas0_L_trait.create_line(event.x,0,event.x,200, fill="green")
+    canevas1_L_trait.delete(ligne_position_1_L_trait)
+    ligne_position_1_L_trait=canevas1_L_trait.create_line(event.x,0,event.x,200, fill="green")
+    coord_zoom_L_trait[2]=event.x
+    coord_zoom_L_trait[3]=event.y
+    if coord_zoom_L_trait[2] > coord_zoom_L_trait[0] :
+        debut= coord_zoom_L_trait[0]*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
+        fin = coord_zoom_L_trait[2]*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
+        variable_zoom_inf_L_trait.set(format(debut, "4.1f"))
+        variable_zoom_sup_L_trait.set(format(fin, "4.1f"))
+        #affiche la longueur d'onde :
+        if flag_premier_lamda_L_trait == False :
+            canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
+            canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
+        l= event.x*delta_limites_L_trait/1000+limites_affichage_spectre_L_trait[0]
+        lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm" ))
+        flag_premier_lamda_L_trait=False
+    if coord_zoom_L_trait[2] < coord_zoom_L_trait[0] :
+        variable_zoom_inf_L_trait.set(limites_spectre_L_trait[0])
+        variable_zoom_sup_L_trait.set(limites_spectre_L_trait[1])
+        limites_affichage_spectre_L_trait[0]=variable_zoom_inf_L_trait.get()
+        limites_affichage_spectre_L_trait[1]=variable_zoom_sup_L_trait.get()
+
+def zoom_clic_release_L_trait(event):
+    affiche_spectre_L_trait()
+    affiche_spectre_corrige_L_trait()
+    affiche_fond_L_trait()
 
 
 
@@ -509,6 +547,9 @@ y1_L_ext=100.0
 x2_L_ext=250.0
 y2_L_ext=100.0
 
+def affiche_nom_spectre_onglet2() :
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+
 ###############################################################################
 # 1- fonctions traitement des données
 ###############################################################################
@@ -533,7 +574,6 @@ def reset_tableau_L_ext() :
     deplace_lignes_L_ext()
 
 def choix_fichier_L_ext():
-    global nom_fichier_L_ext
     global nom_fichier_seul_L_ext
     global rep_travail_L_ext
     global nombre_fichiers_L_ext
@@ -546,44 +586,29 @@ def choix_fichier_L_ext():
     nom_fichier_seul_L_ext=os.path.basename(nom_fichier_L_ext)
     type_fichier_L_ext.set(pathlib.Path(nom_fichier_seul_L_ext).suffix)
     rep_travail_L_ext = os.path.dirname(nom_fichier_L_ext)
-    liste_fichiers_L_ext=LIBStick_extraction_spectres.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
+    liste_fichiers_L_ext=LIBStick_outils.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
     nombre_fichiers_L_ext=len(liste_fichiers_L_ext)    
-    lit_affiche_spectre_L_ext()
+    lit_affiche_spectre_L_ext(nom_fichier_seul_L_ext)
     bouton_execute_L_ext.configure(state="normal")
     bouton_extraction_L_ext.configure(state="disable")
     entree6_L_ext.configure(to=nombre_fichiers_L_ext)
     entree8_L_ext.configure(to=nombre_fichiers_L_ext)
     entree9_L_ext.configure(to=nombre_fichiers_L_ext)
     entree10_L_ext.configure(to=nombre_fichiers_L_ext)
-    
-#def choix_rep_L_ext():
-#    global rep_travail_L_ext
-#    global nombre_fichiers_L_ext
-#    global liste_fichiers_L_ext
-#    rep_travail_L_ext = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_ext,title='Choisissez un repertoire')   
-#    liste_fichiers_L_ext=LIBStick_extraction_spectres.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
-#    nombre_fichiers_L_ext=len(liste_fichiers_L_ext)    
-#    lit_affiche_spectre_L_ext()
-#    bouton_execute_L_ext.configure(state="normal")
-#    bouton_extraction_L_ext.configure(state="disable")
-#    entree6_L_ext.configure(to=nombre_fichiers_L_ext)
-#    entree8_L_ext.configure(to=nombre_fichiers_L_ext)
-#    entree9_L_ext.configure(to=nombre_fichiers_L_ext)
-#    entree10_L_ext.configure(to=nombre_fichiers_L_ext)
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def execute_scripts_L_ext():
-    global liste_fichiers_L_ext
     global nom_echantillon_L_ext
+    global dataframe_norm_L_ext
     tableau_bornes_L_ext=creation_tab_bornes_L_ext()
     if flag_zone2_L_ext.get() == 0 :
         canevas2_L_ext.delete("all")
-    nom_echantillon_L_ext = LIBStick_extraction_spectres.main(rep_travail_L_ext, tableau_bornes_L_ext,
+    nom_echantillon_L_ext, dataframe_norm_L_ext = LIBStick_extraction_spectres.main(rep_travail_L_ext, tableau_bornes_L_ext,
                                                               type_fichier_L_ext.get(), liste_fichiers_L_ext,
                                                               flag_zone2_L_ext.get(), flag_2D_L_ext.get(), flag_3D_L_ext.get())
 
     affiche_image_L_ext()
     bouton_extraction_L_ext.configure(state="normal")
-    #plt.show(block=False)
 
 def creation_spectre_moyen_L_ext():
     bornes_moyenne_spectres_L_ext.insert(0,variable_L_ext_9.get())
@@ -595,30 +620,59 @@ def creation_spectre_moyen_L_ext():
         canevas4_L_ext.delete("all")
     for bornes in tableau_bornes_copy_L_ext :
         repertoire=rep_travail_L_ext+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/"
-        spectre=LIBStick_creation_spectre_moyen.main(repertoire,nom_echantillon_L_ext,bornes, bornes_moyenne_spectres_L_ext)
+        spectre=LIBStick_extraction_spectres.creation_spectre_moyen_main(repertoire,nom_echantillon_L_ext,bornes, bornes_moyenne_spectres_L_ext)
         if i==3 :
             canevas3_L_ext.delete("all")
+            delta_bornes=bornes[1]-bornes[0]
+            spectre[:,0] = (spectre[:,0] - spectre[0,0])*500/delta_bornes
             minimum=spectre[:,1].min()
             maximum=spectre[:,1].max()
             spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
             for j in range(spectre.shape[0] - 1) :
-                dx=500/spectre.shape[0]
-                x=j*dx
-                canevas3_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="red", smooth=1)
+#                dx=500/spectre.shape[0]
+#                x=j*dx
+#                canevas3_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="red", smooth=1)
+                canevas3_L_ext.create_line(spectre[j,0],spectre[j,1],spectre[j+1,0],spectre[j+1,1], width=1, fill="red", smooth=1)
         if i==4 :
             canevas4_L_ext.delete("all")
+            delta_bornes=bornes[1]-bornes[0]
+            spectre[:,0] = (spectre[:,0] - spectre[0,0])*500/delta_bornes
             minimum=spectre[:,1].min()
             maximum=spectre[:,1].max()
             spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
             for j in range(spectre.shape[0] - 1) :
-                dx=500/spectre.shape[0]
-                x=j*dx
-                canevas4_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="blue", smooth=1)
+#                dx=500/spectre.shape[0]
+#                x=j*dx
+#                canevas4_L_ext.create_line(x,spectre[j,1],x+dx,spectre[j+1,1], width=1, fill="blue", smooth=1)
+                canevas4_L_ext.create_line(spectre[j,0],spectre[j,1],spectre[j+1,0],spectre[j+1,1], fill="blue", smooth=1)
         i=i+1
         
 ###############################################################################
 # 2- fonctions graphiques du caneva du spectre (frame1_L_ext)
 ###############################################################################
+def lit_affiche_spectre_L_ext(nom_fichier):
+    global spectre_entier_L_ext
+    global limites_spectre_L_ext
+    os.chdir(rep_travail_L_ext)
+    spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier, type_fichier_L_ext.get())
+    limites_spectre_L_ext=lit_limites_abscisses_L_ext(spectre_entier_L_ext)
+    affiche_spectre_L_ext()
+    
+def lit_limites_abscisses_L_ext(spectre):
+    tableau_abscisses=spectre[:,0]
+    limites_spectre=numpy.zeros((2))
+    limites_spectre[0]=tableau_abscisses[0]             # lit le valeurs min et max du spectre
+    limites_spectre[1]=tableau_abscisses[-1]
+    variable_zoom_inf_L_ext.set(limites_spectre[0])    # fixe les valeurs du zoom à ces valeurs min et max
+    variable_zoom_sup_L_ext.set(limites_spectre[1])
+    entree_zoom_inf_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])   #fixe les valeurs limites pour le zoom et la zone de selection
+    entree_zoom_sup_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree1_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree2_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree3_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree4_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    return limites_spectre
+
 def change_flag_2D_L_ext():
     pass
     
@@ -642,70 +696,6 @@ def change_flag_zone2_L_ext():
         entree8_L_ext.configure(state="normal")
         canevas2_L_ext.configure(state="normal")
         canevas4_L_ext.configure(state="normal")
-        
-def change_zoom_inf_L_ext() :
-#    global limites_affichage_spectre_L_ext
-    if variable_L_ext_zoom_inf.get() >= variable_L_ext_zoom_sup.get() :
-        variable_L_ext_zoom_sup.set(variable_L_ext_zoom_inf.get())
-#    limites_affichage_spectre_L_ext[0]=variable_L_ext_zoom_inf.get()
-#    limites_affichage_spectre_L_ext[1]=variable_L_ext_zoom_sup.get()
-    affiche_spectre_L_ext()
-    
-def change_zoom_sup_L_ext():
-#    global limites_affichage_spectre_L_ext
-    if variable_L_ext_zoom_sup.get() <= variable_L_ext_zoom_inf.get() :
-        variable_L_ext_zoom_inf.set(variable_L_ext_zoom_sup.get())
-#    limites_affichage_spectre_L_ext[0]=variable_L_ext_zoom_inf.get()
-#    limites_affichage_spectre_L_ext[1]=variable_L_ext_zoom_sup.get()
-    affiche_spectre_L_ext()
-
-def change_zoom_inf_return_L_ext(event):
-    change_zoom_inf_L_ext()
-    
-def change_zoom_sup_return_L_ext(event):
-    change_zoom_sup_L_ext()
-
-def zoom_clic_L_ext(event):
-    global coord_zoom_L_ext
-    coord_zoom_L_ext[0]=event.x
-    coord_zoom_L_ext[1]=event.y
-    
-def zoom_drag_and_drop_L_ext(event):
-    global ligne_position_L_ext
-    global coord_zoom_L_ext
-    global limites_affichage_spectre_L_ext
-    global lambda_texte_spectre_L_ext
-    global flag_premier_lamda_L_ext
-    canevas0_L_ext.delete(ligne_position_L_ext)
-    ligne_position_L_ext=canevas0_L_ext.create_line(event.x,0,event.x,200, fill="green")
-    coord_zoom_L_ext[2]=event.x
-    coord_zoom_L_ext[3]=event.y
-    if coord_zoom_L_ext[2] > coord_zoom_L_ext[0] :
-        debut= coord_zoom_L_ext[0]*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
-        fin = coord_zoom_L_ext[2]*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
-        variable_L_ext_zoom_inf.set(format(debut, "4.1f"))
-        variable_L_ext_zoom_sup.set(format(fin, "4.1f"))
-        #affiche la longueur d'onde :
-        if flag_premier_lamda_L_ext == False :
-            canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
-        l= event.x*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
-        lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm" ))
-        flag_premier_lamda_L_ext=False
-    if coord_zoom_L_ext[2] < coord_zoom_L_ext[0] :
-        variable_L_ext_zoom_inf.set(limites_spectre_L_ext[0])
-        variable_L_ext_zoom_sup.set(limites_spectre_L_ext[1])
-        limites_affichage_spectre_L_ext[0]=variable_L_ext_zoom_inf.get()
-        limites_affichage_spectre_L_ext[1]=variable_L_ext_zoom_sup.get()
-
-def zoom_clic_release_L_ext(event):
-    affiche_spectre_L_ext()
-         
-def lit_affiche_spectre_L_ext():
-    global spectre_entier_L_ext
-    os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext=LIBStick_extraction_spectres.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
-    affiche_spectre_L_ext()
 
 def affiche_lambda_L_ext(event):
     global lambda_texte_spectre_L_ext
@@ -739,8 +729,8 @@ def affiche_spectre_L_ext():
     global limites_affichage_spectre_L_ext
     global delta_limites_L_ext
     global spectre_entier_L_ext
-    limites_affichage_spectre_L_ext[0]=variable_L_ext_zoom_inf.get()
-    limites_affichage_spectre_L_ext[1]=variable_L_ext_zoom_sup.get()
+    limites_affichage_spectre_L_ext[0]=variable_zoom_inf_L_ext.get()
+    limites_affichage_spectre_L_ext[1]=variable_zoom_sup_L_ext.get()
     delta_limites_L_ext=limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
     canevas0_L_ext.delete("all")
     spectre=numpy.zeros((0,2))   
@@ -750,7 +740,6 @@ def affiche_spectre_L_ext():
     minimum=spectre[:,1].min()
     maximum=spectre[:,1].max()
     spectre[:,1] = (200-(spectre[:,1] - minimum)*200/(maximum - minimum))
-    #spectre[:,0] = (spectre[:,0] - spectre[0,0])*1000/(spectre[len(spectre),0]-spectre[0,0])
     spectre[:,0] = (spectre[:,0] - limites_affichage_spectre_L_ext[0])*1000/delta_limites_L_ext
     for i in range(len(spectre) - 1) :
         canevas0_L_ext.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1])
@@ -843,6 +832,67 @@ def deplace_ligne0_3_return_L_ext(event):
     
 def deplace_ligne0_4_return_L_ext(event):
     deplace_ligne0_4_L_ext()
+    
+###############################################################################
+# fonctions graphiques de zoom du caneva 1 (frame1_L_ext)
+###############################################################################
+def change_zoom_inf_L_ext() :
+#    global limites_affichage_spectre_L_ext
+    if variable_zoom_inf_L_ext.get() >= variable_zoom_sup_L_ext.get() :
+        variable_zoom_sup_L_ext.set(variable_zoom_inf_L_ext.get())
+#    limites_affichage_spectre_L_ext[0]=variable_zoom_inf_L_ext.get()
+#    limites_affichage_spectre_L_ext[1]=variable_zoom_sup_L_ext.get()
+    affiche_spectre_L_ext()
+    
+def change_zoom_sup_L_ext():
+#    global limites_affichage_spectre_L_ext
+    if variable_zoom_sup_L_ext.get() <= variable_zoom_inf_L_ext.get() :
+        variable_zoom_inf_L_ext.set(variable_zoom_sup_L_ext.get())
+#    limites_affichage_spectre_L_ext[0]=variable_zoom_inf_L_ext.get()
+#    limites_affichage_spectre_L_ext[1]=variable_zoom_sup_L_ext.get()
+    affiche_spectre_L_ext()
+
+def change_zoom_inf_return_L_ext(event):
+    change_zoom_inf_L_ext()
+    
+def change_zoom_sup_return_L_ext(event):
+    change_zoom_sup_L_ext()
+
+def zoom_clic_L_ext(event):
+    global coord_zoom_L_ext
+    coord_zoom_L_ext[0]=event.x
+    coord_zoom_L_ext[1]=event.y
+    
+def zoom_drag_and_drop_L_ext(event):
+    global ligne_position_L_ext
+    global coord_zoom_L_ext
+    global limites_affichage_spectre_L_ext
+    global lambda_texte_spectre_L_ext
+    global flag_premier_lamda_L_ext
+    canevas0_L_ext.delete(ligne_position_L_ext)
+    ligne_position_L_ext=canevas0_L_ext.create_line(event.x,0,event.x,200, fill="green")
+    coord_zoom_L_ext[2]=event.x
+    coord_zoom_L_ext[3]=event.y
+    if coord_zoom_L_ext[2] > coord_zoom_L_ext[0] :
+        debut= coord_zoom_L_ext[0]*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
+        fin = coord_zoom_L_ext[2]*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
+        variable_zoom_inf_L_ext.set(format(debut, "4.1f"))
+        variable_zoom_sup_L_ext.set(format(fin, "4.1f"))
+        #affiche la longueur d'onde :
+        if flag_premier_lamda_L_ext == False :
+            canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
+        l= event.x*delta_limites_L_ext/1000+limites_affichage_spectre_L_ext[0]
+        lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm" ))
+        flag_premier_lamda_L_ext=False
+    if coord_zoom_L_ext[2] < coord_zoom_L_ext[0] :
+        variable_zoom_inf_L_ext.set(limites_spectre_L_ext[0])
+        variable_zoom_sup_L_ext.set(limites_spectre_L_ext[1])
+        limites_affichage_spectre_L_ext[0]=variable_zoom_inf_L_ext.get()
+        limites_affichage_spectre_L_ext[1]=variable_zoom_sup_L_ext.get()
+
+def zoom_clic_release_L_ext(event):
+    affiche_spectre_L_ext()
 
 ###############################################################################
 #  fonctions graphiques des canevas de l'image 1 et 2 (frame2_L_ext)
@@ -888,19 +938,31 @@ def deplace_cible1_L_ext():
     canevas1_L_ext.delete(ligne1_vert_L_ext)
     canevas1_L_ext.delete(ligne1_hori_L_ext)
     ligne1_vert_L_ext=canevas1_L_ext.create_line(x1_L_ext,0,x1_L_ext,200, fill="white")
-    ligne1_hori_L_ext=canevas1_L_ext.create_line(0,y1_L_ext,500,y1_L_ext, fill="white")    
-#    canevas1_L_ext.coords(ligne1_vert_L_ext, x1_L_ext,0,x1_L_ext,200)
-#    canevas1_L_ext.coords(ligne1_hori_L_ext, 0,y1_L_ext,400,y1_L_ext)
+    ligne1_hori_L_ext=canevas1_L_ext.create_line(0,y1_L_ext,500,y1_L_ext, fill="white")   
     
 def coord1_to_vars_5_6_L_ext(x,y):
-    variable_L_ext_5.set(format((variable_L_ext_1.get() + (x * (variable_L_ext_2.get()-variable_L_ext_1.get()) / 500)), "4.1f"))
+    global spectre_entier_L_ext
+    global nom_fichier_seul_L_ext
+    variable_L_ext_5.set(format((variable_L_ext_1.get() + (x * (variable_L_ext_2.get()-variable_L_ext_1.get()) / 500)), "4.1f")) # ATTENTION PAS CORRECT IL FAUT RECUPERER LES BORNES D'UNE AUTRE FAÇON !!!!!
     variable_L_ext_6.set(math.ceil(y * nombre_fichiers_L_ext / 200))
+    nom_fichier_seul_L_ext=liste_fichiers_L_ext[int(variable_L_ext_6.get())-1]
+    os.chdir(rep_travail_L_ext)
+    spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    affiche_spectre_L_ext()
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
 
 def vars_5_6_to_coord1_L_ext():
     global x1_L_ext,y1_L_ext
-    x1_L_ext=round( ((variable_L_ext_5.get()-variable_L_ext_1.get())*500) / (variable_L_ext_2.get()-variable_L_ext_1.get())) 
+    global spectre_entier_L_ext
+    global nom_fichier_seul_L_ext
+    x1_L_ext=round( ((variable_L_ext_5.get()-variable_L_ext_1.get())*500) / (variable_L_ext_2.get()-variable_L_ext_1.get())) # ATTENTION PAS CORRECT IL FAUT RECUPERER LES BORNES D'UNE AUTRE FAÇON !!!!!
     y1_L_ext= round(200*(variable_L_ext_6.get()-0.5)/nombre_fichiers_L_ext)
     deplace_cible1_L_ext()
+    nom_fichier_seul_L_ext=liste_fichiers_L_ext[int(variable_L_ext_6.get())-1]
+    os.chdir(rep_travail_L_ext)
+    spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    affiche_spectre_L_ext()
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_5_6_to_coord1_return_L_ext(event):
     vars_5_6_to_coord1_L_ext()
@@ -924,14 +986,28 @@ def deplace_cible2_L_ext():
     ligne2_hori_L_ext=canevas2_L_ext.create_line(0,y2_L_ext,500,y2_L_ext, fill="white")
     
 def coord2_to_vars_7_8_L_ext(x,y):
-    variable_L_ext_7.set(format((variable_L_ext_3.get() + (x * (variable_L_ext_4.get()-variable_L_ext_3.get()) / 500)), "4.1f"))
+    global spectre_entier_L_ext
+    global nom_fichier_seul_L_ext
+    variable_L_ext_7.set(format((variable_L_ext_3.get() + (x * (variable_L_ext_4.get()-variable_L_ext_3.get()) / 500)), "4.1f")) # ATTENTION PAS CORRECT IL FAUT RECUPERER LES BORNES D'UNE AUTRE FAÇON !!!!!
     variable_L_ext_8.set(math.ceil(y * nombre_fichiers_L_ext / 200))
-
+    nom_fichier_seul_L_ext=liste_fichiers_L_ext[int(variable_L_ext_8.get())-1]
+    os.chdir(rep_travail_L_ext)
+    spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    affiche_spectre_L_ext()
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    
 def vars_7_8_to_coord2_L_ext():
     global x2_L_ext,y2_L_ext
-    x2_L_ext= round((variable_L_ext_7.get()-variable_L_ext_3.get())*500/(variable_L_ext_4.get()-variable_L_ext_3.get()))
+    global spectre_entier_L_ext
+    global nom_fichier_seul_L_ext
+    x2_L_ext= round((variable_L_ext_7.get()-variable_L_ext_3.get())*500/(variable_L_ext_4.get()-variable_L_ext_3.get())) # ATTENTION PAS CORRECT IL FAUT RECUPERER LES BORNES D'UNE AUTRE FAÇON !!!!!
     y2_L_ext= round(200*(variable_L_ext_8.get()-0.5)/nombre_fichiers_L_ext)
     deplace_cible2_L_ext()
+    nom_fichier_seul_L_ext=liste_fichiers_L_ext[int(variable_L_ext_8.get())-1]
+    os.chdir(rep_travail_L_ext)
+    spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    affiche_spectre_L_ext()
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_7_8_to_coord2_return_L_ext(event):
     vars_7_8_to_coord2_L_ext()
@@ -966,8 +1042,8 @@ def __________L_comp__________():pass
 ###############################################################################
 # 0- initialisations
 ###############################################################################
-limites_spectre_L_comp=numpy.array([198.0,1013.0])
-limites_affichage_spectre_L_comp=numpy.array([198.0,1013.0])
+limites_spectre_L_comp=numpy.array([198.0,1013.0])              # limites min et max de l'affichage du spectre
+limites_affichage_spectre_L_comp=numpy.array([198.0,1013.0])    # limites de l'affichage du spectre à l'écran
 coord_zoom_L_comp=numpy.array([198,0,1013,0])
 delta_limites_L_comp=limites_affichage_spectre_L_comp[1]-limites_affichage_spectre_L_comp[0]
 flag_premier_lamda_L_comp=True
@@ -1001,11 +1077,13 @@ y1_L_comp=100.0
 #x2_L_comp=250.0
 #y2_L_comp=100.0
 
+def affiche_nom_spectre_onglet3() :
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+
 ###############################################################################
-# 1- fonctions traitement des données
+# fonctions traitement des données
 ###############################################################################
 def creation_tab_bornes_L_comp() :
-    #global tableau_bornes_L_comp
     tableau_bornes_L_comp[0,0]=variable_1_L_comp.get()
     tableau_bornes_L_comp[0,1]=variable_2_L_comp.get()
     #entree5_L_comp.configure(from_=tableau_bornes_L_comp[0,0], to=tableau_bornes_L_comp[0,1])  
@@ -1024,7 +1102,6 @@ def reset_tableau_L_comp() :
     deplace_lignes_L_comp()
 
 def choix_fichier_L_comp():
-    global nom_fichier_L_comp
     global nom_fichier_seul_L_comp
     global rep_travail_L_comp
     global nombre_fichiers_L_comp
@@ -1038,45 +1115,34 @@ def choix_fichier_L_comp():
     nom_fichier_seul_L_comp=os.path.basename(nom_fichier_L_comp)
     type_fichier_L_comp.set(pathlib.Path(nom_fichier_seul_L_comp).suffix)
     rep_travail_L_comp = os.path.dirname(nom_fichier_L_comp)
-    liste_fichiers_L_comp=LIBStick_comp_spectres.creation_liste_fichiers(rep_travail_L_comp, type_fichier_L_comp.get())
+    liste_fichiers_L_comp=LIBStick_outils.creation_liste_fichiers(rep_travail_L_comp, type_fichier_L_comp.get())
     nombre_fichiers_L_comp=len(liste_fichiers_L_comp)    
     lit_affiche_spectre_L_comp()
     bouton_execute_L_comp.configure(state="normal")
     entree6_L_comp.configure(from_=1, to=nombre_fichiers_L_comp)
-    
-#def choix_rep_L_comp():
-#    global rep_travail_L_comp
-#    global liste_fichiers_L_comp
-#    global nombre_fichier_L_comp
-#    rep_travail_L_comp = tkinter.filedialog.askdirectory(initialdir=rep_travail_L_comp,title='Choisissez un repertoire')
-#    liste_fichiers_L_comp=LIBStick_comp_spectres.creation_liste_fichiers(rep_travail_L_comp, type_fichier_L_comp.get())
-#    nombre_fichier_L_comp=len(liste_fichiers_L_comp)
-#    lit_affiche_spectre_L_comp()
-#    bouton_execute_L_comp.configure(state="normal")
-#    entree6_L_comp.configure(to=nombre_fichier_L_comp)
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 def lit_affiche_spectre_L_comp():
     global spectre_entier_L_comp 
     global limites_spectre_L_comp
     os.chdir(rep_travail_L_comp)
-#    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(liste_fichiers_L_comp[0], type_fichier_L_comp.get())
-    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())    
+    spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())    
     limites_spectre_L_comp=lit_limites_abscisses_L_comp(spectre_entier_L_comp)
     affiche_spectre_L_comp()
 
 def lit_limites_abscisses_L_comp(spectre):
     tableau_abscisses=spectre[:,0]
     limites_spectre=numpy.zeros((2))
-    limites_spectre[0]=limites_affichage_spectre_L_comp[0]=tableau_abscisses[0]
-    limites_spectre[1]=limites_affichage_spectre_L_comp[1]=tableau_abscisses[-1]
-    variable_zoom_inf_L_comp.set(limites_affichage_spectre_L_comp[0])
-    variable_zoom_sup_L_comp.set(limites_affichage_spectre_L_comp[1])
-    entree_zoom_inf_L_comp.configure(from_=limites_spectre_L_comp[0], to=limites_spectre_L_comp[1])
-    entree_zoom_sup_L_comp.configure(from_=limites_spectre_L_comp[0], to=limites_spectre_L_comp[1])
-    entree1_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
-    entree2_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
-    entree3_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
-    entree4_L_comp.configure(from_=limites_affichage_spectre_L_comp[0], to=limites_affichage_spectre_L_comp[1])
+    limites_spectre[0]=tableau_abscisses[0]             # lit le valeurs min et max du spectre
+    limites_spectre[1]=tableau_abscisses[-1]
+    variable_zoom_inf_L_comp.set(limites_spectre[0])    # fixe les valeurs du zoom à ces valeurs min et max
+    variable_zoom_sup_L_comp.set(limites_spectre[1])
+    entree_zoom_inf_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])   #fixe les valeurs limites pour le zoom et la zone de selection
+    entree_zoom_sup_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree1_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree2_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree3_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree4_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
     return limites_spectre
        
 def execute_scripts_L_comp():
@@ -1106,7 +1172,7 @@ def execute_scripts_L_comp():
 #        texte_statistiques_L_comp.grid_forget()
 
 ###############################################################################
-# 2- fonctions graphiques du caneva du spectre (frame1_L_comp)
+# fonctions graphiques du caneva du spectre (frame1_L_comp)
 ###############################################################################
 def change_flag_denominateur_L_comp():
     if flag_denominateur_L_comp.get() == 0 :
@@ -1123,64 +1189,6 @@ def change_flag_2D_L_comp():
 
 def change_flag_3D_L_comp():
     pass
-
-def change_zoom_inf_L_comp() :
-#    global limites_affichage_spectre_L_comp
-    if variable_zoom_inf_L_comp.get() >= variable_zoom_sup_L_comp.get() :
-        variable_zoom_sup_L_comp.set(variable_zoom_inf_L_comp.get())
-#    limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
-#    limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
-    affiche_spectre_L_comp()
-    
-def change_zoom_sup_L_comp():
-#    global limites_affichage_spectre_L_comp
-    if variable_zoom_sup_L_comp.get() <= variable_zoom_inf_L_comp.get() :
-        variable_zoom_inf_L_comp.set(variable_zoom_sup_L_comp.get())
-#    limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
-#    limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
-    affiche_spectre_L_comp()
-
-def change_zoom_inf_return_L_comp(event):
-    change_zoom_inf_L_comp()
-    
-def change_zoom_sup_return_L_comp(event):
-    change_zoom_sup_L_comp()
-
-def zoom_clic_L_comp(event):
-    global coord_zoom_L_comp
-    coord_zoom_L_comp[0]=event.x
-    coord_zoom_L_comp[1]=event.y
-    
-def zoom_drag_and_drop_L_comp(event):
-    global ligne_position_L_comp
-    global coord_zoom_L_comp
-    global limites_affichage_spectre_L_comp
-    global lambda_texte_spectre
-    global flag_premier_lamda_L_comp
-    canevas0_L_comp.delete(ligne_position_L_comp)
-    ligne_position_L_comp=canevas0_L_comp.create_line(event.x,0,event.x,200, fill="green")
-    coord_zoom_L_comp[2]=event.x
-    coord_zoom_L_comp[3]=event.y
-    if coord_zoom_L_comp[2] > coord_zoom_L_comp[0] :
-        debut= coord_zoom_L_comp[0]*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
-        fin = coord_zoom_L_comp[2]*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
-        variable_zoom_inf_L_comp.set(format(debut, "4.1f"))
-        variable_zoom_sup_L_comp.set(format(fin, "4.1f"))
-        #affiche la longueur d'onde :
-        if flag_premier_lamda_L_comp == False :
-            canevas0_L_comp.delete(lambda_texte_spectre)
-        l_L_comp= event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
-        lambda_texte_spectre = canevas0_L_comp.create_text(event.x, event.y, text=str(format(l_L_comp, "4.1f")), fill="blue")
-        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm" ))
-        flag_premier_lamda_L_comp=False
-    if coord_zoom_L_comp[2] < coord_zoom_L_comp[0] :
-        variable_zoom_inf_L_comp.set(limites_spectre_L_comp[0])
-        variable_zoom_sup_L_comp.set(limites_spectre_L_comp[1])
-        #limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
-        #limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
-
-def zoom_clic_release_L_comp(event):
-    affiche_spectre_L_comp()
 
 def affiche_lambda_L_comp(event):
     global lambda_texte_spectre
@@ -1321,7 +1329,69 @@ def deplace_ligne0_4_return_L_comp(event):
     deplace_ligne0_4_L_comp()
 
 ###############################################################################
-# 3- fonctions graphiques du caneva de l'image 1 (frame2_L_comp)
+# fonctions graphiques de zoom du caneva du spectre (frame1_L_comp)
+###############################################################################
+def change_zoom_inf_L_comp() :
+#    global limites_affichage_spectre_L_comp
+    if variable_zoom_inf_L_comp.get() >= variable_zoom_sup_L_comp.get() :
+        variable_zoom_sup_L_comp.set(variable_zoom_inf_L_comp.get())
+#    limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
+#    limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
+    affiche_spectre_L_comp()
+    
+def change_zoom_sup_L_comp():
+#    global limites_affichage_spectre_L_comp
+    if variable_zoom_sup_L_comp.get() <= variable_zoom_inf_L_comp.get() :
+        variable_zoom_inf_L_comp.set(variable_zoom_sup_L_comp.get())
+#    limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
+#    limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
+    affiche_spectre_L_comp()
+
+def change_zoom_inf_return_L_comp(event):
+    change_zoom_inf_L_comp()
+    
+def change_zoom_sup_return_L_comp(event):
+    change_zoom_sup_L_comp()
+
+def zoom_clic_L_comp(event):
+    global coord_zoom_L_comp
+    coord_zoom_L_comp[0]=event.x
+    coord_zoom_L_comp[1]=event.y
+    
+def zoom_drag_and_drop_L_comp(event):
+    global ligne_position_L_comp
+    global coord_zoom_L_comp
+    global limites_affichage_spectre_L_comp
+    global lambda_texte_spectre
+    global flag_premier_lamda_L_comp
+    canevas0_L_comp.delete(ligne_position_L_comp)
+    ligne_position_L_comp=canevas0_L_comp.create_line(event.x,0,event.x,200, fill="green")
+    coord_zoom_L_comp[2]=event.x
+    coord_zoom_L_comp[3]=event.y
+    if coord_zoom_L_comp[2] > coord_zoom_L_comp[0] :
+        debut= coord_zoom_L_comp[0]*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+        fin = coord_zoom_L_comp[2]*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+        variable_zoom_inf_L_comp.set(format(debut, "4.1f"))
+        variable_zoom_sup_L_comp.set(format(fin, "4.1f"))
+        #affiche la longueur d'onde :
+        if flag_premier_lamda_L_comp == False :
+            canevas0_L_comp.delete(lambda_texte_spectre)
+        l_L_comp= event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+        lambda_texte_spectre = canevas0_L_comp.create_text(event.x, event.y, text=str(format(l_L_comp, "4.1f")), fill="blue")
+        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm" ))
+        flag_premier_lamda_L_comp=False
+    if coord_zoom_L_comp[2] < coord_zoom_L_comp[0] :
+        variable_zoom_inf_L_comp.set(limites_spectre_L_comp[0])
+        variable_zoom_sup_L_comp.set(limites_spectre_L_comp[1])
+        #limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
+        #limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
+
+def zoom_clic_release_L_comp(event):
+    affiche_spectre_L_comp()
+
+
+###############################################################################
+# fonctions graphiques du caneva de l'image 1 (frame2_L_comp)
 ###############################################################################
 def coordonnees1_L_comp (event) :
     global x1_L_comp,y1_L_comp
@@ -1342,19 +1412,32 @@ def deplace_cible1_L_comp():
     
 def coord1_to_vars_5_6_L_comp(x,y):
     global spectre_entier_L_comp
+    global nom_fichier_seul_L_comp
     variable_5_L_comp.set(format(limites_spectre_L_comp[0] + (x * (limites_spectre_L_comp[1]-limites_spectre_L_comp[0]) / 1000), "4.1f"))
     variable_6_L_comp.set(math.ceil(y * nombre_fichiers_L_comp / 200))
     child_id = tree_resultats_L_comp.get_children()[variable_6_L_comp.get()-1]
     tree_resultats_L_comp.selection_set(child_id)
     selection=tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
+    nom_fichier_seul_L_comp=selection[1]
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(selection[1], type_fichier_L_comp.get())
+    spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
 
 def vars_5_6_to_coord1_L_comp():
     global x1_L_comp,y1_L_comp
+    global spectre_entier_L_comp
+    global nom_fichier_seul_L_comp
     x1_L_comp=round( ((variable_5_L_comp.get()-limites_spectre_L_comp[0])*1000) / (limites_spectre_L_comp[1]-limites_spectre_L_comp[0])) 
     y1_L_comp= round(200*(variable_6_L_comp.get()-0.5)/nombre_fichiers_L_comp)
+    child_id = tree_resultats_L_comp.get_children()[variable_6_L_comp.get()-1]
+    tree_resultats_L_comp.selection_set(child_id)
+    selection=tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
+    nom_fichier_seul_L_comp=selection[1]
+    os.chdir(rep_travail_L_comp)
+    spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    affiche_spectre_L_comp()
     deplace_cible1_L_comp()
     
 def vars_5_6_to_coord1_return_L_comp(event):
@@ -1388,11 +1471,14 @@ def efface_tableau_resultats_L_comp():
 
 def selectionne_spectre_L_comp(event):
     global spectre_entier_L_comp
+    global nom_fichier_seul_L_comp
     selection=tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
     variable_6_L_comp.set(selection[0])
+    nom_fichier_seul_L_comp=selection[1]
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp=LIBStick_comp_spectres.lit_spectre(selection[1], type_fichier_L_comp.get())
+    spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
 
 def calcule_moyenne_ecarttype_L_comp() :
@@ -1452,6 +1538,8 @@ def lit_element_L_ele(symbole):
 def affiches_lignes_element_L_ele(DataFrame_element_L_ele, limites_affichage_spectre, ID_onglet):
     if ID_onglet == 0 :
         affiche_spectre_L_trait()
+        affiche_fond_L_trait()
+        affiche_spectre_corrige_L_trait()
     if ID_onglet == 1 :
         affiche_spectre_L_ext()
     if ID_onglet == 2 :
@@ -1469,7 +1557,8 @@ def affiches_lignes_element_L_ele(DataFrame_element_L_ele, limites_affichage_spe
                 #affiche_ligne_element(long_onde, canevas0_L_ext)
                 x_ligne=((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet==0 :
-                    ligne=canevas0_L_trait.create_line(x_ligne,0,x_ligne,200, fill=couleur_lignes, dash=(4,1))
+                    ligne0=canevas0_L_trait.create_line(x_ligne,0,x_ligne,200, fill=couleur_lignes, dash=(4,1))
+                    ligne1=canevas1_L_trait.create_line(x_ligne,0,x_ligne,200, fill=couleur_lignes, dash=(4,1))
                 if ID_onglet==1 :
                     ligne=canevas0_L_ext.create_line(x_ligne,0,x_ligne,200, fill=couleur_lignes, dash=(4,1))
                 if ID_onglet==2 :
@@ -1477,7 +1566,8 @@ def affiches_lignes_element_L_ele(DataFrame_element_L_ele, limites_affichage_spe
             if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1 :
                 x_ligne=((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet==0 :
-                    ligne=canevas0_L_trait.create_line(x_ligne,100,x_ligne,200, fill=couleur_lignes, dash=(4,2))
+                    ligne0=canevas0_L_trait.create_line(x_ligne,100,x_ligne,200, fill=couleur_lignes, dash=(4,2))
+                    ligne1=canevas1_L_trait.create_line(x_ligne,100,x_ligne,200, fill=couleur_lignes, dash=(4,2))
                 if ID_onglet==1 :
                     ligne=canevas0_L_ext.create_line(x_ligne,100,x_ligne,200, fill=couleur_lignes, dash=(4,2))
                 if ID_onglet==2 :
@@ -1485,7 +1575,8 @@ def affiches_lignes_element_L_ele(DataFrame_element_L_ele, limites_affichage_spe
             if intensite_relative < 1 and flag_inf1_L_ele.get() == 1 :
                 x_ligne=((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet==0 :
-                    ligne=canevas0_L_trait.create_line(x_ligne,165,x_ligne,200, fill=couleur_lignes, dash=(4,3))
+                    ligne0=canevas0_L_trait.create_line(x_ligne,165,x_ligne,200, fill=couleur_lignes, dash=(4,3))
+                    ligne1=canevas1_L_trait.create_line(x_ligne,165,x_ligne,200, fill=couleur_lignes, dash=(4,3))
                 if ID_onglet==1 :
                     ligne=canevas0_L_ext.create_line(x_ligne,165,x_ligne,200, fill=couleur_lignes, dash=(4,3))
                 if ID_onglet==2 :
@@ -1614,7 +1705,7 @@ class case_classification(tkinter.Button) :
 # 7- Interface graphique : création fenêtre principale avec scrolls et onglets
 ###############################################################################
 fenetre_principale=tkinter.Tk()
-fenetre_principale.title("LIBStick v1.2")
+fenetre_principale.title("LIBStick v1.3")
 fenetre_principale.geometry("1150x850+100+50")
 fenetre_principale.maxsize(width=1160, height=850)
 
@@ -1680,6 +1771,21 @@ fenetre_principale.config(menu=barre_menus)
 
 #fenetre_classification_L_ele=tkinter.Toplevel(fenetre_principale)
 
+###############################################################################
+# Interface graphique : gestion de évènements
+###############################################################################
+def click_onglets(event):
+#   onglet_click = onglets.tk.call(onglets._w, "identify", "tab", event.x, event.y)
+    onglet_actif = onglets.index(onglets.select())
+    if onglet_actif == 0 :
+        affiche_nom_spectre_onglet1()
+    if onglet_actif == 1 :
+        affiche_nom_spectre_onglet2()
+    if onglet_actif == 2 :
+        affiche_nom_spectre_onglet3()
+
+onglets.bind("<ButtonRelease-1>",click_onglets)
+
 
 
 
@@ -1693,8 +1799,8 @@ def __________IHM_traitement__________():pass
 ###############################################################################
 # 8- Interface graphique : création des différentes zones/étapes (frames 1-2)
 ###############################################################################
-frame1_L_trait=tkinter.Frame(onglet1,borderwidth=2,relief=tkinter.RAISED, bg=couleur_interface)
-frame2_L_trait=tkinter.Frame(onglet1,borderwidth=2,relief=tkinter.RAISED, bg=couleur_interface)
+frame1_L_trait=tkinter.Frame(onglet1,borderwidth=2,relief=tkinter.RAISED, bg=couleur_interface, width=1135)
+frame2_L_trait=tkinter.Frame(onglet1,borderwidth=2,relief=tkinter.RAISED, bg=couleur_interface, width=1135)
 
 frame1_L_trait.grid(row=10, column=10, padx=5, pady=5,sticky = tkinter.W)
 frame2_L_trait.grid(row=20, column=10, padx=5, pady=5,sticky = tkinter.W)
@@ -1777,18 +1883,18 @@ frame1_1_L_trait.grid(row=1, column=7, rowspan=4, sticky=tkinter.N+tkinter.S)
 
 text_zoom_L_trait=tkinter.Label(frame1_1_L_trait, text="Zoom : ", width=9, bg=couleur_interface)
 text_zoom_L_trait.grid(row=1, column=1, sticky=tkinter.N)
-variable_L_trait_zoom_inf=tkinter.DoubleVar(value=198)
-variable_L_trait_zoom_sup=tkinter.DoubleVar(value=1013)
+variable_zoom_inf_L_trait=tkinter.DoubleVar(value=198)
+variable_zoom_sup_L_trait=tkinter.DoubleVar(value=1013)
 entree_zoom_inf_L_trait=tkinter.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
-                                        textvariable=variable_L_trait_zoom_inf,
+                                        textvariable=variable_zoom_inf_L_trait,
                                         command=change_zoom_inf_L_trait, width=9)
 entree_zoom_sup_L_trait=tkinter.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
-                                        textvariable=variable_L_trait_zoom_sup,
+                                        textvariable=variable_zoom_sup_L_trait,
                                         command=change_zoom_sup_L_trait, width=9)
 entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tkinter.N)
 entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tkinter.N)
 
-type_fichier_L_trait=tkinter.StringVar(value=".asc")
+#type_fichier_L_trait=tkinter.StringVar(value=".asc")
 bouton_rep_L_trait=tkinter.Button(frame1_1_L_trait, text="Fichier",
                                   command=choix_fichier_L_trait, width=9, bg=couleur_interface)
 bouton_visualisation_L_trait=tkinter.Button(frame1_1_L_trait, text="Visualisation",
@@ -1799,7 +1905,7 @@ bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tkinter.N)
 image_classification=tkinter.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
 bouton_classification_L_trait=tkinter.Button(frame1_1_L_trait, image=image_classification,
                                              command=ouvre_fenetre_classification_L_ele)
-bouton_classification_L_trait.grid(row=6, column=1, sticky=tkinter.S)
+bouton_classification_L_trait.grid(row=8, column=1, sticky=tkinter.S)
 
 ###############################################################################
 # 10- Interface graphique frame2_L_trait
@@ -1821,6 +1927,13 @@ coche_image_brute_L_trait.grid(row=1, column=1)
 bouton_execute_L_trait=tkinter.Button(frame2_1_L_trait, text="Executer", state="disable",
                                       command = execute_L_trait , width=9, bg=couleur_interface)
 bouton_execute_L_trait.grid(row=2, column=1)
+
+text_spectre_L_trait=tkinter.Label(frame2_1_L_trait, text="Spectre : ", bg=couleur_interface)
+text_spectre_L_trait.grid(row=3, column=1, sticky=tkinter.N)
+numero_spectre_L_trait=tkinter.IntVar(value=1)
+entree_spectre_L_trait=tkinter.Spinbox(frame2_1_L_trait, from_=1, to=50, textvariable=numero_spectre_L_trait,
+                                       command=lit_affiche_spectre_numero_L_trait, width=9)
+entree_spectre_L_trait.grid(row=4, column=1, sticky=tkinter.N)
 
 ###############################################################################
 # 12- Interface graphique : gestion de évènements
@@ -1866,6 +1979,10 @@ entree6_L_trait.bind("<<ComboboxSelected>>", change_options_fond_L_trait)
 entree6_L_trait.bind("<Return>", change_options_fond_L_trait)
 entree6_L_trait.bind("<KP_Enter>", change_options_fond_L_trait)
 entree6_L_trait.bind("<Tab>", change_options_fond_L_trait)
+
+entree_spectre_L_trait.bind("<Return>", lit_affiche_spectre_numero_event_L_trait)
+entree_spectre_L_trait.bind("<Tab>", lit_affiche_spectre_numero_event_L_trait)
+entree_spectre_L_trait.bind("<KP_Enter>", lit_affiche_spectre_numero_event_L_trait)
 
 
 
@@ -1933,10 +2050,10 @@ frame1_1_L_ext.grid(row=1, column=7, rowspan=3)
 
 text_zoom_L_ext=tkinter.Label(frame1_1_L_ext, text="Zoom : ", width=9, bg=couleur_interface)
 text_zoom_L_ext.grid(row=1, column=1)
-variable_L_ext_zoom_inf=tkinter.DoubleVar(value=198)
-variable_L_ext_zoom_sup=tkinter.DoubleVar(value=1013)
-entree_zoom_inf_L_ext=tkinter.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_L_ext_zoom_inf, command=change_zoom_inf_L_ext, width=9)
-entree_zoom_sup_L_ext=tkinter.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_L_ext_zoom_sup, command=change_zoom_sup_L_ext, width=9)
+variable_zoom_inf_L_ext=tkinter.DoubleVar(value=198)
+variable_zoom_sup_L_ext=tkinter.DoubleVar(value=1013)
+entree_zoom_inf_L_ext=tkinter.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_zoom_inf_L_ext, command=change_zoom_inf_L_ext, width=9)
+entree_zoom_sup_L_ext=tkinter.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_zoom_sup_L_ext, command=change_zoom_sup_L_ext, width=9)
 entree_zoom_inf_L_ext.grid(row=2, column=1)
 entree_zoom_sup_L_ext.grid(row=3, column=1)
 
@@ -2234,9 +2351,9 @@ affiche_lignes_spectre_L_comp()
 # 11- Interface graphique frame3_L_comp : affichage des résultats sous forme de TreeView
 ###############################################################################
 tree_resultats_L_comp=tkinter.ttk.Treeview(frame3_L_comp, columns=(1,2,3), height = 10 ,show = "headings")
-tree_resultats_L_comp.column(1, width=10)
-tree_resultats_L_comp.column(2, width=600)
 tree_resultats_L_comp.column(1, width=200)
+tree_resultats_L_comp.column(2, width=600)
+tree_resultats_L_comp.column(3, width=200)
 tree_resultats_L_comp.heading(1, text="n°")
 tree_resultats_L_comp.heading(2, text="Nom du spectre")
 tree_resultats_L_comp.heading(3, text="Rapport zone1/zone2")

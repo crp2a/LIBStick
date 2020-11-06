@@ -9,91 +9,36 @@ Created on Thu Apr  2 11:31:54 2020
 import numpy,os,pandas
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as plt3d
+import LIBStick_outils
 
 limites_zone1=[534.5 , 535.8]
 limites_zone2=[528.0 , 543.0]
 limites_spectre=[528.0, 543.0]
 
 ###############################################################################
-# 1- fonction qui liste des fichiers *.mean d'un répertoire
+# fonctions création tableaux et DataFrame
 ###############################################################################
-def repertoire_de_travail(rep_script,rep_travail_relatif):
-    rep_travail=rep_script+"/"+rep_travail_relatif
-    return rep_travail
-
-def creation_liste_fichiers(rep_travail,type_fichier):
-    os.chdir(rep_travail)
-    liste=[]
-    if type_fichier == ".mean" :
-        for fichier in os.listdir():
-            if (os.path.isfile(fichier) and fichier[-4:] == "mean") :
-                liste.append(fichier)
-    if type_fichier == ".tsv" :
-        for fichier in os.listdir():
-            if (os.path.isfile(fichier) and fichier[-3:] == "tsv") :
-                liste.append(fichier)
-    if type_fichier == ".asc" :
-        for fichier in os.listdir():
-            if (os.path.isfile(fichier) and fichier[-3:] == "asc") :
-                liste.append(fichier)
-    liste.sort()
-    return liste
-
-def lit_spectre(fichier,type_fichier):
-    if type_fichier == ".mean" :
-        spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
-    if type_fichier == ".tsv" :
-        spectre=numpy.loadtxt(fichier,delimiter="\t",dtype=float,encoding="Latin-1")
-    if type_fichier == ".asc" :
-        document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
-        spectre=numpy.zeros((0,2))
-        for ligne in document :
-            if (ligne[0]<=1013) :
-                spectre=numpy.row_stack((spectre,ligne))
-    return spectre
-
-def creer_tableau(liste,type_traitement):
-#    if type_traitement == "Echantillons différents" :
+def creer_tableau_avec_x(liste,type_traitement): # données en colonnes
     if type_traitement == 0 :   # On ne normalise pas les spectres
-        i=0
-        for nom_fichier in liste :
-            if i==0 :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")                
-                tableau_abscisses=fichier_entree[:,0]
-                tableau_comparatif=numpy.zeros((0,fichier_entree.shape[0]))
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
-            else :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
-            i=i+1
-#    if type_traitement == "Même échantillon" :
+        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
     if type_traitement == 1 :   # On normalise tous les spectres
-        i=0
-        for nom_fichier in liste :
-            if i==0 :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
-                tableau_abscisses=fichier_entree[:,0]
-                tableau_comparatif=numpy.zeros((0,fichier_entree.shape[0]))
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
-            else :
-                fichier_entree=numpy.loadtxt(nom_fichier, delimiter="\t")
-                tableau_comparatif=numpy.row_stack((tableau_comparatif,fichier_entree[:,1]))
-            i=i+1
-        tableau_comparatif=normalise_tableau_aire(tableau_comparatif)
-    return tableau_comparatif, tableau_abscisses
+        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
+        tableau=normalise_tableau_x_aire(tableau)
+    return tableau    
 
-def normalise_tableau_aire(tableau):
-    for ligne in range(tableau.shape[0]):
-        minimum=tableau[ligne,:].min()
-        tableau[ligne,:] = (tableau[ligne,:] - minimum)
-        aire=tableau[ligne,:].sum()
-        tableau[ligne,:] = (tableau[ligne,:] /aire)
+def normalise_tableau_x_aire(tableau): # données en colonnes
+    for colonne in range(tableau.shape[1]-1):
+        minimum=tableau[:,colonne+1].min()
+        tableau[:,colonne+1] = (tableau[:,colonne+1] - minimum)
+        aire=tableau[:,colonne+1].sum()
+        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
     #tableau=tableau/tableau.max() #A ne pas faire car dépend de la liste à un instant t !!!
     return tableau
 
-def creer_DataFrame(tableau_comparatif,liste,tableau_abscisses):
-    DataFrame_comparatif=pandas.DataFrame(data=tableau_comparatif, index=liste, columns=tableau_abscisses)
-    return DataFrame_comparatif
+#def creer_DataFrame_x(tableau, liste) :
+##    liste[0:0] = ["Lambda (nm)"]
+#    df=pandas.DataFrame(numpy.transpose(tableau[:,1:]), index=liste, columns=tableau[:,0])
+#    return df
 
 def creer_DataFrame_resultats(DataFrame_comparatif, limites_zone1,limites_zone2,flag_denominateur):
     if flag_denominateur == 1 :
@@ -109,9 +54,11 @@ def creer_DataFrame_resultats(DataFrame_comparatif, limites_zone1,limites_zone2,
         DataFrame_tableau_calculs["Somme zone 1"] = Sous_DataFrame.sum(axis=1)
     return DataFrame_tableau_calculs
 
-def Convertir_Dataframe_tableau(DataFrame_comparatif):
+def convertir_Dataframe_resultats_tableau(DataFrame_comparatif):
     tableau=DataFrame_comparatif.values
+#    print(tableau.shape)
     tableau= numpy.delete(tableau, -1 , axis=1)
+#    print(tableau.shape)
     return tableau
 
 def enregistre_DataFrame_resultats(DataFrame_resultats):
@@ -119,7 +66,7 @@ def enregistre_DataFrame_resultats(DataFrame_resultats):
     DataFrame_resultats.to_csv("Resultat_fichiers_classes.txt", sep='\t', decimal=",")
 
 ###############################################################################
-# 2- fonction d'affichage graphique du tableau de résultats
+# fonctions d'affichage graphique du tableau de résultats
 ###############################################################################    
 def tableau_256gris(tableau_norm):
     tableau8bits=tableau_norm*255
@@ -179,8 +126,12 @@ def graphique_lit_tableau():
 ###############################################################################
 def main(rep_travail, liste_fichiers, tableau_bornes,type_traitement,flag_denominateur, flag_2D, flag_3D):
     os.chdir(rep_travail)
-    tableau_comparatif, tableau_abscisses = creer_tableau(liste_fichiers,type_traitement)
-    DataFrame_comparatif=creer_DataFrame(tableau_comparatif,liste_fichiers,tableau_abscisses)
+    tableau_comparatif = creer_tableau_avec_x(liste_fichiers,type_traitement)
+    DataFrame_comparatif=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_comparatif,liste_fichiers)    
+    
+#    print(tableau_comparatif.shape)
+#    print(DataFrame_comparatif.info())
+    
     limites_zone1[0]=tableau_bornes[0,0]
     limites_zone1[1]=tableau_bornes[0,1]
     limites_zone2[0]=tableau_bornes[1,0]
@@ -199,7 +150,7 @@ def main(rep_travail, liste_fichiers, tableau_bornes,type_traitement,flag_denomi
         DataFrame_resultats = DataFrame_resultats.sort_values(by=["Somme zone 1"])
         enregistre_DataFrame_resultats(DataFrame_resultats)    
     
-    tableau_comparatif=Convertir_Dataframe_tableau(DataFrame_comparatif)
+    tableau_comparatif=convertir_Dataframe_resultats_tableau(DataFrame_comparatif)
     tableau8bits=tableau_256gris(tableau_comparatif)
     if flag_2D :
         graphique_creation(tableau8bits, "Echantillons classés", limites_spectre)
