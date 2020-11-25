@@ -18,7 +18,6 @@ import numpy,os,pandas
 ###############################################################################
 # fonctions générales de gestion des repertoires et fichiers
 ###############################################################################
-
 def repertoire_de_travail(rep_script,rep_travail_relatif):
     rep_travail=rep_script+"/"+rep_travail_relatif
     return rep_travail
@@ -58,19 +57,6 @@ def lit_spectre(fichier,type_fichier):
 ###############################################################################
 # fonctions générales de création de DataFrame
 ###############################################################################
-
-# creation tableau avec lambda (1ere colonne) et spectres dans le colonnes suivantes
-def creer_tableau_avec_x_colonne1(liste):
-    i=0
-    for fichier in liste :
-        if i==0 :
-            tableau=numpy.loadtxt(fichier, delimiter="\t")
-        else :
-            fichier_entree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
-            tableau=numpy.column_stack((tableau,fichier_entree))
-        i=i+1
-    return tableau
-
 # creation tableau avec lambda (1ere ligne) et spectres dans les lignes suivantes
 def creer_tableau_avec_x_ligne1(liste):
     i=0
@@ -85,13 +71,71 @@ def creer_tableau_avec_x_ligne1(liste):
     return tableau
 
 # creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes        
+def creer_DataFrame_x_tableau_en_lignes(tableau_en_lignes, liste) :
+#    liste[0:0] = ["Lambda (nm)"]
+    df=pandas.DataFrame(numpy.transpose(tableau_en_lignes[1:,:]), index=liste, columns=tableau_en_lignes[0,:])
+    return df
+
+
+
+# creation tableau avec lambda (1ere colonne) et spectres dans le colonnes suivantes
+def creer_tableau_avec_x_colonne1(liste):
+    i=0
+    for fichier in liste :
+        if i==0 :
+            tableau=numpy.loadtxt(fichier, delimiter="\t")
+        else :
+            fichier_entree=numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
+            tableau=numpy.column_stack((tableau,fichier_entree))
+        i=i+1
+    return tableau
+
+# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes        
 def creer_DataFrame_x_tableau_en_colonnes(tableau_en_colonnes, liste) :
 #    liste[0:0] = ["Lambda (nm)"]
     df=pandas.DataFrame(numpy.transpose(tableau_en_colonnes[:,1:]), index=liste, columns=tableau_en_colonnes[:,0])
     return df
 
-# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes        
-def creer_DataFrame_x_tableau_en_lignes(tableau_en_lignes, liste) :
-#    liste[0:0] = ["Lambda (nm)"]
-    df=pandas.DataFrame(numpy.transpose(tableau_en_lignes[1:,:]), index=liste, columns=tableau_en_lignes[0,:])
-    return df
+# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes entre bornes inf et sup       
+def creer_DataFrame_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bornes) :
+    df=pandas.DataFrame(numpy.transpose(tableau_en_colonnes[:,1:]), index=liste, columns=tableau_en_colonnes[:,0])
+    df_bornes = df.loc[ : , bornes[0]:bornes[1]]
+    return df_bornes
+
+def creer_DataFrame_bornes(df, bornes) :
+    df_bornes = df.loc[ : , bornes[0]:bornes[1]]
+    return df_bornes
+
+###############################################################################
+# normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
+ ###############################################################################
+def normalise_tableau_x_aire(tableau): # données en colonnes, abscisses dans la première colonne
+    for colonne in range(tableau.shape[1]-1):
+        minimum=tableau[:,colonne+1].min()
+        tableau[:,colonne+1] = (tableau[:,colonne+1] - minimum)
+        aire=tableau[:,colonne+1].sum()
+        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
+    return tableau
+
+def normalise_tableau_x_maximum(tableau): # données en colonnes, abscisses dans la première colonne
+    for colonne in range(tableau.shape[1]-1):
+        minimum=tableau[:,colonne+1].min()
+        tableau[:,colonne+1] = (tableau[:,colonne+1] - minimum)
+#        aire=tableau[:,colonne+1].sum()
+#        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
+    tableau=tableau/tableau.max() #A ne pas faire car dépend de la liste à un instant t !!!
+    return tableau
+
+###############################################################################
+# normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
+ ###############################################################################
+def normalise_DataFrame_aire(dataframe): # données lignes
+    tableau=dataframe.values
+    for ligne in range(tableau.shape[0]):
+        minimum=tableau[ligne,:].min()
+        tableau[ligne,:] = (tableau[ligne,:] - minimum)
+        aire=tableau[ligne,:].sum()
+        tableau[ligne,:] = (tableau[ligne,:] /aire)
+    dataframe = pandas.DataFrame(tableau, index=dataframe.index, columns=dataframe.columns)
+    return dataframe
+

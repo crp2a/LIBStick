@@ -152,13 +152,9 @@ def graphique_sauvegarde(tableau8bits) :
 ###############################################################################
 def creation_tableau_norm(rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) :
     liste_fichiers=LIBStick_outils.creation_liste_fichiers(rep_travail, ".tsv")
-    
-#    tableau_brut=  creer_tableau_avec_x(liste_fichiers)
     tableau_brut=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers)
     tableau8bits_brut=tableau_brut_transpose_256gris(tableau_brut)
     graphique_brut_sauvegarde(tableau8bits_brut)
-#    print("tableau brut " + str(tableau_brut.shape))
-#    print("tableau 8bits brut " + str(tableau8bits_brut.shape))
     
     tableau_norm=normalise_tableau_aire(tableau_brut)
     enregistre_fichier_point(tableau_norm,"tableau_normalisé_points.txt")

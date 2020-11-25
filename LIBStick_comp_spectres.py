@@ -23,22 +23,8 @@ def creer_tableau_avec_x(liste,type_traitement): # données en colonnes
         tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
     if type_traitement == 1 :   # On normalise tous les spectres
         tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
-        tableau=normalise_tableau_x_aire(tableau)
+        tableau=LIBStick_outils.normalise_tableau_x_aire(tableau)
     return tableau    
-
-def normalise_tableau_x_aire(tableau): # données en colonnes
-    for colonne in range(tableau.shape[1]-1):
-        minimum=tableau[:,colonne+1].min()
-        tableau[:,colonne+1] = (tableau[:,colonne+1] - minimum)
-        aire=tableau[:,colonne+1].sum()
-        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
-    #tableau=tableau/tableau.max() #A ne pas faire car dépend de la liste à un instant t !!!
-    return tableau
-
-#def creer_DataFrame_x(tableau, liste) :
-##    liste[0:0] = ["Lambda (nm)"]
-#    df=pandas.DataFrame(numpy.transpose(tableau[:,1:]), index=liste, columns=tableau[:,0])
-#    return df
 
 def creer_DataFrame_resultats(DataFrame_comparatif, limites_zone1,limites_zone2,flag_denominateur):
     if flag_denominateur == 1 :
@@ -56,9 +42,7 @@ def creer_DataFrame_resultats(DataFrame_comparatif, limites_zone1,limites_zone2,
 
 def convertir_Dataframe_resultats_tableau(DataFrame_comparatif):
     tableau=DataFrame_comparatif.values
-#    print(tableau.shape)
     tableau= numpy.delete(tableau, -1 , axis=1)
-#    print(tableau.shape)
     return tableau
 
 def enregistre_DataFrame_resultats(DataFrame_resultats):
@@ -127,10 +111,7 @@ def graphique_lit_tableau():
 def main(rep_travail, liste_fichiers, tableau_bornes,type_traitement,flag_denominateur, flag_2D, flag_3D):
     os.chdir(rep_travail)
     tableau_comparatif = creer_tableau_avec_x(liste_fichiers,type_traitement)
-    DataFrame_comparatif=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_comparatif,liste_fichiers)    
-    
-#    print(tableau_comparatif.shape)
-#    print(DataFrame_comparatif.info())
+    DataFrame_comparatif=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_comparatif,liste_fichiers) 
     
     limites_zone1[0]=tableau_bornes[0,0]
     limites_zone1[1]=tableau_bornes[0,1]
