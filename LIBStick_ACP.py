@@ -83,17 +83,16 @@ def calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, f
         ax.text(tableau_ACP[i,dim1-1], tableau_ACP[i,dim2-1], dataframe.index[i])   
     plt.show(block=False)
     
-    dataframe_variables=pandas.DataFrame(donnees_ACP.components_, columns=dataframe.columns)
-    dataframe_variables.to_csv("dataframe_variables", decimal=".", sep="\t")
-    
-    valeurs_propres_corrigees = donnees_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
-    sqrt_valeurs_propres_corrigees = numpy.sqrt(valeurs_propres_corrigees)
-    variables_explicatives_corrigees = numpy.zeros((20,nbr_variables))
-    for i in range(20) :
-        variables_explicatives_corrigees[i,:] = donnees_ACP.components_[i,:] * sqrt_valeurs_propres_corrigees[i]
-    dataframe_variables_2=pandas.DataFrame(variables_explicatives_corrigees, columns=dataframe.columns)
-    dataframe_variables_2.to_csv("dataframe_variables_2", decimal=".", sep="\t")
-    
+#    dataframe_variables=pandas.DataFrame(donnees_ACP.components_, columns=dataframe.columns)
+#    dataframe_variables.to_csv("dataframe_variables", decimal=".", sep="\t")
+#    
+#    valeurs_propres_corrigees = donnees_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
+#    sqrt_valeurs_propres_corrigees = numpy.sqrt(valeurs_propres_corrigees)
+#    variables_explicatives_corrigees = numpy.zeros((20,nbr_variables))
+#    for i in range(20) :
+#        variables_explicatives_corrigees[i,:] = donnees_ACP.components_[i,:] * sqrt_valeurs_propres_corrigees[i]
+#    dataframe_variables_2=pandas.DataFrame(variables_explicatives_corrigees, columns=dataframe.columns)
+#    dataframe_variables_2.to_csv("dataframe_variables_2", decimal=".", sep="\t")
     
     return donnees_ACP
 
