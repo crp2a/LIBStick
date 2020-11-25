@@ -11,17 +11,9 @@ import numpy, pandas
 import matplotlib.pyplot as plt
 import sklearn.decomposition
 #import sklearn.preprocessing
-from fanalysis.pca import PCA
+#from fanalysis.pca import PCA
 
 
-def calcul_ACP (dataframe,dim1, dim2, flag_centre_reduit, flag_echelle, flag_eboulis, flag_calcul) :
-    if flag_calcul == True :
-        donnees_ACP=calcul_ACP_fanalysis(dataframe,dim1, dim2,flag_centre_reduit)
-    else :
-        donnees_ACP=calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, flag_eboulis)
-    return donnees_ACP
-  
-    
 def tableau_centre_reduit(tableau) :
     moyennes=numpy.mean(tableau, axis=0)
     sigmas=numpy.std(tableau, axis=0, ddof=0)
@@ -107,16 +99,21 @@ def calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, f
 
 
 
+#def calcul_ACP (dataframe,dim1, dim2, flag_centre_reduit, flag_echelle, flag_eboulis, flag_calcul) :
+#    if flag_calcul == True :
+#        donnees_ACP=calcul_ACP_fanalysis(dataframe,dim1, dim2,flag_centre_reduit)
+#    else :
+#        donnees_ACP=calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, flag_eboulis)
+#    return donnees_ACP
 
-
-def calcul_ACP_fanalysis (dataframe,dim1, dim2, flag_centre_reduit) :
-#    p=dataframe.shape[1]   #nbre de variable en colonnes
-#    n=dataframe.shape[0]   #nbre d'observation en lignes
-    tableau=dataframe.values     #matrice des valeurs de D
-    
-    if flag_centre_reduit==True :
-        tableau=tableau_centre_reduit(tableau)
-        
-    tableau_ACP=PCA(std_unit=False, row_labels=dataframe.index, col_labels=dataframe.columns) #si std_unit=True => ACP normée
-    tableau_ACP.fit(tableau)
-    tableau_ACP.mapping_row(num_x_axis=dim1, num_y_axis=dim2,figsize=(5,5))   
+#def calcul_ACP_fanalysis (dataframe,dim1, dim2, flag_centre_reduit) :
+##    p=dataframe.shape[1]   #nbre de variable en colonnes
+##    n=dataframe.shape[0]   #nbre d'observation en lignes
+#    tableau=dataframe.values     #matrice des valeurs de D
+#    
+#    if flag_centre_reduit==True :
+#        tableau=tableau_centre_reduit(tableau)
+#        
+#    tableau_ACP=PCA(std_unit=False, row_labels=dataframe.index, col_labels=dataframe.columns) #si std_unit=True => ACP normée
+#    tableau_ACP.fit(tableau)
+#    tableau_ACP.mapping_row(num_x_axis=dim1, num_y_axis=dim2,figsize=(5,5))   

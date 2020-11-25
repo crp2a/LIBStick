@@ -1633,9 +1633,8 @@ def execute_ACP_L_ACP() :
     dataframe=coupe_dataframe_L_ACP(dataframe)
     if flag_normalise_L_ACP.get()==True :
         dataframe=LIBStick_outils.normalise_DataFrame_aire(dataframe)
-    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP(dataframe, dim_1_L_ACP.get(), dim_2_L_ACP.get(),
-                                              flag_centre_reduit_L_ACP.get(), flag_echelle_L_ACP.get(),
-                                              flag_eboulis_L_ACP.get(), flag_calcul_L_ACP.get())
+    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP_sklearn(dataframe, dim_1_L_ACP.get(), dim_2_L_ACP.get(),
+                                              flag_centre_reduit_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
     nbr_spectres = dataframe.shape[0]
     nbr_variables = dataframe.shape[1]
     valeurs_propres_corrigees = donnees_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
@@ -2971,7 +2970,7 @@ flag_eboulis_L_ACP=tkinter.BooleanVar(value=True)
 coche_eboulis_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Diag. éboulis", variable=flag_eboulis_L_ACP, bg=couleur_interface)
 coche_eboulis_L_ACP.grid(row=8, column=1)
 
-flag_calcul_L_ACP=tkinter.BooleanVar(value=False)
+#flag_calcul_L_ACP=tkinter.BooleanVar(value=False)
 #coche_calcul_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="fanalysis ?", variable=flag_calcul_L_ACP, bg=couleur_interface)
 #coche_calcul_L_ACP.grid(row=8, column=1)
 
