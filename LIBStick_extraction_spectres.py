@@ -51,7 +51,7 @@ def creation_sous_repertoire(rep_travail,tableau_bornes, flag_zone2):
 ###############################################################################
 # fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###############################################################################
-def enregistre_fichier(document,repertoire,nom_fichier):
+def enregistre_spectre(document,repertoire,nom_fichier):
     os.chdir(repertoire)
     nom_fichier=nom_fichier[0:-4] + "_" + repertoire[-11:] +".tsv"
     numpy.savetxt(nom_fichier,document, delimiter="\t")
@@ -73,14 +73,14 @@ def enregistre_dataframe_point(dataframe,nom_fichier) :
 ###############################################################################
 # fonction normalise les colonnes du tableau
 ###############################################################################
-def normalise_tableau_aire(tableau):
-    for colonne in range(1,tableau.shape[1]):
-        minimum=tableau[:,colonne].min()
-        tableau[:,colonne] = (tableau[:,colonne] - minimum)
-        aire=tableau[:,colonne].sum()
-        tableau[:,colonne] = (tableau[:,colonne] /aire)
-    tableau[:,1:]=tableau[:,1:]/tableau[:,1:].max()
-    return tableau
+#def normalise_tableau_aire(tableau):
+#    for colonne in range(1,tableau.shape[1]):
+#        minimum=tableau[:,colonne].min()
+#        tableau[:,colonne] = (tableau[:,colonne] - minimum)
+#        aire=tableau[:,colonne].sum()
+#        tableau[:,colonne] = (tableau[:,colonne] /aire)
+#    tableau[:,1:]=tableau[:,1:]/tableau[:,1:].max()
+#    return tableau
         
 ###############################################################################
 # fonctions qui affichent et sauvegardent des graphes
@@ -155,8 +155,9 @@ def creation_tableau_norm(rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) 
     tableau_brut=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers)
     tableau8bits_brut=tableau_brut_transpose_256gris(tableau_brut)
     graphique_brut_sauvegarde(tableau8bits_brut)
+    enregistre_fichier_point(tableau_brut,"tableau_brut_points.txt")
     
-    tableau_norm=normalise_tableau_aire(tableau_brut)
+    tableau_norm=LIBStick_outils.normalise_tableau_x_aire(tableau_brut)
     enregistre_fichier_point(tableau_norm,"tableau_normalisé_points.txt")
     enregistre_fichier_virgule(tableau_norm,"tableau_normalisé_virgules.txt")
     tableau8bits_norm=tableau_transpose_256gris(tableau_norm)
@@ -171,18 +172,28 @@ def creation_tableau_norm(rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) 
         graphique_creation(tableau8bits_norm,nom_echantillon,bornes)
     if flag_3D == 1 :
         graphique_3D_creation(tableau8bits_norm,nom_echantillon,bornes)
-        
-    return dataframe_norm
 
 ###############################################################################
 # Création spectre moyen
 ###############################################################################
-def creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres):  # x sur la première colonne
+#def creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres):  # x sur la première colonne
+#    tableau_abscisses=tableau_norm[:,0]
+#    tableau_extrait=tableau_norm[:,1:]
+#    indice_premier=(bornes_moyenne_spectres[0]-1)
+#    indice_dernier=(bornes_moyenne_spectres[1])
+#    tableau_extrait=tableau_extrait[:,indice_premier:indice_dernier]
+#    spectre_moyen=tableau_extrait.sum(axis=1)
+#    spectre_moyen=spectre_moyen/tableau_extrait.shape[1]
+#    spectre_moyen=numpy.column_stack((tableau_abscisses,spectre_moyen))
+#    return spectre_moyen
+
+def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):  # x sur la première colonne
     tableau_abscisses=tableau_norm[:,0]
     tableau_extrait=tableau_norm[:,1:]
-    indice_premier=(bornes_moyenne_spectres[0]-1)
-    indice_dernier=(bornes_moyenne_spectres[1])
-    tableau_extrait=tableau_extrait[:,indice_premier:indice_dernier]
+    for i in range(len(liste_bool),0, -1) :
+        if liste_bool[i-1] == False :
+            print ("supprime : " + str(i))
+            tableau_extrait= numpy.delete(tableau_extrait, i-1, axis=1)
     spectre_moyen=tableau_extrait.sum(axis=1)
     spectre_moyen=spectre_moyen/tableau_extrait.shape[1]
     spectre_moyen=numpy.column_stack((tableau_abscisses,spectre_moyen))
@@ -193,10 +204,17 @@ def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes):
     nom_fichier=str(numpy.char.replace(nom_fichier, " ", "_"))
     numpy.savetxt(nom_fichier,spectre_moyen,delimiter="\t", newline="\n")
     
-def creation_spectre_moyen_main(rep_travail,nom_echantillon, bornes, bornes_moyenne_spectres) :
+def creation_spectre_moyen_main(rep_travail,nom_echantillon, bornes, bornes_moyenne_spectres, liste_bool, flag_spectres_normalises_moyenne) :
     os.chdir(rep_travail)
-    tableau_norm=numpy.loadtxt("tableau_normalisé_points.txt",delimiter="\t",dtype=float,encoding="Latin-1")
-    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
+    tableau=numpy.loadtxt("tableau_brut_points.txt",delimiter="\t",dtype=float,encoding="Latin-1")
+    if flag_spectres_normalises_moyenne == True :
+        print("moyenne des spectres normalisés")
+        tableau=LIBStick_outils.normalise_tableau_x_aire(tableau)
+    else :
+        print("moyenne des spectres bruts")
+    print(tableau)
+#    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
+    spectre_moyen=creation_spectre_moyen_avec_x_tableau_bool(tableau, liste_bool)
     enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes)
     return spectre_moyen
      
@@ -213,9 +231,10 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
         for bornes in tableau_bornes :
             os.chdir(rep_travail)
             document=lit_fichier_entre_bornes(liste_fichiers[i], bornes[0], bornes[1], type_fichier)
-            enregistre_fichier(document,rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1]) ,liste_fichiers[i])
+            enregistre_spectre(document,rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1]) ,liste_fichiers[i])
     for bornes in tableau_bornes :
         os.chdir(rep_script)
-        dataframe_norm=creation_tableau_norm(rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/", nom_echantillon,bornes, flag_2D, flag_3D)
-    return nom_echantillon, dataframe_norm
+        creation_tableau_norm(rep_travail+"/"+str(bornes[0])+"_"+ str(bornes[1])+"/", nom_echantillon,bornes, flag_2D, flag_3D)
+    return nom_echantillon
+#    return nom_echantillon, dataframe_norm
     

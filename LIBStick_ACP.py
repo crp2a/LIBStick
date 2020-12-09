@@ -98,6 +98,12 @@ def calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, f
 
 
 
+
+
+
+
+
+
 #def calcul_ACP (dataframe,dim1, dim2, flag_centre_reduit, flag_echelle, flag_eboulis, flag_calcul) :
 #    if flag_calcul == True :
 #        donnees_ACP=calcul_ACP_fanalysis(dataframe,dim1, dim2,flag_centre_reduit)
