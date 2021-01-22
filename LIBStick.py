@@ -26,6 +26,9 @@ import LIBStick_ACP
 ###############################################################################
 # 0- initialisations
 ###############################################################################
+#s = tkinter.ttk.Style()
+#s.theme_use("alt")
+
 #couleur_interface="lavender"
 #couleur_interface="linen"
 couleur_interface="light grey"
@@ -165,10 +168,10 @@ def choix_fichier_L_trait():
     global nombre_fichiers_L_trait
     nom_fichier_L_trait = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_trait,
                                                                  title='Choisissez un fichier spectre',
-                                                                 filetypes=(("fichiers IVEA","*.asc"), 
+                                                                 filetypes=(("fichiers IVEA","*.asc"),
+                                                                            ("fichiers SciAps","*.csv"),
                                                                             ("fichiers LIBStick","*.tsv"),
-                                                                            ("fichiers LIBStick moyen","*.mean"),
-                                                                            ("tous","*.*"))   )
+                                                                            ("fichiers LIBStick moyen","*.mean")))
     nom_fichier_seul_L_trait=os.path.basename(nom_fichier_L_trait)    
     type_fichier_L_trait=pathlib.Path(nom_fichier_seul_L_trait).suffix
 #    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
@@ -178,7 +181,7 @@ def choix_fichier_L_trait():
     entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
     lit_affiche_spectre_L_trait()
     bouton_visualisation_L_trait.configure(state="normal")
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_trait)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_trait)
     
 def visualisation_L_trait():
     global fond_continu_L_trait
@@ -409,7 +412,7 @@ def lit_affiche_spectre_numero_L_trait():
     spectre_entier_L_trait=LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait, type_fichier_L_trait)
     affiche_spectre_L_trait()
     visualisation_L_trait()
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_trait)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_trait)
     
 def lit_affiche_spectre_numero_event_L_trait(event):
     lit_affiche_spectre_numero_L_trait()
@@ -550,7 +553,7 @@ y_L_ext=100.0
 x2_L_ext=250.0
 
 def affiche_nom_spectre_onglet2() :
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
 
 ###############################################################################
 # 1- fonctions traitement des données
@@ -583,10 +586,10 @@ def choix_fichier_L_ext():
     global liste_bool_L_ext
     nom_fichier_L_ext = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_ext,
                                                                  title='Choisissez un fichier spectre',
-                                                                 filetypes=(("fichiers IVEA","*.asc"), 
-                                                                            ("fichiers LIBStick","*.tsv"),
-                                                                            ("fichiers LIBStick moyen","*.mean"),
-                                                                            ("tous","*.*"))   )
+                                                                 filetypes=(("fichiers LIBStick","*.tsv"),
+                                                                            ("fichiers IVEA","*.asc"),
+                                                                            ("fichiers SciAps","*.csv"),
+                                                                            ("fichiers LIBStick moyen","*.mean")))
     nom_fichier_seul_L_ext=os.path.basename(nom_fichier_L_ext)
     type_fichier_L_ext.set(pathlib.Path(nom_fichier_seul_L_ext).suffix)
     rep_travail_L_ext = os.path.dirname(nom_fichier_L_ext)
@@ -602,7 +605,7 @@ def choix_fichier_L_ext():
     entree8_L_ext.configure(to=nombre_fichiers_L_ext)
     entree9_L_ext.configure(to=nombre_fichiers_L_ext)
     entree10_L_ext.configure(to=nombre_fichiers_L_ext)
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def execute_scripts_L_ext():
     global nom_echantillon_L_ext
@@ -966,7 +969,7 @@ def coord1_to_vars_5_6_L_ext(x,y):
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
 
 def vars_5_6_to_coord1_L_ext():
     global x1_L_ext,y_L_ext
@@ -981,7 +984,7 @@ def vars_5_6_to_coord1_L_ext():
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_5_6_to_coord1_return_L_ext(event):
     vars_5_6_to_coord1_L_ext()
@@ -1015,7 +1018,7 @@ def coord2_to_vars_7_8_L_ext(x,y):
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_7_8_to_coord2_L_ext():
     global x2_L_ext,y_L_ext
@@ -1030,7 +1033,7 @@ def vars_7_8_to_coord2_L_ext():
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_7_8_to_coord2_return_L_ext(event):
     vars_7_8_to_coord2_L_ext()
@@ -1056,8 +1059,8 @@ def retro_action_entree10_L_ext():
         for i in range(variable_9_L_ext.get()-1, variable_9_avant_L_ext.get()-1) :
             liste_bool_L_ext[i]=True
     variable_9_avant_L_ext.set(variable_9_L_ext.get())
-    print("==================================")
-    print (liste_bool_L_ext)    
+#    print("==================================")
+#    print (liste_bool_L_ext)    
 
 def retro_action_entree9_L_ext():
     global liste_bool_L_ext
@@ -1077,8 +1080,8 @@ def retro_action_entree9_L_ext():
         for i in range(variable_10_avant_L_ext.get(), variable_10_L_ext.get()) :
             liste_bool_L_ext[i]=True
     variable_10_avant_L_ext.set(variable_10_L_ext.get())
-    print("==================================")
-    print (liste_bool_L_ext)
+#    print("==================================")
+#    print (liste_bool_L_ext)
 
 def change_entree9_L_ext(event):
     retro_action_entree10_L_ext()
@@ -1135,7 +1138,7 @@ y1_L_comp=100.0
 #y2_L_comp=100.0
 
 def affiche_nom_spectre_onglet3() :
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 ###############################################################################
 # fonctions traitement des données
@@ -1168,8 +1171,7 @@ def choix_fichier_L_comp():
                                                             filetypes=(("fichiers LIBStick moyen","*.mean"),
                                                                        ("fichiers LIBStick","*.tsv"),
                                                                        ("fichiers IVEA","*.asc"),
-                                                                       ("tous","*.*")),
-                                                                       multiple=False)
+                                                                       ("fichiers SciAps","*.csv")), multiple=False)
     nom_fichier_seul_L_comp=os.path.basename(nom_fichier_L_comp)
     type_fichier_L_comp.set(pathlib.Path(nom_fichier_seul_L_comp).suffix)
     rep_travail_L_comp = os.path.dirname(nom_fichier_L_comp)
@@ -1178,7 +1180,7 @@ def choix_fichier_L_comp():
     lit_affiche_spectre_L_comp()
     bouton_execute_L_comp.configure(state="normal")
     entree6_L_comp.configure(from_=1, to=nombre_fichiers_L_comp)
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 def lit_affiche_spectre_L_comp():
     global spectre_entier_L_comp 
@@ -1205,12 +1207,10 @@ def lit_limites_abscisses_L_comp(spectre):
        
 def execute_scripts_L_comp():
     global DataFrame_resultats_L_comp
-    tableau_bornes_L_comp=creation_tab_bornes_L_comp()
-    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, tableau_bornes_L_comp, flag_traitement_L_comp.get(),
-                                flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
-#    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, tableau_bornes_L_comp, type_traitement_L_comp.get(),
-#                                flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
     global photo
+    tableau_bornes_L_comp=creation_tab_bornes_L_comp()
+    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, type_fichier_L_comp.get(), tableau_bornes_L_comp, flag_traitement_L_comp.get(),
+                                flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
     fichier=rep_travail_L_comp+"/figure.png"
     image_zoom=PIL.Image.open(fichier)    
     image_zoom=image_zoom.resize((1000, 200))
@@ -1473,7 +1473,7 @@ def coord1_to_vars_5_6_L_comp(x,y):
     nom_fichier_seul_L_comp=selection[1]
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
 
 def vars_5_6_to_coord1_L_comp():
@@ -1488,7 +1488,7 @@ def vars_5_6_to_coord1_L_comp():
     nom_fichier_seul_L_comp=selection[1]
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     deplace_cible1_L_comp()
     
@@ -1527,7 +1527,7 @@ def selectionne_spectre_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     
 def selectionne_spectre_up_L_comp(event):
@@ -1541,7 +1541,7 @@ def selectionne_spectre_up_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     tree_resultats_L_comp.see(selection)
 
@@ -1556,7 +1556,7 @@ def selectionne_spectre_down_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()  
     tree_resultats_L_comp.see(selection)
 
@@ -1615,7 +1615,7 @@ spectre_corrige_L_ACP=numpy.zeros((0,2))
 #tableau_bornes_L_ACP=numpy.array([300.0, 608.0])
 
 def affiche_nom_spectre_onglet4() :
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
 
 ###############################################################################
 # fonctions traitement des données
@@ -1630,18 +1630,18 @@ def choix_fichier_L_ACP():
                                                             initialdir=rep_travail_L_ACP,
                                                             filetypes=(("fichiers LIBStick moyen","*.mean"),
                                                                        ("fichiers LIBStick","*.tsv"),
-                                                                       ("tous","*.*")),
-                                                                       multiple=False)
+                                                                       ("fichiers IVEA","*.asc"),
+                                                                       ("fichiers SciAps","*.csv")), multiple=False)
     nom_fichier_seul_L_ACP=os.path.basename(nom_fichier_L_ACP)
     type_fichier_L_ACP.set(pathlib.Path(nom_fichier_seul_L_ACP).suffix)
     rep_travail_L_ACP = os.path.dirname(nom_fichier_L_ACP)
     liste_fichiers_L_ACP=LIBStick_outils.creation_liste_fichiers(rep_travail_L_ACP, type_fichier_L_ACP.get())
     nombre_fichiers_L_ACP=len(liste_fichiers_L_ACP)    
 #    entree6_L_ACP.configure(from_=1, to=nombre_fichiers_L_ACP)
-    tableau_spectres_L_ACP=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP)
+    tableau_spectres_L_ACP=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP, type_fichier_L_ACP.get())
     DataFrame_complet_L_ACP=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_spectres_L_ACP, liste_fichiers_L_ACP)
     lit_affiche_spectre_L_ACP()    
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
     bouton_execute_L_ACP.configure(state="normal")
 
 def lit_affiche_spectre_L_ACP():
@@ -1673,30 +1673,71 @@ def coupe_dataframe_L_ACP(dataframe):
     for selection in tree_L_ACP.get_children() :
         item=tree_L_ACP.item(selection)["values"]
         if item[2] == "Non" :
-            print("supprime la ligne n° " + str(i))
+#            print("supprime la ligne n° " + str(i))
             dataframe_coupe=dataframe_coupe.drop(index=i)
         i=i+1
     return dataframe_coupe
 
+def change_flag_3D_L_ACP() :
+    if flag_3D_L_ACP.get() == True :
+        entree_dim3_L_ACP.configure(state="normal")
+    if flag_3D_L_ACP.get() == False :
+        entree_dim3_L_ACP.configure(state="disable")
+
 def execute_ACP_L_ACP() :
     global donnees_ACP_L_ACP
-    global dataframe_variables_L_ACP
+    global dataframe_facteurs_ACP_L_ACP
     dataframe=DataFrame_complet_L_ACP.copy(deep=True) # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe=coupe_dataframe_L_ACP(dataframe)
     if flag_normalise_L_ACP.get()==True :
         dataframe=LIBStick_outils.normalise_DataFrame_aire(dataframe)
-    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP_sklearn(dataframe, dim_1_L_ACP.get(), dim_2_L_ACP.get(),
-                                              flag_centre_reduit_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+    if flag_3D_L_ACP.get() :
+        dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get(), dim_3_L_ACP.get()]
+    else :
+        dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get()]
+    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP_sklearn(dataframe, dim_L_ACP,
+                                              flag_centre_reduit_L_ACP.get(), flag_3D_L_ACP.get(),
+                                              flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
     nbr_spectres = dataframe.shape[0]
     nbr_variables = dataframe.shape[1]
+    nbr_composantes = nbr_spectres
+    if nbr_spectres >= 20 :
+        nbr_composantes = 20
     valeurs_propres_corrigees = donnees_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
+#    print(valeurs_propres_corrigees)
     sqrt_valeurs_propres_corrigees = numpy.sqrt(valeurs_propres_corrigees)
-    variables_explicatives_corrigees = numpy.zeros((20,nbr_variables))
-    for i in range(20) :
-        variables_explicatives_corrigees[i,:] = donnees_ACP_L_ACP.components_[i,:] * sqrt_valeurs_propres_corrigees[i]
-    dataframe_variables_L_ACP=pandas.DataFrame(variables_explicatives_corrigees, columns=dataframe.columns)
+    facteurs_ACP_corrigees = numpy.zeros((nbr_composantes,nbr_variables))
+    for i in range(nbr_composantes) :
+        facteurs_ACP_corrigees[i,:] = donnees_ACP_L_ACP.components_[i,:] * sqrt_valeurs_propres_corrigees[i]
+    dataframe_facteurs_ACP_L_ACP=pandas.DataFrame(facteurs_ACP_corrigees, columns=dataframe.columns)
     affiche_spectres_var_ACP_L_ACP()
+    bouton_enregistre_L_ACP.configure(state="normal")
     
+def enregistre_var_explic_L_ACP() :
+    suffixe_L_ACP="_"
+    if flag_normalise_L_ACP.get() == True :
+        suffixe_L_ACP = suffixe_L_ACP + "norm_"
+    if flag_centre_reduit_L_ACP.get() == True :
+        suffixe_L_ACP = suffixe_L_ACP + "reduit_"
+    nom_fichier_sauvegarde_L_ACP = tkinter.filedialog.asksaveasfilename(title='Sauvegarde de variables explicites',
+                                                            initialdir=rep_travail_L_ACP)
+    nom_fichier_sauvegarde_L_ACP = nom_fichier_sauvegarde_L_ACP + suffixe_L_ACP
+#    pandas.DataFrame(spectre_dim1_L_ACP).to_csv(nom_fichier_sauvegarde_L_ACP+"dim1.csv")
+    pandas.DataFrame(spectre_dim1_L_ACP).to_csv(nom_fichier_sauvegarde_L_ACP + str(dim_1_L_ACP.get()) + ".txt",
+                     sep='\t', decimal=",", header=None, index=None)
+    pandas.DataFrame(spectre_dim1_L_ACP).to_excel(nom_fichier_sauvegarde_L_ACP + str(dim_1_L_ACP.get()) + ".xls",
+                                                  header=None, index=None)
+#    pandas.DataFrame(spectre_dim2_L_ACP).to_csv(nom_fichier_sauvegarde_L_ACP+"dim2.csv")
+    pandas.DataFrame(spectre_dim2_L_ACP).to_csv(nom_fichier_sauvegarde_L_ACP + str(dim_2_L_ACP.get()) + ".txt",
+                     sep='\t', decimal=",", header=None, index=None)
+    pandas.DataFrame(spectre_dim2_L_ACP).to_excel(nom_fichier_sauvegarde_L_ACP + str(dim_2_L_ACP.get()) + ".xls",
+                     header=None, index=None)
+    if flag_3D_L_ACP.get() == True :
+        pandas.DataFrame(spectre_dim3_L_ACP).to_csv(nom_fichier_sauvegarde_L_ACP + str(dim_3_L_ACP.get()) + ".txt",
+                         sep='\t', decimal=",", header=None, index=None)
+        pandas.DataFrame(spectre_dim3_L_ACP).to_excel(nom_fichier_sauvegarde_L_ACP + str(dim_3_L_ACP.get()) + ".xls",
+                         header=None, index=None)
+
 ###############################################################################
 # fonctions graphiques du caneva du spectre (frame1_L_ACP)
 ###############################################################################
@@ -1807,14 +1848,20 @@ def deplace_ligne0_2_return_L_ACP(event):
 # fonctions graphiques du caneva des "spectres de variable de l'ACP" (frame3_L_ACP)
 ###############################################################################  
 def affiche_spectres_var_ACP_L_ACP():
+    global spectre_dim1_L_ACP
+    global spectre_dim2_L_ACP
+    global spectre_dim3_L_ACP
+    
+    spectres=dataframe_facteurs_ACP_L_ACP.values
     canevas1_L_ACP.delete("all")
+    
     dim1=dim_1_L_ACP.get()-1
     dim2=dim_2_L_ACP.get()-1
-    spectre_dim1_L_ACP=dataframe_variables_L_ACP.columns
-    spectre_dim2_L_ACP=dataframe_variables_L_ACP.columns
-    spectres=dataframe_variables_L_ACP.values
+    spectre_dim1_L_ACP=dataframe_facteurs_ACP_L_ACP.columns
+    spectre_dim2_L_ACP=dataframe_facteurs_ACP_L_ACP.columns
     spectre_dim1_L_ACP=numpy.column_stack((spectre_dim1_L_ACP,spectres[dim1,:]))
     spectre_dim2_L_ACP=numpy.column_stack((spectre_dim2_L_ACP,spectres[dim2,:]))
+
     spectre1=numpy.zeros((0,2))
     spectre2=numpy.zeros((0,2))
     for ligne in spectre_dim1_L_ACP :
@@ -1823,12 +1870,26 @@ def affiche_spectres_var_ACP_L_ACP():
     for ligne in spectre_dim2_L_ACP :
         if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]) :
             spectre2=numpy.row_stack((spectre2,ligne))
+    
     minimum1=spectre1[:,1].min()
     maximum1=spectre1[:,1].max()
     minimum2=spectre2[:,1].min()
     maximum2=spectre2[:,1].max()
     minimum=min(minimum1,minimum2)
     maximum=max(maximum1,maximum2)
+    
+    if flag_3D_L_ACP.get() == True :
+        dim3=dim_3_L_ACP.get()-1
+        spectre_dim3_L_ACP=dataframe_facteurs_ACP_L_ACP.columns
+        spectre_dim3_L_ACP=numpy.column_stack((spectre_dim3_L_ACP,spectres[dim3,:]))
+        spectre3=numpy.zeros((0,2))
+        for ligne in spectre_dim3_L_ACP :
+            if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]) :
+                spectre3=numpy.row_stack((spectre3,ligne))
+        minimum3=spectre3[:,1].min()
+        maximum3=spectre3[:,1].max()       
+        minimum=min(minimum,minimum3)
+        maximum=max(maximum,maximum3)
     
     spectre1[:,1] = (200-(spectre1[:,1] - minimum)*200/((maximum - minimum)+0.000000001))
     spectre1[:,0] = (spectre1[:,0] - limites_affichage_spectre_L_ACP[0])*1000/delta_limites_L_ACP
@@ -1839,10 +1900,16 @@ def affiche_spectres_var_ACP_L_ACP():
     spectre2[:,0] = (spectre2[:,0] - limites_affichage_spectre_L_ACP[0])*1000/delta_limites_L_ACP
     for i in range(len(spectre2) - 1) :
         canevas1_L_ACP.create_line(spectre2[i,0],spectre2[i,1],spectre2[i+1,0],spectre2[i+1,1], fill="blue")
+    
+    if flag_3D_L_ACP.get() == True :
+        spectre3[:,1] = (200-(spectre3[:,1] - minimum)*200/((maximum - minimum)+0.000000001))
+        spectre3[:,0] = (spectre3[:,0] - limites_affichage_spectre_L_ACP[0])*1000/delta_limites_L_ACP
+        for i in range(len(spectre3) - 1) :
+            canevas1_L_ACP.create_line(spectre3[i,0],spectre3[i,1],spectre3[i+1,0],spectre3[i+1,1], fill="green")
+
     y=(200-(0 - minimum)*200/((maximum - minimum)+0.000000001))
     canevas1_L_ACP.create_line(0,y,1000,y, fill="grey")
 
-    
 ###############################################################################
 # fonctions graphiques de zoom du caneva du spectre (frame1_L_ACP)
 ###############################################################################
@@ -1937,7 +2004,7 @@ def selectionne_spectre_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     
 def selectionne_spectre_up_L_ACP(event):
@@ -1948,7 +2015,7 @@ def selectionne_spectre_up_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     tree_L_ACP.see(selection)
 
@@ -1960,7 +2027,7 @@ def selectionne_spectre_down_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.3"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     tree_L_ACP.see(selection)
 
@@ -2195,9 +2262,9 @@ class case_classification(tkinter.Button) :
 ###############################################################################
 fenetre_principale=tkinter.Tk()
 fenetre_principale.title("LIBStick v1.4")
-fenetre_principale.geometry("1160x770+100+50")
+fenetre_principale.geometry("1160x750+100+50")
 #fenetre_principale.maxsize(width=1160, height=850)
-fenetre_principale.maxsize(width=1160, height=770)
+fenetre_principale.maxsize(width=1160, height=750)
 
 vscrollbar = AutoScrollbar(fenetre_principale,orient=tkinter.VERTICAL)
 vscrollbar.grid(row=0, column=1, sticky=tkinter.N+tkinter.S)
@@ -2321,12 +2388,10 @@ text1_L_trait.grid(row=2, column=1, sticky=tkinter.W)
 text2_L_trait.grid(row=2, column=3, sticky=tkinter.W)
 variable_1_L_trait=tkinter.DoubleVar(value=tableau_bornes_L_trait[0])
 variable_2_L_trait=tkinter.DoubleVar(value=tableau_bornes_L_trait[1])
-entree1_L_trait=tkinter.Spinbox(frame1_L_trait, from_=198, to=1013,
-                                textvariable=variable_1_L_trait,
-                                command=deplace_ligne0_1_L_trait)
-entree2_L_trait=tkinter.Spinbox(frame1_L_trait, from_=198, to=1013,
-                                textvariable=variable_2_L_trait,
-                                command=deplace_ligne0_2_L_trait)
+entree1_L_trait=tkinter.Spinbox(frame1_L_trait, from_=198, to=1013, textvariable=variable_1_L_trait,
+                                command=deplace_ligne0_1_L_trait, foreground="red")
+entree2_L_trait=tkinter.Spinbox(frame1_L_trait, from_=198, to=1013, textvariable=variable_2_L_trait,
+                                command=deplace_ligne0_2_L_trait, foreground="red")
 entree1_L_trait.grid(row=2, column=2)
 entree2_L_trait.grid(row=2, column=4)
 
@@ -2402,6 +2467,8 @@ bouton_rep_L_trait.grid(row=4, column=1, sticky=tkinter.N)
 bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tkinter.N)
 
 image_classification=tkinter.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
+#bouton_classification_L_trait=tkinter.Button(frame1_1_L_trait, text="classification",
+#                                             command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_trait=tkinter.Button(frame1_1_L_trait, image=image_classification,
                                              command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_trait.grid(row=8, column=1, sticky=tkinter.S)
@@ -2531,10 +2598,10 @@ variable_1_L_ext=tkinter.DoubleVar(value=tableau_bornes_L_ext[0,0])
 variable_2_L_ext=tkinter.DoubleVar(value=tableau_bornes_L_ext[0,1])
 variable_3_L_ext=tkinter.DoubleVar( value=tableau_bornes_L_ext[1,0])
 variable_4_L_ext=tkinter.DoubleVar(value=tableau_bornes_L_ext[1,1])
-entree1_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_1_L_ext, command=deplace_ligne0_1_L_ext)
-entree2_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_2_L_ext, command=deplace_ligne0_2_L_ext)
-entree3_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_3_L_ext, command=deplace_ligne0_3_L_ext)
-entree4_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_4_L_ext, command=deplace_ligne0_4_L_ext)
+entree1_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_1_L_ext, command=deplace_ligne0_1_L_ext, foreground="red")
+entree2_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_2_L_ext, command=deplace_ligne0_2_L_ext, foreground="red")
+entree3_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_3_L_ext, command=deplace_ligne0_3_L_ext, foreground="blue")
+entree4_L_ext=tkinter.Spinbox(frame1_L_ext, from_=198, to=1013, textvariable=variable_4_L_ext, command=deplace_ligne0_4_L_ext, foreground="blue")
 entree1_L_ext.grid(row=2, column=2)
 entree2_L_ext.grid(row=2, column=4)
 entree3_L_ext.grid(row=3, column=2)
@@ -2580,6 +2647,7 @@ coche_3D_L_ext.grid(row=7, column=1)
 
 #image_classification=tkinter.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
 bouton_classification_L_ext=tkinter.Button(frame1_1_L_ext, image= image_classification, command=ouvre_fenetre_classification_L_ele)
+#bouton_classification_L_ext=tkinter.Button(frame1_1_L_ext, text="classification", command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_ext.grid(row=8, column=1, sticky=tkinter.S)
 
 ###############################################################################
@@ -2602,10 +2670,10 @@ text8_L_ext.grid(row=2, column=7, sticky=tkinter.E)
 variable_5_L_ext=tkinter.DoubleVar(value=0)
 variable_6_L_ext=tkinter.IntVar(value=0)
 variable_7_L_ext=tkinter.DoubleVar(value=0)
-entree5_L_ext=tkinter.Spinbox(frame2_L_ext, from_=198, to=1013, textvariable=variable_5_L_ext, command=vars_5_6_to_coord1_L_ext, increment=0.5, width=9)
-entree6_L_ext=tkinter.Spinbox(frame2_L_ext, from_=1, to=200, textvariable=variable_6_L_ext, command=vars_5_6_to_coord1_L_ext, width=9)
-entree7_L_ext=tkinter.Spinbox(frame2_L_ext, from_=198, to=1013, textvariable=variable_7_L_ext, command=vars_7_8_to_coord2_L_ext, increment=0.5, width=9)
-entree8_L_ext=tkinter.Spinbox(frame2_L_ext, from_=1, to=200, textvariable=variable_6_L_ext, command=vars_7_8_to_coord2_L_ext, width=9)
+entree5_L_ext=tkinter.Spinbox(frame2_L_ext, from_=198, to=1013, textvariable=variable_5_L_ext, command=vars_5_6_to_coord1_L_ext, increment=0.5, width=9, foreground="red")
+entree6_L_ext=tkinter.Spinbox(frame2_L_ext, from_=1, to=200, textvariable=variable_6_L_ext, command=vars_5_6_to_coord1_L_ext, width=9, foreground="red")
+entree7_L_ext=tkinter.Spinbox(frame2_L_ext, from_=198, to=1013, textvariable=variable_7_L_ext, command=vars_7_8_to_coord2_L_ext, increment=0.5, width=9, foreground="blue")
+entree8_L_ext=tkinter.Spinbox(frame2_L_ext, from_=1, to=200, textvariable=variable_6_L_ext, command=vars_7_8_to_coord2_L_ext, width=9, foreground="blue")
 entree5_L_ext.grid(row=2, column=2, sticky=tkinter.W)
 entree6_L_ext.grid(row=2, column=4, sticky=tkinter.W)
 entree7_L_ext.grid(row=2, column=6, sticky=tkinter.W)
@@ -2774,10 +2842,10 @@ variable_1_L_comp=tkinter.DoubleVar(value=tableau_bornes_L_comp[0,0])
 variable_2_L_comp=tkinter.DoubleVar(value=tableau_bornes_L_comp[0,1])
 variable_3_L_comp=tkinter.DoubleVar( value=tableau_bornes_L_comp[1,0])
 variable_4_L_comp=tkinter.DoubleVar(value=tableau_bornes_L_comp[1,1])
-entree1_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013, increment=0.5, textvariable=variable_1_L_comp, command=deplace_ligne0_1_L_comp)
-entree2_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013, increment=0.5, textvariable=variable_2_L_comp, command=deplace_ligne0_2_L_comp)
-entree3_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013,  increment=0.5,textvariable=variable_3_L_comp, command=deplace_ligne0_3_L_comp)
-entree4_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013,  increment=0.5,textvariable=variable_4_L_comp, command=deplace_ligne0_4_L_comp)
+entree1_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013, increment=0.5, textvariable=variable_1_L_comp, command=deplace_ligne0_1_L_comp, foreground="red")
+entree2_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013, increment=0.5, textvariable=variable_2_L_comp, command=deplace_ligne0_2_L_comp, foreground="red")
+entree3_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013,  increment=0.5,textvariable=variable_3_L_comp, command=deplace_ligne0_3_L_comp, foreground="blue")
+entree4_L_comp=tkinter.Spinbox(frame1_L_comp, from_=198, to=1013,  increment=0.5,textvariable=variable_4_L_comp, command=deplace_ligne0_4_L_comp, foreground="blue")
 entree1_L_comp.grid(row=2, column=2)
 entree2_L_comp.grid(row=2, column=4)
 entree3_L_comp.grid(row=3, column=2)
@@ -2823,6 +2891,7 @@ coche_3D_L_comp=tkinter.Checkbutton(frame1_1_L_comp, text="Sortie 3D", variable=
 coche_3D_L_comp.grid(row=7, column=1)
 
 #image_classification=tkinter.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
+#bouton_classification_L_comp=tkinter.Button(frame1_1_L_comp, text="classification", command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_comp=tkinter.Button(frame1_1_L_comp, image= image_classification, command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_comp.grid(row=8, column=1, sticky=tkinter.S)
 
@@ -2832,17 +2901,17 @@ bouton_classification_L_comp.grid(row=8, column=1, sticky=tkinter.S)
 canevas1_L_comp=tkinter.Canvas(frame2_L_comp, width=1000, height=200, bg="white")
 canevas1_L_comp.grid(row=1, column=1, columnspan=4)
 
-text5_L_comp = tkinter.Label(frame2_L_comp, text="Position x (nm) : ", bg=couleur_interface)
-text6_L_comp = tkinter.Label(frame2_L_comp, text="Position y (n° de spectre) : ", bg=couleur_interface)
-text5_L_comp.grid(row=2, column=1, sticky=tkinter.E)
-text6_L_comp.grid(row=2, column=3, sticky=tkinter.E)
+#text5_L_comp = tkinter.Label(frame2_L_comp, text="Position x (nm) : ", bg=couleur_interface)
+#text6_L_comp = tkinter.Label(frame2_L_comp, text="Position y (n° de spectre) : ", bg=couleur_interface)
+#text5_L_comp.grid(row=2, column=1, sticky=tkinter.E)
+#text6_L_comp.grid(row=2, column=3, sticky=tkinter.E)
 
-variable_5_L_comp=tkinter.DoubleVar(value=0)
-variable_6_L_comp=tkinter.IntVar(value=0)
-entree5_L_comp=tkinter.Spinbox(frame2_L_comp, from_=198, to=1013, textvariable=variable_5_L_comp, command=vars_5_6_to_coord1_L_comp, increment=0.5, width=9)
-entree6_L_comp=tkinter.Spinbox(frame2_L_comp, from_=1, to=100, textvariable=variable_6_L_comp, command=vars_5_6_to_coord1_L_comp, width=9)
-entree5_L_comp.grid(row=2, column=2, sticky=tkinter.W)
-entree6_L_comp.grid(row=2, column=4, sticky=tkinter.W)
+#variable_5_L_comp=tkinter.DoubleVar(value=0)
+#variable_6_L_comp=tkinter.IntVar(value=0)
+#entree5_L_comp=tkinter.Spinbox(frame2_L_comp, from_=198, to=1013, textvariable=variable_5_L_comp, command=vars_5_6_to_coord1_L_comp, increment=0.5, width=9)
+#entree6_L_comp=tkinter.Spinbox(frame2_L_comp, from_=1, to=100, textvariable=variable_6_L_comp, command=vars_5_6_to_coord1_L_comp, width=9)
+#entree5_L_comp.grid(row=2, column=2, sticky=tkinter.W)
+#entree6_L_comp.grid(row=2, column=4, sticky=tkinter.W)
 
 frame2_1_L_comp=tkinter.Frame(frame2_L_comp)
 frame2_1_L_comp.grid(row=1, column=5, rowspan=3, sticky=tkinter.N)
@@ -2867,6 +2936,18 @@ coche_stat_L_comp.grid(row=2, column=1)
 
 ligne1_vert_L_comp=canevas1_L_comp.create_line(x1_L_comp,0,x1_L_comp,200, fill="white")
 ligne1_hori_L_comp=canevas1_L_comp.create_line(0,y1_L_comp,500,y1_L_comp, fill="white")
+
+text5_L_comp = tkinter.Label(frame2_1_L_comp, text="\nPosition x (nm) : ", bg=couleur_interface)
+text6_L_comp = tkinter.Label(frame2_1_L_comp, text="Position y \n(n° de spectre) : ", bg=couleur_interface)
+text5_L_comp.grid(row=4, column=1)
+text6_L_comp.grid(row=6, column=1)
+
+variable_5_L_comp=tkinter.DoubleVar(value=0)
+variable_6_L_comp=tkinter.IntVar(value=0)
+entree5_L_comp=tkinter.Spinbox(frame2_1_L_comp, from_=198, to=1013, textvariable=variable_5_L_comp, command=vars_5_6_to_coord1_L_comp, increment=0.5, width=9)
+entree6_L_comp=tkinter.Spinbox(frame2_1_L_comp, from_=1, to=100, textvariable=variable_6_L_comp, command=vars_5_6_to_coord1_L_comp, width=9)
+entree5_L_comp.grid(row=5, column=1)
+entree6_L_comp.grid(row=7, column=1)
 
 affiche_lignes_spectre_L_comp()
 
@@ -3004,6 +3085,7 @@ bouton_rep_L_ACP=tkinter.Button(frame1_1_L_ACP, text="Fichier" ,command=choix_fi
 bouton_rep_L_ACP.grid(row=4, column=1, sticky=tkinter.N)
 
 bouton_classification_L_ACP=tkinter.Button(frame1_1_L_ACP, image= image_classification, command=ouvre_fenetre_classification_L_ele)
+#bouton_classification_L_ACP=tkinter.Button(frame1_1_L_ACP, text="classification", command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_ACP.grid(row=8, column=1, sticky=tkinter.S)
 
 ###############################################################################
@@ -3027,42 +3109,59 @@ frame2_1_L_ACP=tkinter.Frame(frame2_L_ACP, bg=couleur_interface)
 frame2_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tkinter.N)
 
 flag_normalise_L_ACP=tkinter.BooleanVar(value=True)
-coche_normalise_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Spectres normalisés\n(min=0 aire=1)", variable=flag_normalise_L_ACP, bg=couleur_interface)
+coche_normalise_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Spectres normalisés", variable=flag_normalise_L_ACP, bg=couleur_interface)
 coche_normalise_L_ACP.grid(row=1, column=1)
 
+flag_centre_reduit_L_ACP=tkinter.BooleanVar(value=False)
+coche_centre_reduit_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Centré reduit", variable=flag_centre_reduit_L_ACP, bg=couleur_interface)
+coche_centre_reduit_L_ACP.grid(row=2, column=1)
+
 bouton_execute_L_ACP=tkinter.Button(frame2_1_L_ACP, text="ACP", command=execute_ACP_L_ACP, state="disable", width=9, bg=couleur_interface)
-bouton_execute_L_ACP.grid(row=2, column=1)
+bouton_execute_L_ACP.grid(row=3, column=1)
 
 text_dim_L_ACP=tkinter.Label(frame2_1_L_ACP, text="Dimensions : ", bg=couleur_interface)
-text_dim_L_ACP.grid(row=3, column=1)
+text_dim_L_ACP.grid(row=4, column=1)
 dim_1_L_ACP=tkinter.IntVar(value=1)
-entree_dim1_L_ACP=tkinter.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=dim_1_L_ACP, width=9)
+entree_dim1_L_ACP=tkinter.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=dim_1_L_ACP,
+                                  width=9, foreground="red")
 dim_2_L_ACP=tkinter.IntVar(value=2)
-entree_dim2_L_ACP=tkinter.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=dim_2_L_ACP, width=9)
-entree_dim1_L_ACP.grid(row=4, column=1)
-entree_dim2_L_ACP.grid(row=5, column=1)
+entree_dim2_L_ACP=tkinter.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=dim_2_L_ACP,
+                                  width=9, foreground="blue")
+dim_3_L_ACP=tkinter.IntVar(value=3)
+entree_dim3_L_ACP=tkinter.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=dim_3_L_ACP, state="disable",
+                                  width=9, foreground="green")
+entree_dim1_L_ACP.grid(row=5, column=1)
+entree_dim2_L_ACP.grid(row=6, column=1)
+entree_dim3_L_ACP.grid(row=7, column=1)
 
-flag_centre_reduit_L_ACP=tkinter.BooleanVar(value=False)
-coche_centre_reduit_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Données centrée\nreduites", variable=flag_centre_reduit_L_ACP, bg=couleur_interface)
-coche_centre_reduit_L_ACP.grid(row=6, column=1)
+flag_3D_L_ACP=tkinter.BooleanVar(value=False)
+coche_3D_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="3 dimensions", variable=flag_3D_L_ACP, command=change_flag_3D_L_ACP, bg=couleur_interface)
+coche_3D_L_ACP.grid(row=8, column=1)
 
 flag_echelle_L_ACP=tkinter.BooleanVar(value=True)
 coche_echelle_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Même echelle x et y", variable=flag_echelle_L_ACP, bg=couleur_interface)
-coche_echelle_L_ACP.grid(row=7, column=1)
+coche_echelle_L_ACP.grid(row=9, column=1)
 
 flag_eboulis_L_ACP=tkinter.BooleanVar(value=True)
 coche_eboulis_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="Diag. éboulis", variable=flag_eboulis_L_ACP, bg=couleur_interface)
-coche_eboulis_L_ACP.grid(row=8, column=1)
+coche_eboulis_L_ACP.grid(row=10, column=1)
 
 #flag_calcul_L_ACP=tkinter.BooleanVar(value=False)
 #coche_calcul_L_ACP=tkinter.Checkbutton(frame2_1_L_ACP, text="fanalysis ?", variable=flag_calcul_L_ACP, bg=couleur_interface)
 #coche_calcul_L_ACP.grid(row=8, column=1)
 
 ###############################################################################
-# Interface graphique frame2_L_ACP : affichage des "spectres" des variables de l'ACP
+# Interface graphique frame3_L_ACP : affichage des "spectres" des variables de l'ACP
 ###############################################################################
 canevas1_L_ACP=tkinter.Canvas(frame3_L_ACP, width=1000, height=200, bg="white")
 canevas1_L_ACP.grid(row=1, column=1, columnspan=6)
+
+frame3_1_L_ACP = tkinter.Frame(frame3_L_ACP, bg=couleur_interface)
+frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tkinter.N)
+
+bouton_enregistre_L_ACP=tkinter.Button(frame3_1_L_ACP, text="Enregistrer \nfacteurs \nde l'ACP", command=enregistre_var_explic_L_ACP,
+                                       state="disable", width=9, bg=couleur_interface)
+bouton_enregistre_L_ACP.grid(row=1, column=1)
 
 ligne_position_1_L_ACP=canevas0_L_ACP.create_line(0,0,0,200, fill="white")
 

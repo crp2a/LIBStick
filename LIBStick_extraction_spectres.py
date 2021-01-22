@@ -68,7 +68,8 @@ def enregistre_fichier_virgule(tableau,nom_fichier):
     numpy.savetxt(nom_fichier,tableau,delimiter="\t", newline="\n", fmt="%s")
     
 def enregistre_dataframe_point(dataframe,nom_fichier) :
-    dataframe.to_csv(nom_fichier, decimal=".", sep="\t")
+#    dataframe.to_excel(nom_fichier+".xls")
+    dataframe.to_csv(nom_fichier+".txt", decimal=".", sep="\t")
     
 ###############################################################################
 # fonction normalise les colonnes du tableau
@@ -152,7 +153,7 @@ def graphique_sauvegarde(tableau8bits) :
 ###############################################################################
 def creation_tableau_norm(rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) :
     liste_fichiers=LIBStick_outils.creation_liste_fichiers(rep_travail, ".tsv")
-    tableau_brut=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers)
+    tableau_brut=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers,".tsv")
     tableau8bits_brut=tableau_brut_transpose_256gris(tableau_brut)
     graphique_brut_sauvegarde(tableau8bits_brut)
     enregistre_fichier_point(tableau_brut,"tableau_brut_points.txt")
@@ -166,7 +167,7 @@ def creation_tableau_norm(rep_travail,nom_echantillon,bornes, flag_2D, flag_3D) 
 #    dataframe_norm=creer_dataframe(tableau_norm, liste_fichiers)
     dataframe_norm=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_norm,liste_fichiers)
 #    print("DataFrame " + str(dataframe_norm.info()))
-    enregistre_dataframe_point(dataframe_norm,"dataframe_normalisé_points.txt") 
+    enregistre_dataframe_point(dataframe_norm,"dataframe_normalisé_points") 
     
     if flag_2D == 1 :
         graphique_creation(tableau8bits_norm,nom_echantillon,bornes)
@@ -212,7 +213,7 @@ def creation_spectre_moyen_main(rep_travail,nom_echantillon, bornes, bornes_moye
         tableau=LIBStick_outils.normalise_tableau_x_aire(tableau)
     else :
         print("moyenne des spectres bruts")
-    print(tableau)
+#    print(tableau)
 #    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
     spectre_moyen=creation_spectre_moyen_avec_x_tableau_bool(tableau, liste_bool)
     enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes)

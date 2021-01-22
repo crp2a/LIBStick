@@ -18,11 +18,12 @@ limites_spectre=[528.0, 543.0]
 ###############################################################################
 # fonctions création tableaux et DataFrame
 ###############################################################################
-def creer_tableau_avec_x(liste,type_traitement): # données en colonnes
+def creer_tableau_avec_x(liste,type_fichier, type_traitement): # données en colonnes
+    print(type_fichier)
     if type_traitement == 0 :   # On ne normalise pas les spectres
-        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
+        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste,type_fichier)
     if type_traitement == 1 :   # On normalise tous les spectres
-        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste)
+        tableau=LIBStick_outils.creer_tableau_avec_x_colonne1(liste,type_fichier)
         tableau=LIBStick_outils.normalise_tableau_x_aire(tableau)
     return tableau    
 
@@ -46,7 +47,8 @@ def convertir_Dataframe_resultats_tableau(DataFrame_comparatif):
     return tableau
 
 def enregistre_DataFrame_resultats(DataFrame_resultats):
-    DataFrame_resultats.to_csv("Resultat_fichiers_classes.csv")
+#    DataFrame_resultats.to_csv("Resultat_fichiers_classes.csv")
+    DataFrame_resultats.to_excel("Resultat_fichiers_classes.xls")
     DataFrame_resultats.to_csv("Resultat_fichiers_classes.txt", sep='\t', decimal=",")
 
 ###############################################################################
@@ -108,9 +110,9 @@ def graphique_lit_tableau():
 ###############################################################################
 # programme principal
 ###############################################################################
-def main(rep_travail, liste_fichiers, tableau_bornes,type_traitement,flag_denominateur, flag_2D, flag_3D):
+def main(rep_travail, liste_fichiers, type_fichier, tableau_bornes,type_traitement,flag_denominateur, flag_2D, flag_3D):
     os.chdir(rep_travail)
-    tableau_comparatif = creer_tableau_avec_x(liste_fichiers,type_traitement)
+    tableau_comparatif = creer_tableau_avec_x(liste_fichiers,type_fichier, type_traitement)
     DataFrame_comparatif=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_comparatif,liste_fichiers) 
     
     limites_zone1[0]=tableau_bornes[0,0]
