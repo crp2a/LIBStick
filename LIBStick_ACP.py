@@ -118,7 +118,7 @@ def calcul_ACP_sklearn (dataframe,dim, flag_centre_reduit, flag_3D, flag_echelle
             ax3d.set_ylim3d([min_dim2, max_dim2])
             ax3d.set_zlim3d([min_dim3, max_dim3])
         
-        ax3d.scatter (tableau_ACP[:,0], tableau_ACP[:,1], tableau_ACP[:,2], color="xkcd:light blue", marker="o", linestyle="None")
+        ax3d.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], tableau_ACP[:,dim3-1], color="xkcd:light blue", marker="o", linestyle="None")
         ax3d.set_xlabel("F"+str(dim1) +"( %.2f" %inerties[dim1-1] + " %)")
         ax3d.set_ylabel("F"+str(dim2) +"( %.2f" %inerties[dim2-1] + " %)")
         ax3d.set_zlabel("F"+str(dim3) +"( %.2f" %inerties[dim3-1] + " %)")
