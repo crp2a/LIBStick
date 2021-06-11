@@ -24,7 +24,7 @@ def tableau_centre_reduit(tableau) :
     return tableau_centre_reduit
 
 
-def calcul_ACP_sklearn (dataframe,dim, flag_centre_reduit, flag_3D, flag_echelle, flag_eboulis):
+def calcul_ACP_sklearn (dataframe,treeview_dataframe,dim, flag_centre_reduit, flag_3D, flag_echelle, flag_eboulis):
     if flag_3D == True :
         dim1 = dim[0]
         dim2 = dim[1]
@@ -93,7 +93,12 @@ def calcul_ACP_sklearn (dataframe,dim, flag_centre_reduit, flag_3D, flag_echelle
             
     #    lambada=numpy.mean(numpy.power(tableau_ACP,2), axis=0)
     #    inerties=100*lambada/numpy.sum(lambada)
-        ax.plot (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], color="xkcd:light blue", marker="o", linestyle="None")
+        #ax.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], color="xkcd:light blue", marker="o", linestyle="None")
+        #ax.plot (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], color="xkcd:light blue", marker="o", linestyle="None")
+        label=treeview_dataframe.values[:,-1]
+
+
+        ax.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], c=label, marker="o", linestyle="None")
         ax.set_xlabel("F"+str(dim1) +"( %.2f" %inerties[dim1-1] + " %)")
         ax.set_ylabel("F"+str(dim2) +"( %.2f" %inerties[dim2-1] + " %)")
         n=tableau_ACP.shape[0]
@@ -117,8 +122,9 @@ def calcul_ACP_sklearn (dataframe,dim, flag_centre_reduit, flag_3D, flag_echelle
             ax3d.set_xlim3d([min_dim1, max_dim1])
             ax3d.set_ylim3d([min_dim2, max_dim2])
             ax3d.set_zlim3d([min_dim3, max_dim3])
-        
-        ax3d.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], tableau_ACP[:,dim3-1], color="xkcd:light blue", marker="o", linestyle="None")
+            
+        label=treeview_dataframe.values[:,-1]
+        ax3d.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], tableau_ACP[:,dim3-1], c=label, marker="o", linestyle="None")
         ax3d.set_xlabel("F"+str(dim1) +"( %.2f" %inerties[dim1-1] + " %)")
         ax3d.set_ylabel("F"+str(dim2) +"( %.2f" %inerties[dim2-1] + " %)")
         ax3d.set_zlabel("F"+str(dim3) +"( %.2f" %inerties[dim3-1] + " %)")

@@ -150,7 +150,7 @@ spectre_corrige_L_trait=numpy.zeros((0,2))
 tableau_bornes_L_trait=numpy.array([300.0, 608.0])
 
 def affiche_nom_spectre_onglet1() :
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_trait)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_trait)
 
 ###############################################################################
 # 1- fonctions traitement des données
@@ -181,7 +181,7 @@ def choix_fichier_L_trait():
     entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
     lit_affiche_spectre_L_trait()
     bouton_visualisation_L_trait.configure(state="normal")
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_trait)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_trait)
     
 def visualisation_L_trait():
     global fond_continu_L_trait
@@ -412,7 +412,7 @@ def lit_affiche_spectre_numero_L_trait():
     spectre_entier_L_trait=LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait, type_fichier_L_trait)
     affiche_spectre_L_trait()
     visualisation_L_trait()
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_trait)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_trait)
     
 def lit_affiche_spectre_numero_event_L_trait(event):
     lit_affiche_spectre_numero_L_trait()
@@ -553,7 +553,7 @@ y_L_ext=100.0
 x2_L_ext=250.0
 
 def affiche_nom_spectre_onglet2() :
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
 
 ###############################################################################
 # 1- fonctions traitement des données
@@ -605,7 +605,7 @@ def choix_fichier_L_ext():
     entree8_L_ext.configure(to=nombre_fichiers_L_ext)
     entree9_L_ext.configure(to=nombre_fichiers_L_ext)
     entree10_L_ext.configure(to=nombre_fichiers_L_ext)
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def execute_scripts_L_ext():
     global nom_echantillon_L_ext
@@ -969,7 +969,7 @@ def coord1_to_vars_5_6_L_ext(x,y):
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
 
 def vars_5_6_to_coord1_L_ext():
     global x1_L_ext,y_L_ext
@@ -984,7 +984,7 @@ def vars_5_6_to_coord1_L_ext():
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_5_6_to_coord1_return_L_ext(event):
     vars_5_6_to_coord1_L_ext()
@@ -1018,7 +1018,7 @@ def coord2_to_vars_7_8_L_ext(x,y):
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_7_8_to_coord2_L_ext():
     global x2_L_ext,y_L_ext
@@ -1033,7 +1033,7 @@ def vars_7_8_to_coord2_L_ext():
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext, type_fichier_L_ext.get())
     affiche_spectre_L_ext()
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ext)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ext)
     
 def vars_7_8_to_coord2_return_L_ext(event):
     vars_7_8_to_coord2_L_ext()
@@ -1138,7 +1138,7 @@ y1_L_comp=100.0
 #y2_L_comp=100.0
 
 def affiche_nom_spectre_onglet3() :
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 ###############################################################################
 # fonctions traitement des données
@@ -1180,7 +1180,7 @@ def choix_fichier_L_comp():
     lit_affiche_spectre_L_comp()
     bouton_execute_L_comp.configure(state="normal")
     entree6_L_comp.configure(from_=1, to=nombre_fichiers_L_comp)
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 def lit_affiche_spectre_L_comp():
     global spectre_entier_L_comp 
@@ -1473,7 +1473,7 @@ def coord1_to_vars_5_6_L_comp(x,y):
     nom_fichier_seul_L_comp=selection[1]
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
 
 def vars_5_6_to_coord1_L_comp():
@@ -1488,7 +1488,7 @@ def vars_5_6_to_coord1_L_comp():
     nom_fichier_seul_L_comp=selection[1]
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     deplace_cible1_L_comp()
     
@@ -1527,7 +1527,7 @@ def selectionne_spectre_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     
 def selectionne_spectre_up_L_comp(event):
@@ -1541,7 +1541,7 @@ def selectionne_spectre_up_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     tree_resultats_L_comp.see(selection)
 
@@ -1556,7 +1556,7 @@ def selectionne_spectre_down_L_comp(event):
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
     spectre_entier_L_comp=LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_comp)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()  
     tree_resultats_L_comp.see(selection)
 
@@ -1615,11 +1615,22 @@ spectre_corrige_L_ACP=numpy.zeros((0,2))
 #tableau_bornes_L_ACP=numpy.array([300.0, 608.0])
 
 def affiche_nom_spectre_onglet4() :
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ACP)
 
 ###############################################################################
 # fonctions traitement des données
 ###############################################################################
+def creation_tab_bornes_L_ACP() :
+    tableau_bornes_L_ACP[0]=variable_1_L_ACP.get()
+    tableau_bornes_L_ACP[1]=variable_2_L_ACP.get() 
+    return tableau_bornes_L_ACP
+
+def reset_tableau_L_ACP() :
+    tableau_bornes_L_ACP=tableau_bornes_init_L_ACP.copy()
+    variable_1_L_ACP.set(tableau_bornes_L_ACP[0])
+    variable_2_L_ACP.set(tableau_bornes_L_ACP[1])
+    deplace_lignes_L_ACP()
+
 def choix_fichier_L_ACP():
     global nom_fichier_seul_L_ACP
     global rep_travail_L_ACP
@@ -1641,7 +1652,7 @@ def choix_fichier_L_ACP():
     tableau_spectres_L_ACP=LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP, type_fichier_L_ACP.get())
     DataFrame_complet_L_ACP=LIBStick_outils.creer_DataFrame_x_tableau_en_colonnes(tableau_spectres_L_ACP, liste_fichiers_L_ACP)
     lit_affiche_spectre_L_ACP()    
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ACP)
     bouton_execute_L_ACP.configure(state="normal")
 
 def lit_affiche_spectre_L_ACP():
@@ -1662,21 +1673,42 @@ def lit_limites_abscisses_L_ACP(spectre):
     variable_zoom_sup_L_ACP.set(limites_spectre[1])
     entree_zoom_inf_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])   #fixe les valeurs limites pour le zoom et la zone de selection
     entree_zoom_sup_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree1_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree2_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
     return limites_spectre
-    
-def coupe_dataframe_L_ACP(dataframe):
+
+def treeview_dataframe_L_ACP():
+    treeview_columns = ["numero", "nom", "calcul ACP","label"] # list of names here
+    treeview_df = pandas.DataFrame(columns=treeview_columns)
+    for ligne in tree_L_ACP.get_children():
+        # each row will come as a list under name "values" 
+        values = pandas.DataFrame([tree_L_ACP.item(ligne)["values"]], columns=treeview_columns)
+        treeview_df = treeview_df.append(values,ignore_index=True)
+    lignes=treeview_df.shape[0]
+    treeview_df = treeview_df.set_index([pandas.Index(range(1,lignes+1))])
+    return treeview_df
+
+def coupe_dataframe_L_ACP(dataframe,treeview_dataframe,tableau_bornes):
     tableau=dataframe.values
     n=dataframe.shape[0]   #nbre d'observation en lignes
     index_numeros=range(1,n+1)
     dataframe_coupe=pandas.DataFrame(tableau, index=index_numeros, columns=dataframe.columns)
+    treeview_dataframe_coupe = treeview_dataframe.copy(deep=True)
     i=1
-    for selection in tree_L_ACP.get_children() :
-        item=tree_L_ACP.item(selection)["values"]
-        if item[2] == "Non" :
-#            print("supprime la ligne n° " + str(i))
+    for selection in treeview_dataframe["calcul ACP"] :
+        if selection == "Non" :
+            print("supprime la ligne n° " + str(i))
             dataframe_coupe=dataframe_coupe.drop(index=i)
+            treeview_dataframe_coupe=treeview_dataframe_coupe.drop(index=i)
         i=i+1
-    return dataframe_coupe
+#    print(dataframe_coupe)
+#    print("----------------------------")
+    for nom_colonne in dataframe.columns :
+        if float(nom_colonne) < tableau_bornes[0] or float(nom_colonne) > tableau_bornes[1] :
+            dataframe_coupe = dataframe_coupe.drop(nom_colonne, axis=1)
+#    print(dataframe_coupe)
+#    print("----------------------------")
+    return dataframe_coupe,treeview_dataframe_coupe
 
 def change_flag_3D_L_ACP() :
     if flag_3D_L_ACP.get() == True :
@@ -1687,15 +1719,17 @@ def change_flag_3D_L_ACP() :
 def execute_ACP_L_ACP() :
     global donnees_ACP_L_ACP
     global dataframe_facteurs_ACP_L_ACP
+    tableau_bornes_L_ACP=creation_tab_bornes_L_ACP()
     dataframe=DataFrame_complet_L_ACP.copy(deep=True) # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
-    dataframe=coupe_dataframe_L_ACP(dataframe)
+    treeview_dataframe = treeview_dataframe_L_ACP()
+    dataframe,treeview_dataframe=coupe_dataframe_L_ACP(dataframe,treeview_dataframe,tableau_bornes_L_ACP) # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get()==True :
         dataframe=LIBStick_outils.normalise_DataFrame_aire(dataframe)
     if flag_3D_L_ACP.get() :
         dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get(), dim_3_L_ACP.get()]
     else :
         dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get()]
-    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP_sklearn(dataframe, dim_L_ACP,
+    donnees_ACP_L_ACP=LIBStick_ACP.calcul_ACP_sklearn(dataframe,treeview_dataframe, dim_L_ACP,
                                               flag_centre_reduit_L_ACP.get(), flag_3D_L_ACP.get(),
                                               flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
     nbr_spectres = dataframe.shape[0]
@@ -1987,7 +2021,7 @@ def affiche_tableau_L_ACP():
     efface_tableau_L_ACP()
     num_ligne=1
     for ligne_tableau in DataFrame_complet_L_ACP.iterrows() :
-        ID_L_ACP=tree_L_ACP.insert("","end", values=(num_ligne, ligne_tableau[0], "Oui"))
+        ID_L_ACP=tree_L_ACP.insert("","end", values=(num_ligne, ligne_tableau[0], "Oui", 0))
         num_ligne=num_ligne+1
         
 def efface_tableau_L_ACP():
@@ -2004,7 +2038,7 @@ def selectionne_spectre_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     
 def selectionne_spectre_up_L_ACP(event):
@@ -2015,7 +2049,7 @@ def selectionne_spectre_up_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     tree_L_ACP.see(selection)
 
@@ -2027,7 +2061,7 @@ def selectionne_spectre_down_L_ACP(event):
     nom_fichier_seul_L_ACP=item[1]
     os.chdir(rep_travail_L_ACP)
     spectre_entier_L_ACP=LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    fenetre_principale.title("LIBStick v1.4"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    fenetre_principale.title("LIBStick v1.5"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     tree_L_ACP.see(selection)
 
@@ -2036,12 +2070,46 @@ def change_tree_selection_L_ACP(event):
     item=tree_L_ACP.item(selection)["values"]
     if item[2] == "Non" :
 #        tree_L_ACP.item(selection, values=(item[0],item[1], "Oui"))
-        tree_L_ACP.item(selection, values=(item[0],item[1], "Oui"), tags="select")
+        tree_L_ACP.item(selection, values=(item[0],item[1], "Oui",item[3]), tags="select")
     if item[2] == "Oui" :
 #        tree_L_ACP.item(selection, values=(item[0],item[1],"Non"))
-        tree_L_ACP.item(selection, values=(item[0],item[1],"Non"), tags="deselect")
-
-
+        tree_L_ACP.item(selection, values=(item[0],item[1],"Non",item[3]), tags="deselect")
+        
+def ouvre_fenetre_change_tree_label_L_ACP(event):
+    global fenetre_label_L_ACP
+    global tableau_label_ouvert_flag_L_ACP
+    selection=tree_L_ACP.selection()
+    item=tree_L_ACP.item(selection)["values"]
+    if tableau_label_ouvert_flag_L_ACP == False :
+        tableau_label_ouvert_flag_L_ACP=True
+        fenetre_label_L_ACP=tkinter.Toplevel(fenetre_principale)
+        fenetre_label_L_ACP.geometry("200x150")
+        fenetre_label_L_ACP.resizable(False,False)
+        frame_label_L_ACP=tkinter.Frame(fenetre_label_L_ACP, bg="light grey")
+        frame_label_L_ACP.pack()
+        label_L_ACP.set(value=item[3])
+        entree_label_L_ACP=tkinter.Spinbox(frame_label_L_ACP, from_=0, to=20, increment=1, width=200, textvariable=label_L_ACP)
+        entree_label_L_ACP.pack(ipadx=0, ipady=0)
+        buttonFont = tkinter.font.Font(family='Helvetica', size=30)
+        bouton_label_L_ACP=tkinter.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200,height=100,
+                                          command = validation_label_L_ACP, bg=couleur_interface)
+        bouton_label_L_ACP.pack(ipadx=0, ipady=0)
+        fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
+    else :
+        validation_label_L_ACP()
+#        fenetre_label_L_ACP.focus_force()
+#        fenetre_label_L_ACP.focus_set()
+        fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
+        
+def ferme_fenetre_change_tree_label_L_ACP():
+    global tableau_label_ouvert_flag_L_ACP
+    tableau_label_ouvert_flag_L_ACP=False
+    fenetre_label_L_ACP.destroy()
+            
+def validation_label_L_ACP() :
+    selection=tree_L_ACP.selection()
+    item=tree_L_ACP.item(selection)["values"]
+    tree_L_ACP.item(selection, values=(item[0],item[1], item[2],label_L_ACP.get()))
 
 
 
@@ -2261,7 +2329,7 @@ class case_classification(tkinter.Button) :
 # 7- Interface graphique : création fenêtre principale avec scrolls et onglets
 ###############################################################################
 fenetre_principale=tkinter.Tk()
-fenetre_principale.title("LIBStick v1.4")
+fenetre_principale.title("LIBStick v1.5")
 fenetre_principale.geometry("1160x750+100+50")
 #fenetre_principale.maxsize(width=1160, height=850)
 fenetre_principale.maxsize(width=1160, height=750)
@@ -3091,15 +3159,20 @@ bouton_classification_L_ACP.grid(row=8, column=1, sticky=tkinter.S)
 ###############################################################################
 # Interface graphique frame2_L_ACP : affichage des résultats sous forme de TreeView
 ###############################################################################
-tree_L_ACP=tkinter.ttk.Treeview(frame2_L_ACP, columns=(1,2,3), height = 10 ,show = "headings")
+tableau_label_ouvert_flag_L_ACP = False
+label_L_ACP=tkinter.IntVar(0)
+
+tree_L_ACP=tkinter.ttk.Treeview(frame2_L_ACP, columns=(1,2,3,4), height = 10 ,show = "headings")
 tree_L_ACP.tag_configure("deselect", foreground="red")
 tree_L_ACP.tag_configure("select", foreground="black")
 tree_L_ACP.column(1, width=50)
-tree_L_ACP.column(2, width=700)
+tree_L_ACP.column(2, width=600)
 tree_L_ACP.column(3, width=200)
+tree_L_ACP.column(4, width=100)
 tree_L_ACP.heading(1, text="n°")
 tree_L_ACP.heading(2, text="Nom du spectre")
 tree_L_ACP.heading(3, text="Utlisé pour l'ACP :")
+tree_L_ACP.heading(4, text="Label :")
 tree_L_ACP.grid(row=1, column=1, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 scroll_tree_L_ACP=tkinter.ttk.Scrollbar(frame2_L_ACP, orient=tkinter.VERTICAL, command=tree_L_ACP.yview)
 scroll_tree_L_ACP.grid(row=1, column=2, sticky=tkinter.N+tkinter.S)
@@ -3199,6 +3272,7 @@ tree_L_ACP.bind("<Up>", selectionne_spectre_up_L_ACP)
 tree_L_ACP.bind("<Down>", selectionne_spectre_down_L_ACP)
 tree_L_ACP.bind("<Double-Button-1>", change_tree_selection_L_ACP)
 tree_L_ACP.bind("<space>", change_tree_selection_L_ACP)
+tree_L_ACP.bind("l", ouvre_fenetre_change_tree_label_L_ACP)
 
 canevas1_L_ACP.bind("<ButtonRelease-1>", affiche_lambda_L_ACP)
 canevas1_L_ACP.bind("<Motion>", affiche_position_souris_L_ACP)
