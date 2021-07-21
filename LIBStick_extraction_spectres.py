@@ -200,8 +200,11 @@ def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):  # x s
     spectre_moyen=numpy.column_stack((tableau_abscisses,spectre_moyen))
     return spectre_moyen
 
-def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes):
-    nom_fichier=nom_echantillon+"_spectre_moyen_"+ str(bornes[0])+"_"+str(bornes[1])+".mean"
+def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes, flag_spectres_normalises_moyenne):
+    if flag_spectres_normalises_moyenne == True :
+        nom_fichier=nom_echantillon+"_spectre_moyen_norm_"+ str(bornes[0])+"_"+str(bornes[1])+".mean"
+    else :
+        nom_fichier=nom_echantillon+"_spectre_moyen_"+ str(bornes[0])+"_"+str(bornes[1])+".mean"
     nom_fichier=str(numpy.char.replace(nom_fichier, " ", "_"))
     numpy.savetxt(nom_fichier,spectre_moyen,delimiter="\t", newline="\n")
     
@@ -216,7 +219,7 @@ def creation_spectre_moyen_main(rep_travail,nom_echantillon, bornes, bornes_moye
 #    print(tableau)
 #    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
     spectre_moyen=creation_spectre_moyen_avec_x_tableau_bool(tableau, liste_bool)
-    enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes)
+    enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes,flag_spectres_normalises_moyenne)
     return spectre_moyen
      
 ###############################################################################

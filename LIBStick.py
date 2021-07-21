@@ -223,10 +223,12 @@ def execute_L_trait():
 def lit_affiche_spectre_L_trait():
     global spectre_entier_L_trait
     global limites_spectre_L_trait
+    global fond_continu_L_trait
     os.chdir(rep_travail_L_trait)
     spectre_entier_L_trait=LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait, type_fichier_L_trait)
     limites_spectre_L_trait=lit_limites_abscisses_L_trait(spectre_entier_L_trait)
     affiche_spectre_L_trait()
+    fond_continu_L_trait= numpy.zeros((spectre_entier_L_trait.shape[0],2)) #initialisation de 
     
 def lit_limites_abscisses_L_trait(spectre):
     tableau_abscisses=spectre[:,0]
@@ -527,6 +529,7 @@ flag_premier_lamda_L_ext=True
 l_L_ext=0.0
 spectre_entier_L_ext=numpy.zeros((0,2))
 bornes_moyenne_spectres_L_ext=[]
+liste_bool_existe_L_ext = False
 #tableau_bornes_init_L_ext=numpy.array([[528.0, 543.0],[525.0, 561.5]])
 #tableau_bornes_L_ext=numpy.array([[528.0, 543.0],[525.0, 561.5]])
 #rep_travail_L_ext="~/Bureau/LIBS/Scripts_divers_pour_LIBS/repertoire_Zone_1"
@@ -584,10 +587,18 @@ def choix_fichier_L_ext():
     global nombre_fichiers_L_ext
     global liste_fichiers_L_ext
     global liste_bool_L_ext
+    global nombre_fichiers_avant_L_ext
+    global liste_bool_existe_L_ext
+#    nom_fichier_L_ext = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_ext,
+#                                                                 title='Choisissez un fichier spectre',
+#                                                                 filetypes=(("fichiers LIBStick","*.tsv"),
+#                                                                            ("fichiers IVEA","*.asc"),
+#                                                                            ("fichiers SciAps","*.csv"),
+#                                                                            ("fichiers LIBStick moyen","*.mean")))
     nom_fichier_L_ext = tkinter.filedialog.askopenfilename(initialdir=rep_travail_L_ext,
                                                                  title='Choisissez un fichier spectre',
-                                                                 filetypes=(("fichiers LIBStick","*.tsv"),
-                                                                            ("fichiers IVEA","*.asc"),
+                                                                 filetypes=(("fichiers IVEA","*.asc"),
+                                                                            ("fichiers LIBStick","*.tsv"),
                                                                             ("fichiers SciAps","*.csv"),
                                                                             ("fichiers LIBStick moyen","*.mean")))
     nom_fichier_seul_L_ext=os.path.basename(nom_fichier_L_ext)
@@ -597,7 +608,10 @@ def choix_fichier_L_ext():
     nombre_fichiers_L_ext=len(liste_fichiers_L_ext)    
     variable_10_L_ext.set(nombre_fichiers_L_ext)
     variable_10_avant_L_ext.set(nombre_fichiers_L_ext)
-    liste_bool_L_ext=[True]*nombre_fichiers_L_ext
+    if liste_bool_existe_L_ext == False or nombre_fichiers_L_ext != nombre_fichiers_avant_L_ext :
+        liste_bool_L_ext=[True]*nombre_fichiers_L_ext
+        liste_bool_existe_L_ext = True
+        nombre_fichiers_avant_L_ext = nombre_fichiers_L_ext
     lit_affiche_spectre_L_ext(nom_fichier_seul_L_ext)
     bouton_execute_L_ext.configure(state="normal")
     bouton_extraction_L_ext.configure(state="disable")
@@ -1088,6 +1102,7 @@ def change_entree9_L_ext(event):
     
 def change_entree10_L_ext(event):
     retro_action_entree9_L_ext()
+    
     
 
 
