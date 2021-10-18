@@ -19,9 +19,19 @@ def creation_sous_repertoire(rep_travail):
     if os.path.isdir(repertoire_sauvegarde) == False :
         os.mkdir(repertoire_sauvegarde)
     return repertoire_sauvegarde
+
+def creation_sous_repertoire_fond(rep_travail):
+    repertoire_sauvegarde_fond = rep_travail + "/fond_continu"
+    if os.path.isdir(repertoire_sauvegarde_fond) == False :
+        os.mkdir(repertoire_sauvegarde_fond)
+    return repertoire_sauvegarde_fond
     
 def enregistre_fichier(spectre,repertoire,nom_fichier):
     nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_corrige.tsv"
+    numpy.savetxt(nom_fichier,spectre, delimiter="\t")
+    
+def enregistre_fichier_fond(spectre,repertoire,nom_fichier):
+    nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_fond_continu.tsv"
     numpy.savetxt(nom_fichier,spectre, delimiter="\t")
   
     
@@ -176,17 +186,24 @@ def creation_spectre_corrige(spectre_filtre, fond_continu):
     spectre_corrige[:,1] = spectre_filtre[:,1]-fond_continu[:,1]
     return spectre_corrige
 
-def execute(rep_travail, spectre_corrige, nom_fichier):
+def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
+    if flag_sauve_fond == True :
+        repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
+        enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
 
-def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, deriv, type_fond, param1, param2, param3) :
+def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, deriv, type_fond, param1, param2, param3, flag_sauve_fond) :
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, type_fichier)
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
+    if flag_sauve_fond == True :
+        repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
     for nom_fichier in liste_fichiers :
         spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
         spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
         fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
         spectre= creation_spectre_corrige(spectre, fond_continu)
         enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
+        if flag_sauve_fond == True :
+            enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
         

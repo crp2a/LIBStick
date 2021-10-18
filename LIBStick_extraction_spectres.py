@@ -45,7 +45,7 @@ def creation_sous_repertoire(rep_travail,tableau_bornes, flag_zone2):
         if not os.path.isdir(rep_travail + "/"+str(tableau_bornes[1,0])+"_"+str(tableau_bornes[1,1])):
             os.mkdir(rep_travail + "/"+str(tableau_bornes[1,0])+"_"+str(tableau_bornes[1,1]))
     if flag_zone2 == 0 :
-         if not os.path.isdir(rep_travail + "/"+str(tableau_bornes[0,0])+"_"+str(tableau_bornes[0,1])):
+        if not os.path.isdir(rep_travail + "/"+str(tableau_bornes[0,0])+"_"+str(tableau_bornes[0,1])):
             os.mkdir(rep_travail + "/"+str(tableau_bornes[0,0])+"_"+str(tableau_bornes[0,1]))
 
 ###############################################################################

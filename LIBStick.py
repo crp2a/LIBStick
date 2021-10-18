@@ -215,13 +215,15 @@ def visualisation_L_trait():
     bouton_execute_L_trait.configure(state="normal")
     
 def execute_L_trait():
-    flag = flag_tous_fichiers_L_trait.get()
-    if flag == False :
-        LIBStick_traitements_spectres.execute(rep_travail_L_trait, spectre_corrige_L_trait, nom_fichier_seul_L_trait)
-    if flag == True :
+    flag_tous_fichiers = flag_tous_fichiers_L_trait.get()
+    flag_sauve_fond = flag_sauve_fond_L_trait.get()
+    if flag_tous_fichiers == False :
+        LIBStick_traitements_spectres.execute(rep_travail_L_trait, spectre_corrige_L_trait, fond_continu_L_trait, nom_fichier_seul_L_trait, flag_sauve_fond)
+    if flag_tous_fichiers == True :
         LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait, tableau_bornes_L_trait,
                                                       type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(), derivee_filtre_L_trait.get(),
-                                                      type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
+                                                      type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get(), 
+                                                      flag_sauve_fond)
 #        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(), tableau_bornes_L_trait,
 #                                                      type_filtre_L_trait.get(), taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(), derivee_filtre_L_trait.get(),
 #                                                      type_fond_L_trait.get(), param1_fond_L_trait.get(), param2_fond_L_trait.get(),param3_fond_L_trait.get())
@@ -2915,16 +2917,22 @@ coche_tous_fichiers_L_trait=tkinter.Checkbutton(frame2_1_L_trait, text="Applique
                                             variable=flag_tous_fichiers_L_trait, bg=couleur_interface)
 coche_tous_fichiers_L_trait.grid(row=1, column=1)
 
+flag_sauve_fond_init_L_trait=False
+flag_sauve_fond_L_trait=tkinter.BooleanVar(value=flag_sauve_fond_init_L_trait)
+coche_sauve_fond_L_trait=tkinter.Checkbutton(frame2_1_L_trait, text="Sauvegarde du\nfond continu",
+                                            variable=flag_sauve_fond_L_trait, bg=couleur_interface)
+coche_sauve_fond_L_trait.grid(row=2, column=1)
+
 bouton_execute_L_trait=tkinter.Button(frame2_1_L_trait, text="Executer", state="disable",
                                       command = execute_L_trait , width=9, bg=couleur_interface)
-bouton_execute_L_trait.grid(row=2, column=1)
+bouton_execute_L_trait.grid(row=3, column=1)
 
 text_spectre_L_trait=tkinter.Label(frame2_1_L_trait, text="Spectre : ", bg=couleur_interface)
-text_spectre_L_trait.grid(row=3, column=1, sticky=tkinter.N)
+text_spectre_L_trait.grid(row=4, column=1, sticky=tkinter.N)
 numero_spectre_L_trait=tkinter.IntVar(value=1)
 entree_spectre_L_trait=tkinter.Spinbox(frame2_1_L_trait, from_=1, to=50, textvariable=numero_spectre_L_trait,
                                        command=lit_affiche_spectre_numero_L_trait, width=9)
-entree_spectre_L_trait.grid(row=4, column=1, sticky=tkinter.N)
+entree_spectre_L_trait.grid(row=5, column=1, sticky=tkinter.N)
 
 ###############################################################################
 # 12- Interface graphique : gestion de évènements
