@@ -6,204 +6,215 @@ Created on Wed May 13 14:41:09 2020
 @author: yannick
 """
 
-import os, numpy, math
+import os
+import math
+import numpy
 import scipy.signal
 import LIBStick_outils
 
 
-###############################################################################
+###################################################################################################
 # fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
-###############################################################################
+###################################################################################################
 def creation_sous_repertoire(rep_travail):
     repertoire_sauvegarde = rep_travail + "/traitement"
-    if os.path.isdir(repertoire_sauvegarde) == False :
+    if os.path.isdir(repertoire_sauvegarde) is False:
         os.mkdir(repertoire_sauvegarde)
     return repertoire_sauvegarde
 
+
 def creation_sous_repertoire_fond(rep_travail):
     repertoire_sauvegarde_fond = rep_travail + "/fond_continu"
-    if os.path.isdir(repertoire_sauvegarde_fond) == False :
+    if os.path.isdir(repertoire_sauvegarde_fond) is False:
         os.mkdir(repertoire_sauvegarde_fond)
     return repertoire_sauvegarde_fond
-    
-def enregistre_fichier(spectre,repertoire,nom_fichier):
-    nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_corrige.tsv"
-    numpy.savetxt(nom_fichier,spectre, delimiter="\t")
-    
-def enregistre_fichier_fond(spectre,repertoire,nom_fichier):
-    nom_fichier=repertoire + "/" + nom_fichier[0:-4] + "_fond_continu.tsv"
-    numpy.savetxt(nom_fichier,spectre, delimiter="\t")
-  
-    
-###############################################################################
+
+
+def enregistre_fichier(spectre, repertoire, nom_fichier):
+    nom_fichier = repertoire + "/" + nom_fichier[0:-4] + "_corrige.tsv"
+    numpy.savetxt(nom_fichier, spectre, delimiter="\t")
+
+
+def enregistre_fichier_fond(spectre, repertoire, nom_fichier):
+    nom_fichier = repertoire + "/" + nom_fichier[0:-4] + "_fond_continu.tsv"
+    numpy.savetxt(nom_fichier, spectre, delimiter="\t")
+
+
+###################################################################################################
 # fonction qui limite le traitement aux bornes
-###############################################################################
+###################################################################################################
 def creation_spectre_bornes(spectre_entier, tableau_bornes):
-    spectre_limite_bornes = numpy.zeros((0,2))
-    for ligne in spectre_entier :
-        if ligne[0] > tableau_bornes[0] and ligne[0] < tableau_bornes[1] :
-            spectre_limite_bornes = numpy.row_stack((spectre_limite_bornes,ligne))
+    spectre_limite_bornes = numpy.zeros((0, 2))
+    for ligne in spectre_entier:
+        if ligne[0] > tableau_bornes[0] and ligne[0] < tableau_bornes[1]:
+            spectre_limite_bornes = numpy.row_stack((spectre_limite_bornes, ligne))
     return spectre_limite_bornes
 
-   
-###############################################################################
+
+###################################################################################################
 # fonctions de filtres
-###############################################################################
-def rolling_ball_fonction(spectre, wm, ws) :
-    ########## initialisations
+###################################################################################################
+def rolling_ball_fonction(spectre, wm, ws):
+    # initialisations
     taille_spectre = spectre.shape[0]
     ligne_base = spectre.copy()
-    y = spectre[:,1]
+    y = spectre[:, 1]
     T1 = numpy.zeros(taille_spectre)
     T2 = numpy.zeros(taille_spectre)
     a, b, v = 0, 0, 0
     ########## Minimise ##########
     a = math.ceil((wm+1)/2)
     T1[0] = numpy.min(y[0:a])
-    for i in range(1,wm) :   # -- Start of spectrum --
-        b = a +1 +(i%2)
-        T1[i] = min(numpy.min(y[a:b]), T1[i-1]) # Check if new is smaller
-        a = b   
-    for i in range(wm, taille_spectre-wm) :   # -- Main part of spectrum --
-        if ( (y[a] <= T1[i-1]) and (y[a-wm] != T1[i-1]) ) :
+    for i in range(1, wm):   # -- Start of spectrum --
+        b = a + 1 + (i % 2)
+        T1[i] = min(numpy.min(y[a:b]), T1[i-1])  # Check if new is smaller
+        a = b
+    for i in range(wm, taille_spectre-wm):   # -- Main part of spectrum --
+        if ((y[a] <= T1[i-1]) and (y[a-wm] != T1[i-1])):
             T1[i] = y[a]   # Next is smaller
-        else :
+        else:
             T1[i] = numpy.min(y[(i-wm):(i+wm)])
-        a = a + 1          
-    a = (taille_spectre - 2*wm -1)
-    for i in range(taille_spectre-wm, taille_spectre ) :   # -- End of spectrum --
-        b =  a +1 + (i%2)
-        if (numpy.min(y[a:(b)])) > T1[i-1] :
+        a = a + 1
+    a = (taille_spectre - 2*wm - 1)
+    for i in range(taille_spectre-wm, taille_spectre):   # -- End of spectrum --
+        b = a + 1 + (i % 2)
+        if (numpy.min(y[a:(b)])) > T1[i-1]:
             T1[i] = T1[i-1]   # Removed is larger
-        else :
+        else:
             T1[i] = numpy.min(y[b:taille_spectre])
         a = b
     ########## Maximise ##########
     a = math.ceil((wm+1)/2)
     T2[0] = numpy.max(T1[0:a])
-    for i in range(1,wm) :                # -- Start of spectrum --
-        b = a +1 +(i%2)
+    for i in range(1, wm):                # -- Start of spectrum --
+        b = a + 1 + (i % 2)
         #b = a +1
-        T2[i] = max(numpy.max(T1[a:b]), T2[i-1]) # Check if new is larger
-        a = b    
-    for i in range(wm, taille_spectre-wm) :     # -- Main part of spectrum --
-        if ( (T1[a] >= T2[i-1]) and (T1[a-wm] != T2[i-1]) ) :
-            T2[i] = T1[a] # Next is larger
-        else :
-            T2[i] = numpy.max(T1[i-wm : i+wm])
+        T2[i] = max(numpy.max(T1[a:b]), T2[i-1])  # Check if new is larger
+        a = b
+    for i in range(wm, taille_spectre-wm):     # -- Main part of spectrum --
+        if ((T1[a] >= T2[i-1]) and (T1[a-wm] != T2[i-1])):
+            T2[i] = T1[a]  # Next is larger
+        else:
+            T2[i] = numpy.max(T1[i-wm: i+wm])
         a = a + 1
-    a = (taille_spectre - 2*wm -1)
-    for i in range(taille_spectre -wm, taille_spectre) :   # -- End of spectrum --
-        b = a +1 +(i%2)
-        if (numpy.max(T1[a:b]) < T2[i-1]) :
+    a = (taille_spectre - 2*wm - 1)
+    for i in range(taille_spectre - wm, taille_spectre):   # -- End of spectrum --
+        b = a + 1 + (i % 2)
+        if numpy.max(T1[a:b]) < T2[i-1]:
             T2[i] = T2[i-1]   # Removed is smaller
-        else :
-            T2[i] = numpy.max(T1[b : taille_spectre])
-        a = b     
+        else:
+            T2[i] = numpy.max(T1[b: taille_spectre])
+        a = b
     ########## Lissage ##########
-    a =math.ceil((wm+1)/2)
+    a = math.ceil((wm+1)/2)
     v = numpy.sum(T2[0:a])
-    for i in range(0,ws) :                 # -- Start of spectrum --
-        b = a + 1+ (i%2)
+    for i in range(0, ws):                 # -- Start of spectrum --
+        b = a + 1 + (i % 2)
         v = v + numpy.sum(T2[a:b])
-        ligne_base[i ,1] = v/b
+        ligne_base[i, 1] = v/b
         a = b
     v = numpy.sum(T2[0:2*ws])
     ligne_base[ws, 1] = v/(2*ws)
-    for i in range(ws, taille_spectre-ws)  :    # -- Main part of spectrum --
+    for i in range(ws, taille_spectre-ws):    # -- Main part of spectrum --
         v = v - T2[i-ws] + T2[i+ws]
-        ligne_base[i ,1] = v/(2*ws)
-    a = taille_spectre -2*ws
+        ligne_base[i, 1] = v/(2*ws)
+    a = taille_spectre - 2*ws
     v = v-T2[a]
-    ligne_base[taille_spectre -ws ,1] = v/(2*ws)
-    for i in range(taille_spectre-ws, taille_spectre) :    # -- End of spectrum --
-        b = a +1 +((i+1)%2)
+    ligne_base[taille_spectre - ws, 1] = v/(2*ws)
+    for i in range(taille_spectre-ws, taille_spectre):    # -- End of spectrum --
+        b = a + 1 + ((i+1) % 2)
         v = v-numpy.sum(T2[a:b])
-        ligne_base[i ,1] = v/(taille_spectre -b)
+        ligne_base[i, 1] = v/(taille_spectre - b)
         a = b
     ########## retour ##########
     return ligne_base
 
 
-def SNIP_fonction (spectre, iterations, LLS_flag) :
+def SNIP_fonction(spectre, iterations, LLS_flag):
     ########## LLS ##########
-    if LLS_flag == True :
-        spectre[:,1] = numpy.log(numpy.log(numpy.sqrt(spectre[:,1] + 1) + 1) + 1)  
+    if LLS_flag is True:
+        spectre[:, 1] = numpy.log(numpy.log(numpy.sqrt(spectre[:, 1] + 1) + 1) + 1)
     ########## SNIP ##########
     dim_spectre = spectre.shape[0]
     fond = spectre.copy()
-    for p in range(0,iterations) :
-        for i in range(p, dim_spectre-p) :
-            a = spectre[i,1]
-            b = (spectre[i-p,1] + spectre[i+p,1]) / 2
-            fond[i,1] = min(a,b)
-        spectre[:,1] = fond[:,1]            
+    for p in range(0, iterations):
+        for i in range(p, dim_spectre-p):
+            a = spectre[i, 1]
+            b = (spectre[i-p, 1] + spectre[i+p, 1]) / 2
+            fond[i, 1] = min(a, b)
+        spectre[:, 1] = fond[:, 1]
     ########## inverse LLS ##########
-    if LLS_flag == True :
-        fond[:,1] = (numpy.exp(numpy.exp(fond[:,1]) - 1) - 1)**2 - 1
+    if LLS_flag is True:
+        fond[:, 1] = (numpy.exp(numpy.exp(fond[:, 1]) - 1) - 1)**2 - 1
     ########## retour ##########
     return fond
 
 
-###############################################################################
+###################################################################################################
 # fonctions de traitement des spectres
-###############################################################################
+###################################################################################################
 def creation_spectre_filtre(spectre_entier, tableau_bornes, filtre, taille, ordre, deriv):
     spectre_filtre = creation_spectre_bornes(spectre_entier, tableau_bornes)
-    if filtre == "Aucun" :
+    if filtre == "Aucun":
         pass
-    if filtre == "Savitzky-Golay" :
-        spectre_filtre[:,1] = scipy.signal.savgol_filter(spectre_filtre[:,1], taille, ordre, deriv, delta=1.0, axis=-1, mode='interp', cval=0.0)
-    if filtre == "Median" :
-        spectre_filtre[:,1] = scipy.signal.medfilt(spectre_filtre[:,1], taille)
-    if filtre == "Passe-bas" :
-        print ("Pas encore codé")
-        spectre_filtre = spectre_filtre
-        pass
+    if filtre == "Savitzky-Golay":
+        spectre_filtre[:, 1] = scipy.signal.savgol_filter(
+            spectre_filtre[:, 1], taille, ordre, deriv, delta=1.0, axis=-1, mode='interp', cval=0.0)
+    if filtre == "Median":
+        spectre_filtre[:, 1] = scipy.signal.medfilt(spectre_filtre[:, 1], taille)
+    if filtre == "Passe-bas":
+        print("Pas encore codé")
+        # spectre_filtre = spectre_filtre
+        # pass
     return spectre_filtre
 
+
 def creation_fond(spectre_filtre, fond, param1, param2, param3):
-    if fond =="Aucun" :
-        fond_continu = numpy.zeros((spectre_filtre.shape[0],2))
-    if fond == "Rolling ball" :
+    if fond == "Aucun":
+        fond_continu = numpy.zeros((spectre_filtre.shape[0], 2))
+    if fond == "Rolling ball":
         fond_continu = spectre_filtre.copy()
         fond_continu = rolling_ball_fonction(fond_continu, param1, param2)
-    if fond =="SNIP" :
+    if fond == "SNIP":
         fond_continu = spectre_filtre.copy()
-        fond_continu = SNIP_fonction (fond_continu, param1, param3)
-    if fond == "Top-hat" :
+        fond_continu = SNIP_fonction(fond_continu, param1, param3)
+    if fond == "Top-hat":
         fond_continu = spectre_filtre.copy()
         str_el = numpy.repeat([1], param1)
-        fond_continu[:,1] = scipy.ndimage.white_tophat(fond_continu[:,1], None, str_el)
-    if fond == "Peak filling" :
-        print ("Pas encore codé")
+        fond_continu[:, 1] = scipy.ndimage.white_tophat(fond_continu[:, 1], None, str_el)
+    if fond == "Peak filling":
+        print("Pas encore codé")
         fond_continu = spectre_filtre.copy()
-        fond_continu[:,1] = scipy.signal.medfilt(fond_continu[:,1], param1)
+        fond_continu[:, 1] = scipy.signal.medfilt(fond_continu[:, 1], param1)
     return fond_continu
+
 
 def creation_spectre_corrige(spectre_filtre, fond_continu):
     spectre_corrige = spectre_filtre.copy()
-    spectre_corrige[:,1] = spectre_filtre[:,1]-fond_continu[:,1]
+    spectre_corrige[:, 1] = spectre_filtre[:, 1]-fond_continu[:, 1]
     return spectre_corrige
+
 
 def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
-    if flag_sauve_fond == True :
+    if flag_sauve_fond is True:
         repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
         enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
 
-def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre, deriv, type_fond, param1, param2, param3, flag_sauve_fond) :
+
+def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre,
+                    deriv, type_fond, param1, param2, param3, flag_sauve_fond):
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, type_fichier)
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
-    if flag_sauve_fond == True :
+    if flag_sauve_fond is True:
         repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
-    for nom_fichier in liste_fichiers :
+    for nom_fichier in liste_fichiers:
         spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
-        spectre = creation_spectre_filtre(spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
+        spectre = creation_spectre_filtre(
+            spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
         fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
-        spectre= creation_spectre_corrige(spectre, fond_continu)
+        spectre = creation_spectre_corrige(spectre, fond_continu)
         enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
-        if flag_sauve_fond == True :
+        if flag_sauve_fond is True:
             enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
-        
