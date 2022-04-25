@@ -1,17 +1,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: LIBStick v2.0\n"
-"POT-Creation-Date: 2022-02-08 14:09+0100\n"
-"PO-Revision-Date: 2022-02-08 14:09+0100\n"
+"POT-Creation-Date: 2022-02-08 12:13+0100\n"
+"PO-Revision-Date: 2022-03-11 10:15+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 "X-Poedit-Basepath: ../../..\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: LIBStick.py\n"
 
 #: LIBStick.py:124 LIBStick.py:3010
@@ -56,11 +56,11 @@ msgstr "I relativo < 1%"
 
 #: LIBStick.py:3277
 msgid "LIBStick pré-traitements"
-msgstr "LIBStick Extracción"
+msgstr "LIBStick pre-tratamientos"
 
 #: LIBStick.py:3278
 msgid "LIBStick extraction"
-msgstr "LIBStickExtracción"
+msgstr "LIBStick Extracción"
 
 #: LIBStick.py:3279
 msgid "LIBStick comparaison"
@@ -113,7 +113,7 @@ msgstr "Ventana principal en primer plano"
 
 #: LIBStick.py:3309
 msgid "Langue au prochain démarage"
-msgstr "Lengua en la próxima puesta en marcha"
+msgstr "Lengua en el próximo inicio"
 
 #: LIBStick.py:3311
 msgid "Français"
@@ -129,11 +129,11 @@ msgstr "Español"
 
 #: LIBStick.py:3377
 msgid "Borne inf :"
-msgstr "Terminal inf:"
+msgstr "Límite inf:"
 
 #: LIBStick.py:3378
 msgid "Borne sup :"
-msgstr "Terminal sup:"
+msgstr "Límite sup:"
 
 #: LIBStick.py:3390
 msgid "Filtre :"
@@ -173,16 +173,16 @@ msgid ""
 "tous les fichiers\n"
 "du répertoire"
 msgstr ""
-"Aplicar atodos\n"
-"los archivosen el\n"
-"directorio"
+"Aplicar a todos\n"
+"los archivos en\n"
+" el directorio"
 
 #: LIBStick.py:3494
 msgid ""
 "Sauvegarde du\n"
 "fond continu"
 msgstr ""
-"Copia de seguridad\n"
+"Registrar\n"
 "fondo continuo"
 
 #: LIBStick.py:3498
@@ -195,19 +195,19 @@ msgstr "Espectro: "
 
 #: LIBStick.py:3598
 msgid "Première borne inf (nm)"
-msgstr "Primer terminal inf (nm)"
+msgstr "Primer límite inf (nm)"
 
 #: LIBStick.py:3599
 msgid "Première borne sup (nm)"
-msgstr "Primer terminal sup (nm)"
+msgstr "Primer límite sup (nm)"
 
 #: LIBStick.py:3600
 msgid "Seconde borne inf (nm)"
-msgstr "Segundo terminal inf (nm)"
+msgstr "Segundo límite inf (nm)"
 
 #: LIBStick.py:3601
 msgid "Seconde borne sup (nm)"
-msgstr "Segundo terminal sup (nm)"
+msgstr "Segundo límite sup (nm)"
 
 #: LIBStick.py:3625
 msgid "Seconde extraction"
@@ -245,7 +245,7 @@ msgid ""
 msgstr ""
 "Imagen en bruto\n"
 "espectros no\n"
-"normalizado"
+"normalizados"
 
 #: LIBStick.py:3718
 msgid ""
@@ -263,7 +263,7 @@ msgstr "Desde el espectro #:"
 
 #: LIBStick.py:3742
 msgid "Au spectre n° :"
-msgstr "Desde el espectro #:"
+msgstr "Hasta el espectro #:"
 
 #: LIBStick.py:3762
 msgid ""
@@ -271,25 +271,25 @@ msgid ""
 "spectres \n"
 "normalisés"
 msgstr ""
-"Media de la\n"
-"espectro \n"
-"normalizado"
+"Media de\n"
+"espectros \n"
+"normalizados"
 
 #: LIBStick.py:3869 LIBStick.py:4119
 msgid "Numérateur borne inf (nm)"
-msgstr "Numerador inf. terminal (nm)"
+msgstr "Numerador límite inf. (nm)"
 
 #: LIBStick.py:3871 LIBStick.py:4120
 msgid "Numérateur borne sup (nm)"
-msgstr "Terminal sup del numerador (nm)"
+msgstr "Numerador límite sup. (nm)"
 
 #: LIBStick.py:3873
 msgid "Dénominateur borne inf (nm)"
-msgstr "Terminal inf del denominador (nm)"
+msgstr "Denominador límite inf. (nm)"
 
 #: LIBStick.py:3875
 msgid "Dénominateur borne sup( nm)"
-msgstr "Denominador sup terminal (nm)"
+msgstr "Denominador límite sup. (nm)"
 
 #: LIBStick.py:3899
 msgid "Dénominateur ?"
@@ -333,15 +333,15 @@ msgstr "Nombre del espectro"
 
 #: LIBStick.py:4020
 msgid "Rapport zone1/zone2"
-msgstr "Ratio zone1/zone2"
+msgstr "Ratio zona1/zona2"
 
 #: LIBStick.py:4175
 msgid "Utlisé pour l'ACP :"
-msgstr "Usado para PCA:"
+msgstr "Utizado para PCA:"
 
 #: LIBStick.py:4176
 msgid "Label :"
-msgstr "Label :"
+msgstr "Etiqueta:"
 
 #: LIBStick.py:4188
 msgid "Spectres normalisés"
@@ -352,11 +352,10 @@ msgid "Centré reduit"
 msgstr "Centrado reducido"
 
 #: LIBStick.py:4197
-msgid "ACP"
-msgstr "PCA"
+msgid "Calcule"
+msgstr "Cálculo"
 
 #: LIBStick.py:4201
-#, fuzzy
 msgid "+ ind. supp."
 msgstr "+ ind. adicional"
 
@@ -386,12 +385,9 @@ msgid ""
 "facteurs \n"
 "de l'ACP"
 msgstr ""
-"Registro\n"
+"Guardar \n"
 "factores\n"
 "de la PCA"
-
-#~ msgid "Calcule"
-#~ msgstr "Calcula"
 
 #~ msgid "Applique"
 #~ msgstr "Se aplica"

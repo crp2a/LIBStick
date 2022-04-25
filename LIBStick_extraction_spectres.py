@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Feb  6 12:20:38 2020
-
+Module outils pour l'extration de parties des spectres et création de spectres moyens
 @author: yannick
 """
+
 
 import sys
 import os
@@ -21,6 +22,10 @@ sys.path.insert(0, "./dossier_mes_modules/")
 # fonction qui liste des fichiers *.asc d'un répertoire
 ###################################################################################################
 def creation_nom_echantillon(liste_fichiers):
+    """
+    Retourne le nom de l'échantillon en utilisant le nom du premier spectre du répertoire
+    et en suppriment les 6 dernier carractères (extension et numéro à deux chiffres)
+    """
     nom_echantillon = liste_fichiers[0][0:-6]
     return nom_echantillon
 
@@ -29,7 +34,10 @@ def creation_nom_echantillon(liste_fichiers):
 # fonction qui lit un fichier spectre
 ###################################################################################################
 def lit_fichier_entre_bornes(fichier, bas, haut, type_fichier):
-    #    document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
+    """
+    Lit un fichier spectre grâce à LIBStick_outils.lit_spectre et renvoie un spectre
+    tronqué, uniquement entre les bornes basses et hautes données par les spinbox
+    """
     document = LIBStick_outils.lit_spectre(fichier, type_fichier)
     document_tronc = numpy.zeros((0, 2))
     for ligne in document:
@@ -43,6 +51,9 @@ def lit_fichier_entre_bornes(fichier, bas, haut, type_fichier):
 # fonction qui crée un sous répertoire d'un certain nom passé en argument
 ###################################################################################################
 def creation_sous_repertoire(rep_travail, tableau_bornes, flag_zone2):
+    """
+    Création de sous répertoire dont les noms correspondent aux bornes des zones à extraire
+    """
     if flag_zone2:
         if not os.path.isdir(rep_travail + "/"+str(tableau_bornes[0, 0])+"_"+str(tableau_bornes[0, 1])):
             os.mkdir(rep_travail + "/"+str(tableau_bornes[0, 0])+"_"+str(tableau_bornes[0, 1]))
@@ -57,6 +68,9 @@ def creation_sous_repertoire(rep_travail, tableau_bornes, flag_zone2):
 # fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###################################################################################################
 def enregistre_spectre(document, repertoire, nom_fichier):
+    """
+    Enregistrement d'un spectre tronqué dans le sous répertoire correspondant aux bornes
+    """
     os.chdir(repertoire)
     nom_fichier = nom_fichier[0:-4] + "_" + repertoire[-11:] + ".tsv"
     numpy.savetxt(nom_fichier, document, delimiter="\t")
@@ -66,16 +80,28 @@ def enregistre_spectre(document, repertoire, nom_fichier):
 # fonction qui sauvegarde le résultat dans un fichier tsv dans le sous répertoire
 ###################################################################################################
 def enregistre_fichier_point(tableau, nom_fichier):
+    """
+    Enregistre le tableau des n spectres tronqués en fichier texte tabulé
+    et le point comme séparateur de décimales
+    """
     numpy.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n")
 
 
 def enregistre_fichier_virgule(tableau, nom_fichier):
+    """
+    Enregistre le tableau des n spectres tronqués en fichier texte tabulé
+    et la virgule comme séparateur de décimales
+    """
     tableau = tableau.astype(str)
     tableau = numpy.char.replace(tableau, ".", ",")
     numpy.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n", fmt="%s")
 
 
 def enregistre_dataframe_point(dataframe, nom_fichier):
+    """
+    Enregistre le dataframe des n spectres tronqués en fichier texte
+    et le point comme séparateur de décimales
+    """
     #    dataframe.to_excel(nom_fichier+".xlsx")
     dataframe.to_csv(nom_fichier+".txt", decimal=".", sep="\t")
 
@@ -97,6 +123,11 @@ def enregistre_dataframe_point(dataframe, nom_fichier):
 # fonctions qui affichent et sauvegardent des graphes
 ###################################################################################################
 def tableau_brut_transpose_256gris(tableau_brut):
+    """
+    Crée tableau des n spectres bruts en supprimant lambda,
+    multiplie les valeurs par 255
+    et le transpose de façon à avoir chaque spectre en ligne
+    """
     tableau8bits_brut = tableau_brut[:, 1:]
     tableau8bits_brut = tableau8bits_brut*255
     tableau8bits_brut = tableau8bits_brut.transpose()
@@ -105,10 +136,19 @@ def tableau_brut_transpose_256gris(tableau_brut):
 
 
 def graphique_brut_sauvegarde(tableau8bits_brut):
+    """
+    Sauvegarde le tableau brut de n spectres au format image png
+    en fausses couleurs Inferno au lieu de niveau de gris
+    """
     plt.imsave("figure_brute.png", tableau8bits_brut, cmap="inferno")
 
 
 def tableau_transpose_256gris(tableau_norm):
+    """
+    Crée tableau des n spectres normalisés en supprimant lambda,
+    converti les valeurs entre 0 et 255 au lieu de 0 et 1
+    et le transpose de façon à avoir chaque spectre en ligne
+    """
     tableau8bits = tableau_norm[:, 1:]
     tableau8bits = tableau8bits*255
     tableau8bits = tableau8bits.transpose()
@@ -117,9 +157,15 @@ def tableau_transpose_256gris(tableau_norm):
 
 
 def graphique_creation(tableau8bits, nom_echantillon, bornes):
+    """
+    Affiche le tableau de n spectres normalisés en 256 niveau de gris
+    avec la LUT Inferno dans une fenêtre matplotlib.pyplot 2D
+    et la sauvegarde sous figure_plot.png
+    """
     # fig=plt.figure()
     fig, ax = plt.subplots()
-    #plt.imshow(tableau8bits, cmap="gray", extent=[bornes[0],bornes[1],tableau8bits.shape[0],0], aspect="auto")
+    # plt.imshow(tableau8bits, cmap="gray", extent=[
+    #     bornes[0],bornes[1],tableau8bits.shape[0],0], aspect="auto")
     plt.imshow(tableau8bits, cmap="inferno", extent=[
                bornes[0], bornes[1], tableau8bits.shape[0], 0], aspect="auto")
 #    print(tableau8bits.shape[0])
@@ -142,6 +188,10 @@ def graphique_creation(tableau8bits, nom_echantillon, bornes):
 
 # def graphique_3D_creation(tableau8bits,nom_echantillon,bornes):
 def graphique_3D_creation(tableau8bits, nom_echantillon):
+    """
+    Affiche le tableau de n spectres normalisés en 256 niveau de gris
+    avec la LUT Inferno dans une fenêtre matplotlib.pyplot 3D
+    """
     xx, yy = numpy.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
     #fig = plt.figure(figsize=(15,15))
     fig = plt.figure()
@@ -164,6 +214,10 @@ def graphique_3D_creation(tableau8bits, nom_echantillon):
 
 
 def graphique_sauvegarde(tableau8bits):
+    """
+    Saugegarde le tableau de n spectres normalisés en 256 niveau de gris
+    avec la LUT Inferno sous figure.png
+    """
     plt.imsave("figure.png", tableau8bits, cmap="inferno")
 
 
@@ -171,6 +225,13 @@ def graphique_sauvegarde(tableau8bits):
 # ex-LIBStick_creation_tableau_norm
 ###################################################################################################
 def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D):
+    """
+    Crée un tableau avec tous les spectres d'un répertoire dont
+    tous ces spectres avaient déjà été extraits entre les bornes des spinbox.
+    Sauvegarde le tableau des spectres bruts et le tableau des spectres normalisés
+    sous forme de fichier texte et d'image png
+    Sauvegarde le même tableau mais en dataframe en ajoutant les lambda
+    """
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, ".tsv")
     tableau_brut = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers, ".tsv")
     tableau8bits_brut = tableau_brut_transpose_256gris(tableau_brut)
@@ -184,7 +245,7 @@ def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D
     graphique_sauvegarde(tableau8bits_norm)
 
 #    dataframe_norm=creer_dataframe(tableau_norm, liste_fichiers)
-    dataframe_norm = LIBStick_outils.creer_dataFrame_x_tableau_en_colonnes(
+    dataframe_norm = LIBStick_outils.creer_dataframe_x_tableau_en_colonnes(
         tableau_norm, liste_fichiers)
 #    print("DataFrame " + str(dataframe_norm.info()))
     enregistre_dataframe_point(dataframe_norm, "dataframe_normalisé_points")
@@ -199,7 +260,8 @@ def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D
 ###################################################################################################
 # Création spectre moyen
 ###################################################################################################
-# def creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres):  # x sur la première colonne
+# x sur la première colonne
+# def creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres):
 #    tableau_abscisses=tableau_norm[:,0]
 #    tableau_extrait=tableau_norm[:,1:]
 #    indice_premier=(bornes_moyenne_spectres[0]-1)
@@ -213,6 +275,9 @@ def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D
 
 # x sur la première colonne
 def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):
+    """
+    Crée un spectre moyen à l'aide des spectres sélectionnés
+    """
     tableau_abscisses = tableau_norm[:, 0]
     tableau_extrait = tableau_norm[:, 1:]
     for i in range(len(liste_bool), 0, -1):
@@ -225,7 +290,13 @@ def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):
     return spectre_moyen
 
 
-def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes, flag_spectres_normalises_moyenne):
+def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes,
+                             flag_spectres_normalises_moyenne):
+    """
+    enregistre le spectre moyen au format tsv  avec l'extension .mean
+    et le suffixe _spectre_moyen_norm_ ou _spectre_moyen_
+    ainsi que les bornes inf et sup
+    """
     if flag_spectres_normalises_moyenne is True:
         nom_fichier = nom_echantillon+"_spectre_moyen_norm_" + \
             str(bornes[0])+"_"+str(bornes[1])+".mean"
@@ -235,8 +306,14 @@ def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes, flag_spectr
     numpy.savetxt(nom_fichier, spectre_moyen, delimiter="\t", newline="\n")
 
 
-# def creation_spectre_moyen_main(rep_travail,nom_echantillon, bornes, bornes_moyenne_spectres, liste_bool, flag_spectres_normalises_moyenne) :
-def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool, flag_spectres_normalises_moyenne):
+def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool,
+                                flag_spectres_normalises_moyenne):
+    """
+    Normalise ou non les spectres
+    puis crée le spectre moyen à l'aide des spectres sélectionnés
+    puis enregistre le spectre moyen
+    et retourne le spectre moyen
+    """
     os.chdir(rep_travail)
     tableau = numpy.loadtxt("tableau_brut_points.txt", delimiter="\t",
                             dtype=float, encoding="Latin-1")
@@ -257,6 +334,11 @@ def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool
 # programme principal
 ###################################################################################################
 def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, flag_2D, flag_3D):
+    """
+    Fonction principale du module
+    Crée un ou deux sous-répertoire de sauvegarde
+    Extrait les spectres entre les bornes choisies par les spinbox et les enregistre
+    """
     rep_script = os.getcwd()
     if flag_zone2 == 0:
         tableau_bornes = numpy.delete(tableau_bornes, (1), axis=0)
@@ -271,7 +353,7 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
                                str(bornes[0])+"_" + str(bornes[1]), liste_fichiers[i])
     for bornes in tableau_bornes:
         os.chdir(rep_script)
-        creation_tableau_norm(
-            rep_travail+"/"+str(bornes[0])+"_" + str(bornes[1])+"/", nom_echantillon, bornes, flag_2D, flag_3D)
+        creation_tableau_norm(rep_travail+"/"+str(bornes[0])+"_" + str(bornes[1])+"/",
+                              nom_echantillon, bornes, flag_2D, flag_3D)
     return nom_echantillon
 #    return nom_echantillon, dataframe_norm

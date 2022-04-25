@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Oct 28 10:12:06 2020
-
+Module outils généraux de manipulation des fichiers spectres
+de transformations de tableaux et dataframes
 @author: yannick
 """
+
 
 ###################################################################################################
 ###################################################################################################
@@ -20,11 +22,18 @@ import pandas
 # fonctions générales de gestion des repertoires et fichiers
 ###################################################################################################
 def repertoire_de_travail(rep_script, rep_travail_relatif):
+    """
+    Renvoie le répertoire de travail absolu à partir du
+    répertoire de travail relatif
+    """
     rep_travail = rep_script+"/"+rep_travail_relatif
     return rep_travail
 
 
 def creation_liste_fichiers(rep_travail, type_fichier):
+    """
+    Renvoie la liste des fichiers d'un même extension d'un répertoire
+    """
     os.chdir(rep_travail)
     liste = []
     if type_fichier == ".mean":
@@ -48,6 +57,10 @@ def creation_liste_fichiers(rep_travail, type_fichier):
 
 
 def lit_spectre(fichier, type_fichier):
+    """
+    Lit un fichier spectre suivant le type de fichier et
+    renvoie ce spectre sous forme d'un tableau
+    """
     if type_fichier == ".mean":
         spectre = numpy.loadtxt(fichier, delimiter="\t", dtype=float, encoding="Latin-1")
     if type_fichier == ".tsv":
@@ -72,7 +85,14 @@ def lit_spectre(fichier, type_fichier):
 # fonctions générales de création de DataFrame
 ###################################################################################################
 # creation tableau avec lambda (1ere ligne) et spectres dans les lignes suivantes
+# INUTILISE !!!! UNIQUEMENT POUR DES FICHIERS tsv !!!!
 def creer_tableau_avec_x_ligne1(liste):
+    """
+    Creation tableau avec lambda (1ere ligne) et
+    les ordonnées de tous les spectres de la liste de fichiers
+    dans les lignes suivantes
+    INUTILISE !!!! UNIQUEMENT POUR DES FICHIERS tsv !!!!
+    """
     i = 0
     for fichier in liste:
         if i == 0:
@@ -85,16 +105,13 @@ def creer_tableau_avec_x_ligne1(liste):
     return tableau
 
 
-# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes
-def creer_dataFrame_x_tableau_en_lignes(tableau_en_lignes, liste):
-    #    liste[0:0] = ["Lambda (nm)"]
-    df = pandas.DataFrame(numpy.transpose(
-        tableau_en_lignes[1:, :]), index=liste, columns=tableau_en_lignes[0, :])
-    return df
-
-
 # creation tableau avec lambda (1ere colonne) et spectres dans le colonnes suivantes
 def creer_tableau_avec_x_colonne1(liste, type_fichier):
+    """
+    Creation tableau avec lambda (1ere colonne) et
+    les ordonnées de tous les spectres de la liste de fichiers du même type
+    dans les colonnes suivantes
+    """
     i = 0
     if type_fichier == ".tsv":
         for fichier in liste:
@@ -139,31 +156,67 @@ def creer_tableau_avec_x_colonne1(liste, type_fichier):
     return tableau
 
 
-# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes
-def creer_dataFrame_x_tableau_en_colonnes(tableau_en_colonnes, liste):
+# creation d'un DataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes
+# INUTILISE !!!! et sûrement FAUX !!!!
+def creer_dataframe_x_tableau_en_lignes(tableau_en_lignes, liste):
+    """
+    Creation d'un DataFrame avec lambda en nom des colonnes et
+    le nom des fichiers en index des lignes
+    à partir d'un tableau de spectres en lignes
+    # INUTILISE !!!! et sûrement FAUX (cf. transpose à vérifier) !!!!
+    """
     #    liste[0:0] = ["Lambda (nm)"]
-    df = pandas.DataFrame(numpy.transpose(
+    dataframe = pandas.DataFrame(numpy.transpose(
+        tableau_en_lignes[1:, :]), index=liste, columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
+    return dataframe
+
+
+# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes
+def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
+    """
+    Creation d'un DataFrame avec lambda en nom des colonnes et
+    le nom des fichiers en index des lignes
+    à partir d'un tableau de spectres en colonnes
+    """
+    #    liste[0:0] = ["Lambda (nm)"]
+    dataframe = pandas.DataFrame(numpy.transpose(
         tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
-    return df
+    return dataframe
 
 
-# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes entre bornes inf et sup
-def creer_dataFrame_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bornes):
-    df = pandas.DataFrame(numpy.transpose(
+# creation d'un DataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes entre bornes inf et sup
+def creer_dataframe_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bornes):
+    """
+    Creation d'un DataFrame avec lambda en nom des colonnes et
+    le nom des fichiers en index des lignes
+    à partir d'un tableau de spectres en colonnes
+    entre bornes inf et sup
+    """
+    dataframe = pandas.DataFrame(numpy.transpose(
         tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
-    df_bornes = df.loc[:, bornes[0]:bornes[1]]
-    return df_bornes
+    dataframe_bornes = dataframe.loc[:, bornes[0]:bornes[1]]
+    return dataframe_bornes
 
 
-def creer_dataFrame_bornes(df, bornes):
-    df_bornes = df.loc[:, bornes[0]:bornes[1]]
-    return df_bornes
+def creer_dataframe_bornes(dataframe, bornes):
+    """
+    Creation d'un DataFrame avec lambda en nom des colonnes et
+    le nom des fichiers en index des lignes
+    à partir d'un DataFrame
+    entre bornes inf et sup
+    """
+    dataframe_bornes = dataframe.loc[:, bornes[0]:bornes[1]]
+    return dataframe_bornes
 
 
 ###################################################################################################
 # normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
 ###################################################################################################
 def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans la première colonne
+    """
+    Normalise un tableau de spectres en colonnes
+    Minimum à 0 et divise par l'aire sous la courbe (ainsi aire du spectre = 1)
+    """
     for colonne in range(tableau.shape[1]-1):
         minimum = tableau[:, colonne+1].min()
         tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
@@ -173,6 +226,10 @@ def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans l
 
 
 def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dans la première colonne
+    """
+    Normalise un tableau de spectres en colonnes
+    Minimum à 0 et divise par le maximum du spectre
+    """
     for colonne in range(tableau.shape[1]-1):
         minimum = tableau[:, colonne+1].min()
         tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
@@ -183,9 +240,13 @@ def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dan
 
 
 ###################################################################################################
-# normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
+# normalisation des spectres d'un DataFrame, données en lignes
 ###################################################################################################
-def normalise_dataFrame_aire(dataframe):  # données lignes
+def normalise_dataframe_aire(dataframe):  # données lignes
+    """
+    Normalise un DataFrame de spectres (données en lignes)
+    Minimum à 0 et divise par l'aire sous la courbe (ainsi aire du spectre = 1)
+    """
     tableau = dataframe.values
     for ligne in range(tableau.shape[0]):
         minimum = tableau[ligne, :].min()

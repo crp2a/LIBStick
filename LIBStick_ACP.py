@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Oct  7 09:34:25 2020
-
+Module outils pour l'ACP
 @author: yannick
 """
+
 
 import pickle as pk
 import numpy
@@ -20,11 +21,17 @@ _ = gettext.gettext
 # fonctions de sauvegarde et lecture d'ACP
 ###################################################################################################
 def enregistre_ACP(modele_ACP, rep_travail):
+    """
+    Enregistre le calcul d'ACP. Non encore utilisé
+    """
     print(rep_travail)
     pk.dump(modele_ACP, open(rep_travail+"\ACP_modele.pkl", "wb"))
 
 
 def ouvre_ACP(rep_travail):
+    """
+    Ouvre un calcul d'ACP. Non encore utilisé
+    """
     modele_ACP = pk.load(open(rep_travail+"\ACP_modele.pkl", "rb"))
     return modele_ACP
 
@@ -34,6 +41,10 @@ def ouvre_ACP(rep_travail):
 ###################################################################################################
 def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
                 flag_3D, flag_echelle, flag_eboulis):
+    """
+    Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
+    uniquement des individus ayant servi au calcul de l'ACP
+    """
     if flag_3D is True:
         dim1 = dim[0]
         dim2 = dim[1]
@@ -123,6 +134,10 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
 
 def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe, modele_ACP,
                          tableau_ACP, tableau_ACP_individus_supp, dim, flag_3D, flag_echelle, flag_eboulis):
+    """
+    Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
+    avec les individus supplémentaires n'ayant pas servi au calcul de l'ACP, calculé au préalable
+    """
     if flag_3D is True:
         dim1 = dim[0]
         dim2 = dim[1]
@@ -239,6 +254,9 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
 # fonctions de calculs d'ACP par scikit-learn (sklearn)
 ###################################################################################################
 def creation_tableau_centre_reduit(tableau):
+    """
+    transformation des données en données centrées réduites
+    """
     moyennes = numpy.mean(tableau, axis=0)
     sigmas = numpy.std(tableau, axis=0, ddof=0)
     tableau_centre_reduit = (tableau-moyennes)/sigmas
@@ -246,6 +264,9 @@ def creation_tableau_centre_reduit(tableau):
 
 
 def calcul_ACP_sklearn(tableau, nbr_composantes, flag_centre_reduit):
+    """
+    Calcul de l'ACP par sklearn.decomposition.PCA
+    """
     if flag_centre_reduit == True:
         tableau = creation_tableau_centre_reduit(tableau)
     acp = sklearn.decomposition.PCA(n_components=nbr_composantes)
@@ -265,6 +286,9 @@ def calcul_ACP_sklearn(tableau, nbr_composantes, flag_centre_reduit):
 
 
 def applique_ACP(modele_ACP, tableau):
+    """
+    applique l'ACP préalablement calculée sur le tableau de données
+    """
     tableau_ACP = modele_ACP.transform(tableau)
     return tableau_ACP
 
