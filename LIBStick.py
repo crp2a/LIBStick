@@ -34,7 +34,7 @@ import LIBStick_ACP
 
 
 ###################################################################################################
-# initialisations
+# initialisations générales et définitions des variables globales
 ###################################################################################################
 # s = tkinter.ttk.Style()
 # s.theme_use("alt")
@@ -48,15 +48,38 @@ LARGEUR_LIGNES = 2
 TAILLE_CASE = [1, 2]
 TAILLE_FONT_CLASSIFICATION = 8
 
-lambda_texte_spectre_0_L_trait = lambda_texte_spectre_1_L_trait = lambda_texte_spectre_L_ext = 0
-lambda_texte_spectre_L_comp = lambda_texte_spectre_0_L_ACP = lambda_texte_spectre_1_L_ACP = 0
+# textes d'affichage de la longueur d'onde
+lambda_texte_spectre_0_L_trait = lambda_texte_spectre_1_L_trait = 0
+lambda_texte_spectre_L_ext = 0
+lambda_texte_spectre_L_comp = 0
+lambda_texte_spectre_0_L_ACP = lambda_texte_spectre_1_L_ACP = 0
 
+# noms des fichiers et répertoires, listes des fichiers, nombre de fichiers
+nom_echantillon_L_ext = ""
 nom_fichier_seul_L_trait = nom_fichier_seul_L_ext = nom_fichier_seul_L_comp = nom_fichier_seul_L_ACP = ""
-type_fichier_L_trait = ""
 rep_travail_L_trait = rep_travail_L_ext = rep_travail_L_comp = rep_travail_L_ACP = ""
 liste_fichiers_L_trait = liste_fichiers_L_ext = liste_fichiers_L_comp = liste_fichiers_L_ACP = []
+liste_bool_L_ext = []
 nombre_fichiers_L_trait = nombre_fichiers_L_ext = nombre_fichiers_L_comp = nombre_fichiers_L_ACP = 1
+nombre_fichiers_avant_L_ext = 1
 
+# gestion des zooms
+minimum_spectre_L_trait = maximum_spectre_L_trait = maximum_spectre_ancien_L_trait = maximum_spectre_corrige_ancien_L_trait = 0
+maximum_spectre_ancien_L_ext = 0
+maximum_spectre_ancien_L_comp = 0
+maximum_spectre_ancien_L_ACP = 0
+anciennes_zoom_inf_L_trait = anciennes_zoom_sup_L_trait = 0
+anciennes_zoom_inf_L_ext = anciennes_zoom_sup_L_ext = 0
+anciennes_zoom_inf_L_comp = anciennes_zoom_sup_L_comp = 0
+anciennes_zoom_inf_L_ACP = anciennes_zoom_sup_L_ACP = 0
+
+# identifiants des lignes
+ligne0_1_L_trait = ligne0_2_L_trait = 0
+ligne0_1_L_ext = ligne0_2_L_ext = ligne0_3_L_ext = ligne0_4_L_ext = 0
+ligne0_1_L_comp = ligne0_2_L_comp = ligne0_3_L_comp = ligne0_4_L_comp = 0
+ligne0_1_L_ACP = ligne0_2_L_ACP = 0
+
+# position des traits verticaux sur les spectres
 ligne_position_0_x_L_trait = ligne_position_1_x_L_trait = 0
 ligne_position_0_y_L_trait = ligne_position_1_y_L_trait = 0
 ligne_position_x_L_ext = ligne_position_y_L_ext = 0
@@ -66,11 +89,20 @@ ligne_position_x_L_comp = ligne_position_y_L_comp = 0
 ligne1_vert_L_comp = ligne1_hori_L_comp = 0
 ligne_position_x_L_ACP = ligne_position_y_L_ACP = ligne_position_1_L_ACP = 0
 
-# minimum_spectre_L_trait = maximum_spectre_L_trait = maximum_spectre_ancien_L_trait = 0
-# maximum_spectre_corrige_ancien_L_trait = 0
-# minimum_spectre_L_ext = maximum_spectre_L_ext = maximum_spectre_ancien_L_ext = 0
-# minimum_spectre_L_comp = maximum_spectre_L_comp = maximum_spectre_ancien_L_comp = 0
-# minimum_spectre_L_ACP = maximum_spectre_L_ACP = maximum_spectre_ancien_L_ACP = 0
+# identifiants des photos
+photo1_L_ext = photo2_L_ext = photo_L_comp = 0
+
+# Dataframes
+DataFrame_resultats_L_comp = DataFrame_complet_L_ACP = dataframe_facteurs_ACP_L_ACP = pandas.DataFrame()
+spectre_dim1_L_ACP = spectre_dim2_L_ACP = spectre_dim3_L_ACP = pandas.DataFrame()
+DataFrame_element_L_ele = pandas.DataFrame()
+
+# identifiants des fenêtres
+fenetre_label_L_ACP = 0
+fenetre_classification_L_ele = 0
+
+# divers
+symbole_L_ele = ""
 
 
 class CaseConfigParser(configparser.ConfigParser):
@@ -93,7 +125,7 @@ def lit_section_fichier_ini(section):
             dictionnaire[option] = config.get(section, option)
             # if dictionnaire[option] == -1:
             #    DebugPrint("skip: %s" % option)
-        except:
+        except UserWarning:
             print("exception on %s!" % option)
             dictionnaire[option] = None
     return dictionnaire
@@ -116,7 +148,7 @@ try:
         langue_LIBStick, localedir="locale", languages=[langue_LIBStick])
     traduction.install()
     _ = traduction.gettext
-except:
+except UnicodeTranslateError:
     gettext.install("fr")
     _ = gettext.gettext
 
@@ -225,6 +257,7 @@ limites_spectre_L_trait = numpy.array([198.0, 1013.0])
 limites_affichage_spectre_L_trait = numpy.array([198.0, 1013.0])
 coord_zoom_L_trait = numpy.array([198, 0, 1013, 0])
 delta_limites_L_trait = limites_affichage_spectre_L_trait[1]-limites_affichage_spectre_L_trait[0]
+
 flag_premier_lamda_L_trait = True
 flag_dezoom_L_trait = False
 flag_bouton_zoom_L_trait = False
@@ -235,8 +268,9 @@ flag_bouton_zoom_L_comp = False
 flag_dezoom_L_ACP = False
 flag_bouton_zoom_L_ACP = False
 # flag_premier_fond_L_trait=True
-l_L_trait = 0.0
+
 spectre_entier_L_trait = numpy.zeros((0, 2))
+fond_continu_L_trait = numpy.zeros((0, 2))
 spectre_corrige_L_trait = numpy.zeros((0, 2))
 tableau_bornes_L_trait = numpy.array([300.0, 608.0])
 
@@ -265,7 +299,6 @@ def choix_fichier_L_trait():
     Ouverture/affichage d'un fichier spectre et récupération du chemin du répertoire. Bouton Fichier
     """
     global nom_fichier_seul_L_trait
-    global type_fichier_L_trait
     global rep_travail_L_trait
     global liste_fichiers_L_trait
     global nombre_fichiers_L_trait
@@ -276,11 +309,10 @@ def choix_fichier_L_trait():
                                                                         ("fichiers LIBStick", "*.tsv"),
                                                                         ("fichiers LIBStick moyen", "*.mean")))
     nom_fichier_seul_L_trait = os.path.basename(nom_fichier_L_trait)
-    type_fichier_L_trait = pathlib.Path(nom_fichier_seul_L_trait).suffix
-#    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
+    type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
     rep_travail_L_trait = os.path.dirname(nom_fichier_L_trait)
     liste_fichiers_L_trait = LIBStick_outils.creation_liste_fichiers(rep_travail_L_trait,
-                                                                     type_fichier_L_trait)
+                                                                     type_fichier_L_trait.get())
     nombre_fichiers_L_trait = len(liste_fichiers_L_trait)
     entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
     lit_affiche_spectre_L_trait()
@@ -326,7 +358,7 @@ def execute_L_trait():
                                               fond_continu_L_trait, nom_fichier_seul_L_trait,
                                               flag_sauve_fond)
     if flag_tous_fichiers is True:
-        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait,
+        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(),
                                                       tableau_bornes_L_trait, type_filtre_L_trait.get(),
                                                       taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(),
                                                       derivee_filtre_L_trait.get(), type_fond_L_trait.get(),
@@ -345,8 +377,8 @@ def lit_affiche_spectre_L_trait():
     global limites_spectre_L_trait
     global fond_continu_L_trait
     os.chdir(rep_travail_L_trait)
-    spectre_entier_L_trait = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_trait, type_fichier_L_trait)
+    spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait,
+                                                         type_fichier_L_trait.get())
     limites_spectre_L_trait = lit_limites_abscisses_L_trait(spectre_entier_L_trait)
     affiche_spectre_L_trait()
     fond_continu_L_trait = numpy.zeros((spectre_entier_L_trait.shape[0], 2))
@@ -546,7 +578,6 @@ def affiche_fond_L_trait():
     for i in range(len(spectre) - 1):
         canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1],
                                      spectre[i+1, 0], spectre[i+1, 1], fill="blue")
-#        dessin_fond_continu_L_trait = canevas0_L_trait.create_line(spectre[i,0],spectre[i,1],spectre[i+1,0],spectre[i+1,1], fill="blue")
     # flag_premier_fond_L_trait = False
 
 
@@ -555,15 +586,15 @@ def affiche_lignes_spectre_L_trait():
     Affichages des limites du traitement sur le spectre sous forme de deux lignes
     rouges verticales. Les valeurs sont fixées par les spinbox borne inf. et borne sup.
     """
-    global ligne0_1
-    global ligne0_2
+    global ligne0_1_L_trait
+    global ligne0_2_L_trait
     x_ligne0_1 = ((variable_1_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait)
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait)
-    ligne0_1 = canevas0_L_trait.create_line(
+    ligne0_1_L_trait = canevas0_L_trait.create_line(
         x_ligne0_1, 0, x_ligne0_1, 200, fill="red", width=LARGEUR_LIGNES)
-    ligne0_2 = canevas0_L_trait.create_line(
+    ligne0_2_L_trait = canevas0_L_trait.create_line(
         x_ligne0_2, 0, x_ligne0_2, 200, fill="red", width=LARGEUR_LIGNES)
 
 
@@ -579,11 +610,11 @@ def deplace_ligne0_1_L_trait():
     """
     Déplace la ligne rouge de la limite inf. sur le canevas 0
     """
-    global ligne0_1
-    canevas0_L_trait.delete(ligne0_1)
+    global ligne0_1_L_trait
+    canevas0_L_trait.delete(ligne0_1_L_trait)
     x_ligne0_1 = ((variable_1_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait)
-    ligne0_1 = canevas0_L_trait.create_line(
+    ligne0_1_L_trait = canevas0_L_trait.create_line(
         x_ligne0_1, 0, x_ligne0_1, 200, fill="red", width=LARGEUR_LIGNES)
     if variable_1_L_trait.get() >= variable_2_L_trait.get():
         variable_2_L_trait.set(variable_1_L_trait.get())
@@ -594,11 +625,11 @@ def deplace_ligne0_2_L_trait():
     """
     Déplace la ligne rouge de la limite sup. sur le canevas 0
     """
-    global ligne0_2
-    canevas0_L_trait.delete(ligne0_2)
+    global ligne0_2_L_trait
+    canevas0_L_trait.delete(ligne0_2_L_trait)
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*1000/delta_limites_L_trait)
-    ligne0_2 = canevas0_L_trait.create_line(
+    ligne0_2_L_trait = canevas0_L_trait.create_line(
         x_ligne0_2, 0, x_ligne0_2, 200, fill="red", width=LARGEUR_LIGNES)
     if variable_2_L_trait.get() <= variable_1_L_trait.get():
         variable_1_L_trait.set(variable_2_L_trait.get())
@@ -689,7 +720,7 @@ def lit_affiche_spectre_numero_L_trait():
     nom_fichier_seul_L_trait = liste_fichiers_L_trait[numero]
     os.chdir(rep_travail_L_trait)
     spectre_entier_L_trait = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_trait, type_fichier_L_trait)
+        nom_fichier_seul_L_trait, type_fichier_L_trait.get())
     affiche_spectre_L_trait()
     visualisation_L_trait()
     fenetre_principale.title("LIBStick v2.0"+"\t spectre : "+nom_fichier_seul_L_trait)
@@ -922,7 +953,6 @@ limites_affichage_spectre_L_ext = numpy.array([198.0, 1013.0])
 coord_zoom_L_ext = numpy.array([198, 0, 1013, 0])
 delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
 flag_premier_lamda_L_ext = True
-l_L_ext = 0.0
 spectre_entier_L_ext = numpy.zeros((0, 2))
 # bornes_moyenne_spectres_L_ext=[]
 liste_bool_existe_L_ext = False
@@ -986,7 +1016,7 @@ def reset_tableau_L_ext():
     """
     Réinitialisation des valeurs par défaut enregistrées dans le fichier LIBStick.ini
     """
-    # global tableau_bornes_L_ext
+    global tableau_bornes_L_ext
     tableau_bornes_L_ext = tableau_bornes_init_L_ext.copy()
     variable_1_L_ext.set(tableau_bornes_L_ext[0, 0])
     variable_2_L_ext.set(tableau_bornes_L_ext[0, 1])
@@ -1043,12 +1073,10 @@ def execute_scripts_L_ext():
     dans les canevas 1 (et 2)
     """
     global nom_echantillon_L_ext
-#    global tableau_brut_L_ext, tableau_norm_L_ext
-#    global dataframe_norm_L_ext
-    tableau_bornes_L_ext = creation_tab_bornes_L_ext()
+    tableau_bornes = creation_tab_bornes_L_ext()
     if flag_zone2_L_ext.get() == 0:
         canevas2_L_ext.delete("all")
-    nom_echantillon_L_ext = LIBStick_extraction_spectres.main(rep_travail_L_ext, tableau_bornes_L_ext,
+    nom_echantillon_L_ext = LIBStick_extraction_spectres.main(rep_travail_L_ext, tableau_bornes,
                                                               type_fichier_L_ext.get(), liste_fichiers_L_ext,
                                                               flag_zone2_L_ext.get(), flag_2D_L_ext.get(), flag_3D_L_ext.get())
     affiche_image_L_ext()
@@ -1235,7 +1263,6 @@ def affiche_spectre_L_ext():
     global limites_affichage_spectre_L_ext
     global delta_limites_L_ext
     global maximum_spectre_ancien_L_ext
-    # global spectre_entier_L_ext
 
     # gestion du zoom avec y personnalisé
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ext is False and flag_bouton_zoom_L_ext is False:
@@ -1246,7 +1273,7 @@ def affiche_spectre_L_ext():
         minimum_spectre_ancien_L_ext = spectre[:, 1].min()
         maximum = (maximum_spectre_ancien_L_ext-minimum_spectre_ancien_L_ext) * \
             (200-coord_zoom_L_ext[1])/200
-        maximum_spectre_ancien_L_ext = maximum_spectre_L_ext = maximum
+        maximum_spectre_ancien_L_ext = maximum
 
         limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
         limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
@@ -1260,7 +1287,7 @@ def affiche_spectre_L_ext():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ext is False and flag_bouton_zoom_L_ext is True:
-        maximum = maximum_spectre_L_ext = maximum_spectre_ancien_L_ext
+        maximum = maximum_spectre_ancien_L_ext
         limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
         limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
         delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
@@ -1269,7 +1296,7 @@ def affiche_spectre_L_ext():
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_ext = minimum = spectre[:, 1].min()
+        minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_ext is True:
@@ -1281,8 +1308,8 @@ def affiche_spectre_L_ext():
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_ext = minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_ext = maximum_spectre_L_ext = maximum = spectre[:, 1].max()
+        minimum = spectre[:, 1].min()
+        maximum_spectre_ancien_L_ext = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (200-(spectre[:, 1] - minimum)*200/(maximum - minimum))
@@ -1587,7 +1614,7 @@ def affiche_image_L_ext():
     Affiche le(s) image(s) bruts ou normalisées dans le(s) caneva(s) 1 (et 2)
     représentant la (les) zone(s) extraite(s) de tous spectres  du répertoire
     """
-    global photo1, photo2
+    global photo1_L_ext, photo2_L_ext
     if flag_image_brute_L_ext.get() is False:
         fichier1 = rep_travail_L_ext+"/" + \
             str(tableau_bornes_L_ext[0, 0])+"_"+str(tableau_bornes_L_ext[0, 1])+"/figure.png"
@@ -1596,8 +1623,8 @@ def affiche_image_L_ext():
             str(tableau_bornes_L_ext[0, 0])+"_"+str(tableau_bornes_L_ext[0, 1])+"/figure_brute.png"
     image1_zoom = PIL.Image.open(fichier1)
     image1_zoom = image1_zoom.resize((500, 200))
-    photo1 = PIL.ImageTk.PhotoImage(image1_zoom)
-    canevas1_L_ext.create_image(250, 100, image=photo1)
+    photo1_L_ext = PIL.ImageTk.PhotoImage(image1_zoom)
+    canevas1_L_ext.create_image(250, 100, image=photo1_L_ext)
     if flag_zone2_L_ext.get():
         if flag_image_brute_L_ext.get() is False:
             fichier2 = rep_travail_L_ext+"/" + \
@@ -1608,8 +1635,8 @@ def affiche_image_L_ext():
                 str(tableau_bornes_L_ext[1, 1])+"/figure_brute.png"
         image2_zoom = PIL.Image.open(fichier2)
         image2_zoom = image2_zoom.resize((500, 200))
-        photo2 = PIL.ImageTk.PhotoImage(image2_zoom)
-        canevas2_L_ext.create_image(250, 100, image=photo2)
+        photo2_L_ext = PIL.ImageTk.PhotoImage(image2_zoom)
+        canevas2_L_ext.create_image(250, 100, image=photo2_L_ext)
 
 
 def change_flag_image_brute_L_ext():
@@ -1747,7 +1774,7 @@ def deplace_cible2_L_ext():
     """
     Déplace la cible sur l'image 2 à l'endroit cliqué dans l'une des deux images
     """
-    #global x2_L_ext, y_L_ext
+    # global x2_L_ext, y_L_ext
     global ligne2_vert_L_ext, ligne2_hori_L_ext
     canevas2_L_ext.delete(ligne2_vert_L_ext)
     canevas2_L_ext.delete(ligne2_hori_L_ext)
@@ -1913,7 +1940,6 @@ limites_affichage_spectre_L_comp = numpy.array([198.0, 1013.0])
 coord_zoom_L_comp = numpy.array([198, 0, 1013, 0])
 delta_limites_L_comp = limites_affichage_spectre_L_comp[1]-limites_affichage_spectre_L_comp[0]
 flag_premier_lamda_L_comp = True
-l_L_comp = 0.0
 spectre_entier_L_comp = numpy.zeros((0, 2))
 # tableau_bornes_init_L_comp=numpy.array([ [529.0, 542.0] , [534.7, 535.8] ])
 # tableau_bornes_L_comp=numpy.array([ [529.0, 542.0] , [534.7, 535.8] ])
@@ -1979,7 +2005,7 @@ def reset_tableau_L_comp():
     """
     Réinitialisation des valeurs par défaut enregistrées dans le fichier LIBStick.ini
     """
-    # global tableau_bornes_L_comp
+    global tableau_bornes_L_comp
     tableau_bornes_L_comp = tableau_bornes_init_L_comp.copy()
     variable_1_L_comp.set(tableau_bornes_L_comp[0, 0])
     variable_2_L_comp.set(tableau_bornes_L_comp[0, 1])
@@ -2058,15 +2084,18 @@ def execute_scripts_L_comp():
     dans le tableau avec éventuellemnt les statistiques
     """
     global DataFrame_resultats_L_comp
-    global photo
-    tableau_bornes_L_comp = creation_tab_bornes_L_comp()
-    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp, type_fichier_L_comp.get(), tableau_bornes_L_comp, flag_traitement_L_comp.get(),
-                                                             flag_denominateur_L_comp.get(), flag_2D_L_comp.get(), flag_3D_L_comp.get())
+    global photo_L_comp
+    tableau_bornes = creation_tab_bornes_L_comp()
+    DataFrame_resultats_L_comp = LIBStick_comp_spectres.main(rep_travail_L_comp, liste_fichiers_L_comp,
+                                                             type_fichier_L_comp.get(), tableau_bornes,
+                                                             flag_traitement_L_comp.get(),
+                                                             flag_denominateur_L_comp.get(),
+                                                             flag_2D_L_comp.get(), flag_3D_L_comp.get())
     fichier = rep_travail_L_comp+"/figure.png"
     image_zoom = PIL.Image.open(fichier)
     image_zoom = image_zoom.resize((1000, 200))
-    photo = PIL.ImageTk.PhotoImage(image_zoom)
-    canevas1_L_comp.create_image(500, 100, image=photo)
+    photo_L_comp = PIL.ImageTk.PhotoImage(image_zoom)
+    canevas1_L_comp.create_image(500, 100, image=photo_L_comp)
     affiche_tableau_resultats_L_comp()
     if flag_stat_L_comp.get() == 0:
         texte_statistiques_L_comp.grid_forget()
@@ -2112,10 +2141,10 @@ def affiche_lambda_L_comp(event):
     # affiche_spectre_L_comp()
     if flag_premier_lamda_L_comp is False:
         canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
-    l_L_comp = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+    l = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
     lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
-        event.x, event.y, text=str(format(l_L_comp, "4.1f")), fill="blue")
-    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm"))
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
     flag_premier_lamda_L_comp = False
 
 
@@ -2154,10 +2183,10 @@ def affiche_position_souris_motion_L_comp(event):
             0, event.y, 1000, event.y, fill="green")
     if flag_premier_lamda_L_comp is False:
         canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
-    l_L_comp = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+    l = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
     lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
-        event.x, event.y, text=str(format(l_L_comp, "4.1f")), fill="blue")
-    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm"))
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
     flag_premier_lamda_L_comp = False
 
 
@@ -2178,7 +2207,7 @@ def affiche_spectre_L_comp():
         minimum_spectre_ancien_L_comp = spectre[:, 1].min()
         maximum = (maximum_spectre_ancien_L_comp-minimum_spectre_ancien_L_comp) * \
             (200-coord_zoom_L_comp[1])/200
-        maximum_spectre_ancien_L_comp = maximum_spectre_L_comp = maximum
+        maximum_spectre_ancien_L_comp = maximum
 
         limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
         limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
@@ -2193,7 +2222,7 @@ def affiche_spectre_L_comp():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_comp is False and flag_bouton_zoom_L_comp is True:
-        maximum = maximum_spectre_L_comp = maximum_spectre_ancien_L_comp
+        maximum = maximum_spectre_ancien_L_comp
         limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
         limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
         delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - \
@@ -2203,7 +2232,7 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_comp = minimum = spectre[:, 1].min()
+        minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_comp is True:
@@ -2216,8 +2245,8 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_comp = minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_comp = maximum_spectre_L_comp = maximum = spectre[:, 1].max()
+        minimum = spectre[:, 1].min()
+        maximum_spectre_ancien_L_comp = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (200-(spectre[:, 1] - minimum)*200/(maximum - minimum))
@@ -2494,10 +2523,10 @@ def zoom_drag_and_drop_L_comp(event):
         # affiche la longueur d'onde :
         if flag_premier_lamda_L_comp is False:
             canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
-        l_L_comp = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
+        l = event.x*delta_limites_L_comp/1000+limites_affichage_spectre_L_comp[0]
         lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
-            event.x, event.y, text=str(format(l_L_comp, "4.1f")), fill="blue")
-        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm"))
+            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
         flag_premier_lamda_L_comp = False
     if coord_zoom_L_comp[2] < coord_zoom_L_comp[0]:
         flag_dezoom_L_comp = True
@@ -2621,13 +2650,13 @@ def affiche_tableau_resultats_L_comp():
     if flag_denominateur_L_comp.get() == 1:
         tree_resultats_L_comp.heading(3, text="Rapport zone1/zone2")
         for ligne_tableau in DataFrame_resultats_L_comp.iterrows():
-            ID_L_comp = tree_resultats_L_comp.insert("", "end", values=(
+            tree_resultats_L_comp.insert("", "end", values=(
                 num_ligne, ligne_tableau[0], DataFrame_resultats_L_comp.iloc[num_ligne-1, 2]))
             num_ligne = num_ligne+1
     if flag_denominateur_L_comp.get() == 0:
         tree_resultats_L_comp.heading(3, text="Aire zone 1")
         for ligne_tableau in DataFrame_resultats_L_comp.iterrows():
-            ID_L_comp = tree_resultats_L_comp.insert("", "end", values=(
+            tree_resultats_L_comp.insert("", "end", values=(
                 num_ligne, ligne_tableau[0], DataFrame_resultats_L_comp.iloc[num_ligne-1, 0]))
             num_ligne = num_ligne+1
 
@@ -2767,7 +2796,6 @@ limites_affichage_spectre_L_ACP = numpy.array([198.0, 1013.0])
 coord_zoom_L_ACP = numpy.array([198, 0, 1013, 0])
 delta_limites_L_ACP = limites_affichage_spectre_L_ACP[1]-limites_affichage_spectre_L_ACP[0]
 flag_premier_lamda_L_ACP = True
-l_L_ACP = 0.0
 spectre_entier_L_ACP = numpy.zeros((0, 2))
 spectre_corrige_L_ACP = numpy.zeros((0, 2))
 # tableau_bornes_L_ACP=numpy.array([300.0, 608.0])
@@ -2796,6 +2824,7 @@ def reset_tableau_L_ACP():
     """
     Réinitialisation des valeurs par défaut enregistrées dans le fichier LIBStick.ini
     """
+    global tableau_bornes_L_ACP
     tableau_bornes_L_ACP = tableau_bornes_init_L_ACP.copy()
     variable_1_L_ACP.set(tableau_bornes_L_ACP[0])
     variable_2_L_ACP.set(tableau_bornes_L_ACP[1])
@@ -2953,12 +2982,12 @@ def execute_ACP_L_ACP():
     """
     global modele_ACP_L_ACP
     global dataframe_facteurs_ACP_L_ACP
-    tableau_bornes_L_ACP = creation_tab_bornes_L_ACP()
+    tableau_bornes = creation_tab_bornes_L_ACP()
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
     treeview_dataframe = treeview_dataframe_L_ACP()
     dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe, treeview_dataframe,
-                                                                                                                       tableau_bornes_L_ACP)  # suprime les lignes non incluses dans le calcul de l'ACP
+                                                                                                                       tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get() is True:
         dataframe = LIBStick_outils.normalise_dataframe_aire(dataframe)
         dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(
@@ -2994,7 +3023,7 @@ def execute_ACP_L_ACP():
     dataframe_facteurs_ACP_L_ACP = pandas.DataFrame(
         facteurs_ACP_corrigees, columns=dataframe.columns)
     affiche_spectres_var_ACP_L_ACP()
-    # bouton_enregistre_L_ACP.configure(state="normal")
+    bouton_enregistre_L_ACP.configure(state="normal")
     # bouton_sauve_L_ACP.configure(state="normal")
     bouton_applique_L_ACP.configure(state="normal")
 
@@ -3025,12 +3054,12 @@ def applique_ACP_L_ACP():
     """
     global modele_ACP_L_ACP
     global dataframe_facteurs_ACP_L_ACP
-    tableau_bornes_L_ACP = creation_tab_bornes_L_ACP()
+    tableau_bornes = creation_tab_bornes_L_ACP()
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
     treeview_dataframe = treeview_dataframe_L_ACP()
     dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe, treeview_dataframe,
-                                                                                                                       tableau_bornes_L_ACP)  # suprime les lignes non incluses dans le calcul de l'ACP
+                                                                                                                       tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get() is True:
         dataframe = LIBStick_outils.normalise_dataframe_aire(dataframe)
         dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(
@@ -3054,11 +3083,15 @@ def applique_ACP_L_ACP():
     if tableau_individus_supp.shape[0] != 0:
         tableau_ACP_individus_supp = LIBStick_ACP.applique_ACP(
             modele_ACP_L_ACP, tableau_individus_supp)
-        LIBStick_ACP.affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe, modele_ACP_L_ACP, tableau_ACP, tableau_ACP_individus_supp,
-                                          dim_L_ACP, flag_3D_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+        LIBStick_ACP.affiche_ACP_ind_supp(dataframe, dataframe_individus_supp,
+                                          treeview_dataframe, modele_ACP_L_ACP,
+                                          tableau_ACP, tableau_ACP_individus_supp,
+                                          dim_L_ACP, flag_3D_L_ACP.get(),
+                                          flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
     else:
-        LIBStick_ACP.affiche_ACP(dataframe, treeview_dataframe, modele_ACP_L_ACP, tableau_ACP, dim_L_ACP,
-                                 flag_3D_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+        LIBStick_ACP.affiche_ACP(dataframe, treeview_dataframe, modele_ACP_L_ACP,
+                                 tableau_ACP, dim_L_ACP, flag_3D_L_ACP.get(),
+                                 flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
 
     valeurs_propres_corrigees = modele_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
     sqrt_valeurs_propres_corrigees = numpy.sqrt(valeurs_propres_corrigees)
@@ -3069,7 +3102,7 @@ def applique_ACP_L_ACP():
     dataframe_facteurs_ACP_L_ACP = pandas.DataFrame(
         facteurs_ACP_corrigees, columns=dataframe.columns)
     affiche_spectres_var_ACP_L_ACP()
-    # bouton_enregistre_L_ACP.configure(state="normal")
+    bouton_enregistre_L_ACP.configure(state="normal")
 
 
 def enregistre_ACP_L_ACP():
@@ -3132,12 +3165,12 @@ def affiche_lambda_L_ACP(event):
     if flag_premier_lamda_L_ACP is False:
         canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
         canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
-    l_L_ACP = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
+    l = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
     lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
-        event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
     lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-        event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
-    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l_L_ACP, "4.1f") + " nm"))
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
     flag_premier_lamda_L_ACP = False
 
 
@@ -3182,12 +3215,12 @@ def affiche_position_souris_motion_L_ACP(event):
     if flag_premier_lamda_L_ACP is False:
         canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
         canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
-    l_L_ACP = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
+    l = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
     lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
-        event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
     lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-        event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
-    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l_L_ACP, "4.1f") + " nm"))
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
     flag_premier_lamda_L_ACP = False
 
 
@@ -3208,7 +3241,7 @@ def affiche_spectre_L_ACP():
         minimum_spectre_ancien_L_ACP = spectre[:, 1].min()
         maximum = (maximum_spectre_ancien_L_ACP-minimum_spectre_ancien_L_ACP) * \
             (200-coord_zoom_L_ACP[1])/200
-        maximum_spectre_ancien_L_ACP = maximum_spectre_L_ACP = maximum
+        maximum_spectre_ancien_L_ACP = maximum
 
         limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
         limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
@@ -3222,7 +3255,7 @@ def affiche_spectre_L_ACP():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ACP is False and flag_bouton_zoom_L_ACP is True:
-        maximum = maximum_spectre_L_ACP = maximum_spectre_ancien_L_ACP
+        maximum = maximum_spectre_ancien_L_ACP
         limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
         limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
         delta_limites_L_ACP = limites_affichage_spectre_L_ACP[1]-limites_affichage_spectre_L_ACP[0]
@@ -3231,7 +3264,8 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_ACP = minimum = spectre[:, 1].min()
+
+        minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_ACP is True:
@@ -3243,8 +3277,8 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = numpy.row_stack((spectre, ligne))
-        minimum_spectre_L_ACP = minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_ACP = maximum_spectre_L_ACP = maximum = spectre[:, 1].max()
+        minimum = spectre[:, 1].min()
+        maximum_spectre_ancien_L_ACP = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (200-(spectre[:, 1] - minimum)*200/(maximum - minimum))
@@ -3512,12 +3546,12 @@ def zoom_drag_and_drop_L_ACP(event):
         if flag_premier_lamda_L_ACP is False:
             canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
             canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
-        l_L_ACP = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
+        l = event.x*delta_limites_L_ACP/1000+limites_affichage_spectre_L_ACP[0]
         lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
-            event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
+            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
         lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-            event.x, event.y, text=str(format(l_L_ACP, "4.1f")), fill="blue")
-        lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l_L_ACP, "4.1f") + " nm"))
+            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
         flag_premier_lamda_L_ACP = False
     if coord_zoom_L_ACP[2] < coord_zoom_L_ACP[0]:
         flag_dezoom_L_ACP = True
@@ -3757,8 +3791,8 @@ def lit_element_L_ele(symbole):
                 rep_LIBStick+"/LIBStick_datas/ions/"+symbole+".csv")
             return DataFrame_element
     except:
-        fenetre_exception_L_ele = tkinter.messagebox.showinfo(
-            title=_("Attention !"), message=_("Pas d'informations pour cet élément."))
+        tkinter.messagebox.showinfo(title=_("Attention !"),
+                                    message=_("Pas d'informations pour cet élément."))
         # print("Pas de fichier de données pour cet éléments")
 
 
@@ -3798,56 +3832,56 @@ def affiches_lignes_element_L_ele():
                 # affiche_ligne_element(long_onde, canevas0_L_ext)
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet == 0:
-                    ligne0 = canevas0_L_trait.create_line(
+                    canevas0_L_trait.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
-                    ligne1 = canevas1_L_trait.create_line(
+                    canevas1_L_trait.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
                 if ID_onglet == 1:
-                    ligne = canevas0_L_ext.create_line(
+                    canevas0_L_ext.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
                 if ID_onglet == 2:
-                    ligne = canevas0_L_comp.create_line(
+                    canevas0_L_comp.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
                 if ID_onglet == 3:
-                    ligne0 = canevas0_L_ACP.create_line(
+                    canevas0_L_ACP.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
-                    ligne1 = canevas1_L_ACP.create_line(
+                    canevas1_L_ACP.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
             if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet == 0:
-                    ligne0 = canevas0_L_trait.create_line(
+                    canevas0_L_trait.create_line(
                         x_ligne, 100, x_ligne, 200, fill=couleur_lignes, dash=(4, 2))
-                    ligne1 = canevas1_L_trait.create_line(
+                    canevas1_L_trait.create_line(
                         x_ligne, 100, x_ligne, 200, fill=couleur_lignes, dash=(4, 2))
                 if ID_onglet == 1:
-                    ligne = canevas0_L_ext.create_line(
+                    canevas0_L_ext.create_line(
                         x_ligne, 100, x_ligne, 200, fill=couleur_lignes, dash=(4, 2))
                 if ID_onglet == 2:
-                    ligne = canevas0_L_comp.create_line(
+                    canevas0_L_comp.create_line(
                         x_ligne, 100, x_ligne, 200, fill=couleur_lignes, dash=(4, 2))
                 if ID_onglet == 3:
-                    ligne0 = canevas0_L_ACP.create_line(
+                    canevas0_L_ACP.create_line(
                         x_ligne, 100, x_ligne, 200, fill=couleur_lignes, dash=(4, 2))
-                    ligne1 = canevas1_L_ACP.create_line(
+                    canevas1_L_ACP.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
             if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*1000/delta_limites)
                 if ID_onglet == 0:
-                    ligne0 = canevas0_L_trait.create_line(
+                    canevas0_L_trait.create_line(
                         x_ligne, 165, x_ligne, 200, fill=couleur_lignes, dash=(4, 3))
-                    ligne1 = canevas1_L_trait.create_line(
+                    canevas1_L_trait.create_line(
                         x_ligne, 165, x_ligne, 200, fill=couleur_lignes, dash=(4, 3))
                 if ID_onglet == 1:
-                    ligne = canevas0_L_ext.create_line(
+                    canevas0_L_ext.create_line(
                         x_ligne, 165, x_ligne, 200, fill=couleur_lignes, dash=(4, 3))
                 if ID_onglet == 2:
-                    ligne = canevas0_L_comp.create_line(
+                    canevas0_L_comp.create_line(
                         x_ligne, 165, x_ligne, 200, fill=couleur_lignes, dash=(4, 3))
                 if ID_onglet == 3:
-                    ligne0 = canevas0_L_ACP.create_line(
+                    canevas0_L_ACP.create_line(
                         x_ligne, 165, x_ligne, 200, fill=couleur_lignes, dash=(4, 3))
-                    ligne1 = canevas1_L_ACP.create_line(
+                    canevas1_L_ACP.create_line(
                         x_ligne, 0, x_ligne, 200, fill=couleur_lignes, dash=(4, 1))
 
 
@@ -3875,8 +3909,8 @@ def affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele, frame1,
         ligne = ligne_tableau[5]
         colonne = ligne_tableau[6]
         couleur = ligne_tableau[8]
-        boutton_L_ele = case_classification(
-            frame1, nom, symbole,  Z, ligne, colonne, couleur, bouton_affichage_L_ele)
+        case_classification(frame1, nom, symbole,  Z, ligne,
+                            colonne, couleur, bouton_affichage_L_ele)
 
 
 def ouvre_fenetre_classification_L_ele():
@@ -4000,6 +4034,7 @@ class case_classification(tkinter.Button):
             size=TAILLE_FONT_CLASSIFICATION, weight="bold"))
         DataFrame_element_L_ele = lit_element_L_ele(symbole)
         affiches_lignes_element_L_ele()
+        print(nom)
 
 
 ###################################################################################################
@@ -4140,7 +4175,7 @@ ligne_position_0_x_L_trait = canevas0_L_trait.create_line(0, 0, 0, 200, fill="wh
 ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, 0, 1000, 0, fill="white")
 
 lambda_texte_L_trait = tkinter.Label(
-    frame1_L_trait, text="Lambda = " + str(format(l_L_trait, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
+    frame1_L_trait, text="Lambda = " + str(format(lambda_texte_spectre_0_L_trait, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
 lambda_texte_L_trait.grid(row=2, column=5)
 
 text1_L_trait = tkinter.Label(frame1_L_trait, text=_("Borne inf :"), bg=COULEUR_INTERFACE)
@@ -4225,7 +4260,7 @@ entree_zoom_sup_L_trait = tkinter.Spinbox(frame1_1_L_trait, from_=198, to=1013, 
 entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tkinter.N)
 entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tkinter.N)
 
-# type_fichier_L_trait=tkinter.StringVar(value=".asc")
+type_fichier_L_trait = tkinter.StringVar(value=".asc")
 bouton_rep_L_trait = tkinter.Button(frame1_1_L_trait, text=_("Fichier"),
                                     command=choix_fichier_L_trait, width=8, bg=COULEUR_INTERFACE)
 bouton_visualisation_L_trait = tkinter.Button(frame1_1_L_trait, text=_("Visualisation"),
@@ -4362,7 +4397,7 @@ ligne_position_x_L_ext = canevas0_L_ext.create_line(0, 0, 0, 200, fill="white")
 ligne_position_y_L_ext = canevas0_L_ext.create_line(0, 0, 1000, 0, fill="white")
 
 lambda_texte_L_ext = tkinter.Label(
-    frame1_L_ext, text="Lambda = " + str(format(l_L_ext, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
+    frame1_L_ext, text="Lambda = " + str(format(lambda_texte_spectre_L_ext, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
 lambda_texte_L_ext.grid(row=2, column=5)
 
 text1_L_ext = tkinter.Label(frame1_L_ext, text=_("Première borne inf (nm)"), bg=COULEUR_INTERFACE)
@@ -4633,7 +4668,7 @@ ligne_position_x_L_comp = canevas0_L_comp.create_line(0, 0, 0, 200, fill="white"
 ligne_position_y_L_comp = canevas0_L_comp.create_line(0, 0, 1000, 0, fill="white")
 
 lambda_texte_L_comp = tkinter.Label(
-    frame1_L_comp, text="Lambda = " + str(format(l_L_comp, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
+    frame1_L_comp, text="Lambda = " + str(format(lambda_texte_spectre_L_comp, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
 lambda_texte_L_comp.grid(row=2, column=5)
 
 text1_L_comp = tkinter.Label(frame1_L_comp, text=_(
@@ -4893,7 +4928,7 @@ ligne_position_x_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, 200, fill="white")
 ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, 0, 1000, 0, fill="white")
 
 lambda_texte_L_ACP = tkinter.Label(
-    frame1_L_ACP, text="Lambda = " + str(format(l_L_ACP, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
+    frame1_L_ACP, text="Lambda = " + str(format(lambda_texte_spectre_0_L_ACP, "4.1f") + " nm"), bg=COULEUR_INTERFACE)
 lambda_texte_L_ACP.grid(row=2, column=5)
 
 text1_L_ACP = tkinter.Label(frame1_L_ACP, text=_("Borne inf :"), bg=COULEUR_INTERFACE)
@@ -5033,7 +5068,8 @@ canevas1_L_ACP.grid(row=1, column=1, columnspan=6)
 frame3_1_L_ACP = tkinter.Frame(frame3_L_ACP, bg=COULEUR_INTERFACE)
 frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tkinter.N)
 
-bouton_enregistre_L_ACP = tkinter.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"), command=enregistre_facteurs_ACP_L_ACP,
+bouton_enregistre_L_ACP = tkinter.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"),
+                                         command=enregistre_facteurs_ACP_L_ACP,
                                          state="disable", width=8, bg=COULEUR_INTERFACE)
 bouton_enregistre_L_ACP.grid(row=1, column=1)
 

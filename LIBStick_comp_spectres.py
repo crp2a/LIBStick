@@ -97,7 +97,8 @@ def graphique_creation(tableau8bits, nom_echantillon, lim_spectre):
     """
     # fig=plt.figure()
     fig, ax = plt.subplots()
-    #plt.imshow(tableau8bits, cmap="gray", extent=[lim_spectre[0],lim_spectre[1],tableau8bits.shape[0],0], aspect="auto")
+    # plt.imshow(tableau8bits, cmap="gray", extent=[lim_spectre[0],lim_spectre[1],t
+    #                                               ableau8bits.shape[0],0], aspect="auto")
     plt.imshow(tableau8bits, cmap="inferno", extent=[
                lim_spectre[0], lim_spectre[1], tableau8bits.shape[0], 0], aspect="auto")
 
@@ -160,7 +161,8 @@ def graphique_sauvegarde(tableau8bits):
 ###################################################################################################
 # programme principal
 ###################################################################################################
-def main(rep_travail, liste_fichiers, type_fichier, tableau_bornes, type_traitement, flag_denominateur, flag_2D, flag_3D):
+def main(rep_travail, liste_fichiers, type_fichier, tableau_bornes,
+         type_traitement, flag_denominateur, flag_2D, flag_3D):
     """
     Fonction principale du module
     Crée un tableau_comparatif avec tous les spectres en colonne et les lambda en colonne 0

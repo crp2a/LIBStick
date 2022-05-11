@@ -73,11 +73,12 @@ def lit_spectre(fichier, type_fichier):
     if type_fichier == ".asc":
         spectre = numpy.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
                                 0, 1], dtype=float, encoding="Latin-1")
-#        document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64, usecols=[0,1],dtype=float,encoding="Latin-1")
-#        spectre=numpy.zeros((0,2))
-#        for ligne in document :
-#            if (ligne[0]<=1013) :
-#                spectre=numpy.row_stack((spectre,ligne))
+        # document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64,
+        #                        usecols=[0,1],dtype=float,encoding="Latin-1")
+        # spectre=numpy.zeros((0,2))
+        # for ligne in document :
+        #     if (ligne[0]<=1013) :
+        #         spectre=numpy.row_stack((spectre,ligne))
     return spectre
 
 
@@ -166,12 +167,13 @@ def creer_dataframe_x_tableau_en_lignes(tableau_en_lignes, liste):
     # INUTILISE !!!! et sûrement FAUX (cf. transpose à vérifier) !!!!
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    dataframe = pandas.DataFrame(numpy.transpose(
-        tableau_en_lignes[1:, :]), index=liste, columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
+    dataframe = pandas.DataFrame(numpy.transpose(tableau_en_lignes[1:, :]), index=liste,
+                                 columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
     return dataframe
 
 
-# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes
+# creation d'un DFataFrame avec lambda en nom des colonnes et le nom des fichiers
+# en index des lignes
 def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
     """
     Creation d'un DataFrame avec lambda en nom des colonnes et
@@ -184,7 +186,8 @@ def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
     return dataframe
 
 
-# creation d'un DataFrame avec lambda en nom des colonnes et le nom des fichiers en index des lignes entre bornes inf et sup
+# creation d'un DataFrame avec lambda en nom des colonnes et le nom des fichiers en index
+# des lignes entre bornes inf et sup
 def creer_dataframe_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bornes):
     """
     Creation d'un DataFrame avec lambda en nom des colonnes et

@@ -25,14 +25,14 @@ def enregistre_ACP(modele_ACP, rep_travail):
     Enregistre le calcul d'ACP. Non encore utilisé
     """
     print(rep_travail)
-    pk.dump(modele_ACP, open(rep_travail+"\ACP_modele.pkl", "wb"))
+    pk.dump(modele_ACP, open(rep_travail+"\\ACP_modele.pkl", "wb"))
 
 
 def ouvre_ACP(rep_travail):
     """
     Ouvre un calcul d'ACP. Non encore utilisé
     """
-    modele_ACP = pk.load(open(rep_travail+"\ACP_modele.pkl", "rb"))
+    modele_ACP = pk.load(open(rep_travail+"\\ACP_modele.pkl", "rb"))
     return modele_ACP
 
 
@@ -89,8 +89,10 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
 
     #    lambada=numpy.mean(numpy.power(tableau_ACP,2), axis=0)
     #    inerties=100*lambada/numpy.sum(lambada)
-        #ax.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], color="xkcd:light blue", marker="o", linestyle="None")
-        #ax.plot (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1], color="xkcd:light blue", marker="o", linestyle="None")
+        # ax.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1],
+        #             color="xkcd:light blue", marker="o", linestyle="None")
+        # ax.plot (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1],
+        #          color="xkcd:light blue", marker="o", linestyle="None")
         label = treeview_dataframe.values[:, -1]
 
         ax.scatter(tableau_ACP[:, dim1-1], tableau_ACP[:, dim2-1],
@@ -132,8 +134,9 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
         plt.show(block=False)
 
 
-def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe, modele_ACP,
-                         tableau_ACP, tableau_ACP_individus_supp, dim, flag_3D, flag_echelle, flag_eboulis):
+def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe,
+                         modele_ACP, tableau_ACP, tableau_ACP_individus_supp,
+                         dim, flag_3D, flag_echelle, flag_eboulis):
     """
     Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
     avec les individus supplémentaires n'ayant pas servi au calcul de l'ACP, calculé au préalable
@@ -267,7 +270,8 @@ def calcul_ACP_sklearn(tableau, nbr_composantes, flag_centre_reduit):
     """
     Calcul de l'ACP par sklearn.decomposition.PCA
     """
-    if flag_centre_reduit == True:
+    # if flag_centre_reduit == True:
+    if flag_centre_reduit:
         tableau = creation_tableau_centre_reduit(tableau)
     acp = sklearn.decomposition.PCA(n_components=nbr_composantes)
     modele_ACP = acp.fit(tableau)
@@ -281,7 +285,8 @@ def calcul_ACP_sklearn(tableau, nbr_composantes, flag_centre_reduit):
 #    print("singular_values_ : \n")
 #    print(modele_ACP.singular_values_)
     #tableau_ACP=applique_ACP(modele_ACP, tableau)
-    #affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim, flag_3D, flag_echelle, flag_eboulis)
+    # affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP,
+    #             dim, flag_3D, flag_echelle, flag_eboulis)
     return modele_ACP
 
 
@@ -306,21 +311,24 @@ def applique_ACP(modele_ACP, tableau):
 ###################################################################################################
 # fonctions de calculs d'ACP par fanalysis
 ###################################################################################################
-# def calcul_ACP (dataframe,dim1, dim2, flag_centre_reduit, flag_echelle, flag_eboulis, flag_calcul) :
-#    if flag_calcul == True :
-#        modele_ACP=calcul_ACP_fanalysis(dataframe,dim1, dim2,flag_centre_reduit)
-#    else :
-#        modele_ACP=calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit, flag_echelle, flag_eboulis)
-#    return modele_ACP
+# def calcul_ACP (dataframe,dim1, dim2, flag_centre_reduit, flag_echelle,
+#                 flag_eboulis, flag_calcul) :
+#     if flag_calcul == True :
+#         modele_ACP=calcul_ACP_fanalysis(dataframe,dim1, dim2,flag_centre_reduit)
+#     else :
+#         modele_ACP=calcul_ACP_sklearn (dataframe,dim1, dim2,flag_centre_reduit,
+#                                        flag_echelle, flag_eboulis)
+#     return modele_ACP
 
 # def calcul_ACP_fanalysis (dataframe,dim1, dim2, flag_centre_reduit) :
 # p=dataframe.shape[1]   #nbre de variable en colonnes
 # n=dataframe.shape[0]   #nbre d'observation en lignes
-#    tableau=dataframe.values     #matrice des valeurs de D
-#
-#    if flag_centre_reduit==True :
-#        tableau=creation_tableau_centre_reduit(tableau)
-#
-#    tableau_ACP=PCA(std_unit=False, row_labels=dataframe.index, col_labels=dataframe.columns) #si std_unit=True => ACP normée
-#    tableau_ACP.fit(tableau)
-#    tableau_ACP.mapping_row(num_x_axis=dim1, num_y_axis=dim2,figsize=(5,5))
+#     tableau=dataframe.values     #matrice des valeurs de D
+
+#     if flag_centre_reduit==True :
+#         tableau=creation_tableau_centre_reduit(tableau)
+
+#     tableau_ACP=PCA(std_unit=False, row_labels=dataframe.index,
+#                     col_labels=dataframe.columns) #si std_unit=True => ACP normée
+#     tableau_ACP.fit(tableau)
+#     tableau_ACP.mapping_row(num_x_axis=dim1, num_y_axis=dim2,figsize=(5,5))
