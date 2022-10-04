@@ -14,8 +14,8 @@ de transformations de tableaux et dataframes
 ###################################################################################################
 ###################################################################################################
 import os
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 
 
 ###################################################################################################
@@ -62,23 +62,23 @@ def lit_spectre(fichier, type_fichier):
     renvoie ce spectre sous forme d'un tableau
     """
     if type_fichier == ".mean":
-        spectre = numpy.loadtxt(fichier, delimiter="\t", dtype=float, encoding="Latin-1")
+        spectre = np.loadtxt(fichier, delimiter="\t", dtype=float, encoding="Latin-1")
     if type_fichier == ".tsv":
-        spectre = numpy.loadtxt(fichier, delimiter="\t", dtype=float, encoding="Latin-1")
+        spectre = np.loadtxt(fichier, delimiter="\t", dtype=float, encoding="Latin-1")
     if type_fichier == ".csv":
-        spectre = numpy.loadtxt(fichier, delimiter=",", skiprows=1, dtype=float, encoding="Latin-1")
+        spectre = np.loadtxt(fichier, delimiter=",", skiprows=1, dtype=float, encoding="Latin-1")
         nb_colonnes = spectre.shape[1]
         if nb_colonnes == 3:
-            spectre = numpy.delete(spectre, 0, axis=1)
+            spectre = np.delete(spectre, 0, axis=1)
     if type_fichier == ".asc":
-        spectre = numpy.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
+        spectre = np.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
                                 0, 1], dtype=float, encoding="Latin-1")
-        # document=numpy.loadtxt(fichier,delimiter="\t",skiprows=64,
+        # document=np.loadtxt(fichier,delimiter="\t",skiprows=64,
         #                        usecols=[0,1],dtype=float,encoding="Latin-1")
-        # spectre=numpy.zeros((0,2))
+        # spectre=np.zeros((0,2))
         # for ligne in document :
         #     if (ligne[0]<=1013) :
-        #         spectre=numpy.row_stack((spectre,ligne))
+        #         spectre=np.row_stack((spectre,ligne))
     return spectre
 
 
@@ -97,12 +97,12 @@ def creer_tableau_avec_x_ligne1(liste):
     i = 0
     for fichier in liste:
         if i == 0:
-            tableau = numpy.loadtxt(fichier, delimiter="\t")
+            tableau = np.loadtxt(fichier, delimiter="\t")
         else:
-            fichier_entree = numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
-            tableau = numpy.column_stack((tableau, fichier_entree))
+            fichier_entree = np.loadtxt(fichier, delimiter="\t", usecols=[1])
+            tableau = np.column_stack((tableau, fichier_entree))
         i = i+1
-    tableau = numpy.transpose(tableau)
+    tableau = np.transpose(tableau)
     return tableau
 
 
@@ -117,42 +117,42 @@ def creer_tableau_avec_x_colonne1(liste, type_fichier):
     if type_fichier == ".tsv":
         for fichier in liste:
             if i == 0:
-                tableau = numpy.loadtxt(fichier, delimiter="\t")
+                tableau = np.loadtxt(fichier, delimiter="\t")
             else:
-                fichier_entree = numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
-                tableau = numpy.column_stack((tableau, fichier_entree))
+                fichier_entree = np.loadtxt(fichier, delimiter="\t", usecols=[1])
+                tableau = np.column_stack((tableau, fichier_entree))
             i = i+1
     if type_fichier == ".mean":
         for fichier in liste:
             if i == 0:
-                tableau = numpy.loadtxt(fichier, delimiter="\t")
+                tableau = np.loadtxt(fichier, delimiter="\t")
             else:
-                fichier_entree = numpy.loadtxt(fichier, delimiter="\t", usecols=[1])
-                tableau = numpy.column_stack((tableau, fichier_entree))
+                fichier_entree = np.loadtxt(fichier, delimiter="\t", usecols=[1])
+                tableau = np.column_stack((tableau, fichier_entree))
             i = i+1
     if type_fichier == ".csv":
         for fichier in liste:
             if i == 0:
-                tableau = numpy.loadtxt(fichier, delimiter=",", skiprows=1)
+                tableau = np.loadtxt(fichier, delimiter=",", skiprows=1)
                 nb_colonnes = tableau.shape[1]
                 if nb_colonnes == 3:
-                    tableau = numpy.delete(tableau, 0, axis=1)
+                    tableau = np.delete(tableau, 0, axis=1)
             else:
                 if nb_colonnes == 2:
-                    fichier_entree = numpy.loadtxt(fichier, delimiter=",", skiprows=1, usecols=[1])
+                    fichier_entree = np.loadtxt(fichier, delimiter=",", skiprows=1, usecols=[1])
                 if nb_colonnes == 3:
-                    fichier_entree = numpy.loadtxt(fichier, delimiter=",", skiprows=1, usecols=[2])
-                tableau = numpy.column_stack((tableau, fichier_entree))
+                    fichier_entree = np.loadtxt(fichier, delimiter=",", skiprows=1, usecols=[2])
+                tableau = np.column_stack((tableau, fichier_entree))
             i = i+1
     if type_fichier == ".asc":
         for fichier in liste:
             if i == 0:
-                tableau = numpy.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
+                tableau = np.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
                                         0, 1], dtype=float, encoding="Latin-1")
             else:
-                fichier_entree = numpy.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
+                fichier_entree = np.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
                                                1], dtype=float, encoding="Latin-1")
-                tableau = numpy.column_stack((tableau, fichier_entree))
+                tableau = np.column_stack((tableau, fichier_entree))
             i = i+1
     return tableau
 
@@ -167,7 +167,7 @@ def creer_dataframe_x_tableau_en_lignes(tableau_en_lignes, liste):
     # INUTILISE !!!! et sûrement FAUX (cf. transpose à vérifier) !!!!
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    dataframe = pandas.DataFrame(numpy.transpose(tableau_en_lignes[1:, :]), index=liste,
+    dataframe = pd.DataFrame(np.transpose(tableau_en_lignes[1:, :]), index=liste,
                                  columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
     return dataframe
 
@@ -181,7 +181,7 @@ def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
     à partir d'un tableau de spectres en colonnes
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    dataframe = pandas.DataFrame(numpy.transpose(
+    dataframe = pd.DataFrame(np.transpose(
         tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
     return dataframe
 
@@ -195,7 +195,7 @@ def creer_dataframe_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bor
     à partir d'un tableau de spectres en colonnes
     entre bornes inf et sup
     """
-    dataframe = pandas.DataFrame(numpy.transpose(
+    dataframe = pd.DataFrame(np.transpose(
         tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
     dataframe_bornes = dataframe.loc[:, bornes[0]:bornes[1]]
     return dataframe_bornes
@@ -256,5 +256,5 @@ def normalise_dataframe_aire(dataframe):  # données lignes
         tableau[ligne, :] = (tableau[ligne, :] - minimum)
         aire = tableau[ligne, :].sum()
         tableau[ligne, :] = (tableau[ligne, :] / aire)
-    dataframe = pandas.DataFrame(tableau, index=dataframe.index, columns=dataframe.columns)
+    dataframe = pd.DataFrame(tableau, index=dataframe.index, columns=dataframe.columns)
     return dataframe

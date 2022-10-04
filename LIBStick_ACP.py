@@ -8,7 +8,7 @@ Module outils pour l'ACP
 
 
 import pickle as pk
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.decomposition
 #import sklearn.preprocessing
@@ -58,14 +58,14 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
         fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
         fig.set_tight_layout(True)
         ax1.plot(variables_explicatives_proportion, '-o', label=_("Variance expliquée %"))
-        ax1.plot(numpy.cumsum(variables_explicatives_proportion),
+        ax1.plot(np.cumsum(variables_explicatives_proportion),
                  '-o', label=_('Variance cumulée %'))
         ax1.set_xlabel(_("Composantes Principales"))
         ax1.set_title(_("Diagramme d'éboulis"))
         plt.legend()
 
-    min_tableau_acp = numpy.min(tableau_ACP, axis=0)
-    max_tableau_acp = numpy.max(tableau_ACP, axis=0)
+    min_tableau_acp = np.min(tableau_ACP, axis=0)
+    max_tableau_acp = np.max(tableau_ACP, axis=0)
     min_dim1 = min_tableau_acp[dim1-1]*1.05
     max_dim1 = max_tableau_acp[dim1-1]*1.05
     min_dim2 = min_tableau_acp[dim2-1]*1.05
@@ -87,8 +87,8 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
             ax.plot([min_dim1, max_dim1], [0, 0], color="silver", linestyle="--")
             ax.plot([0, 0], [min_dim2, max_dim2], color="silver", linestyle="--")
 
-    #    lambada=numpy.mean(numpy.power(tableau_ACP,2), axis=0)
-    #    inerties=100*lambada/numpy.sum(lambada)
+    #    lambada=np.mean(np.power(tableau_ACP,2), axis=0)
+    #    inerties=100*lambada/np.sum(lambada)
         # ax.scatter (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1],
         #             color="xkcd:light blue", marker="o", linestyle="None")
         # ax.plot (tableau_ACP[:,dim1-1], tableau_ACP[:,dim2-1],
@@ -154,18 +154,18 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
         fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(5, 5))
         fig.set_tight_layout(True)
         ax1.plot(variables_explicatives_proportion, '-o', label="Variance expliquée %")
-        ax1.plot(numpy.cumsum(variables_explicatives_proportion), '-o', label='Variance cumulée %')
+        ax1.plot(np.cumsum(variables_explicatives_proportion), '-o', label='Variance cumulée %')
         ax1.set_xlabel("Composantes Principales")
         ax1.set_title("Diagramme d'éboulis")
         plt.legend()
 
-    min_tableau_acp = numpy.min(tableau_ACP, axis=0)
-    max_tableau_acp = numpy.max(tableau_ACP, axis=0)
+    min_tableau_acp = np.min(tableau_ACP, axis=0)
+    max_tableau_acp = np.max(tableau_ACP, axis=0)
     # print (tableau_ACP)
     # print("----------------------------")
     # print (max_tableau_acp)
-    min_tableau_acp_ind_supp = numpy.min(tableau_ACP_individus_supp, axis=0)
-    max_tableau_acp_ind_sup = numpy.max(tableau_ACP_individus_supp, axis=0)
+    min_tableau_acp_ind_supp = np.min(tableau_ACP_individus_supp, axis=0)
+    max_tableau_acp_ind_sup = np.max(tableau_ACP_individus_supp, axis=0)
 
     min_dim1 = min_tableau_acp[dim1-1]*1.05
     max_dim1 = max_tableau_acp[dim1-1]*1.05
@@ -260,8 +260,8 @@ def creation_tableau_centre_reduit(tableau):
     """
     transformation des données en données centrées réduites
     """
-    moyennes = numpy.mean(tableau, axis=0)
-    sigmas = numpy.std(tableau, axis=0, ddof=0)
+    moyennes = np.mean(tableau, axis=0)
+    sigmas = np.std(tableau, axis=0, ddof=0)
     tableau_centre_reduit = (tableau-moyennes)/sigmas
     return tableau_centre_reduit
 

@@ -9,7 +9,7 @@ Module outils pour l'extration de parties des spectres et création de spectres 
 
 import sys
 import os
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 #import mpl_toolkits.mplot3d as plt3d
 import LIBStick_outils
@@ -39,11 +39,11 @@ def lit_fichier_entre_bornes(fichier, bas, haut, type_fichier):
     tronqué, uniquement entre les bornes basses et hautes données par les spinbox
     """
     document = LIBStick_outils.lit_spectre(fichier, type_fichier)
-    document_tronc = numpy.zeros((0, 2))
+    document_tronc = np.zeros((0, 2))
     for ligne in document:
         if (ligne[0] >= bas and ligne[0] <= haut):
-            document_tronc = numpy.row_stack((document_tronc, ligne))
-            # document_tronc=numpy.vstack((document_tronc,ligne)) #idem ci-dessus
+            document_tronc = np.row_stack((document_tronc, ligne))
+            # document_tronc=np.vstack((document_tronc,ligne)) #idem ci-dessus
     return document_tronc
 
 
@@ -76,7 +76,7 @@ def enregistre_spectre(document, repertoire, nom_fichier):
     """
     os.chdir(repertoire)
     nom_fichier = nom_fichier[0:-4] + "_" + repertoire[-11:] + ".tsv"
-    numpy.savetxt(nom_fichier, document, delimiter="\t")
+    np.savetxt(nom_fichier, document, delimiter="\t")
 
 
 ###################################################################################################
@@ -87,7 +87,7 @@ def enregistre_fichier_point(tableau, nom_fichier):
     Enregistre le tableau des n spectres tronqués en fichier texte tabulé
     et le point comme séparateur de décimales
     """
-    numpy.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n")
+    np.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n")
 
 
 def enregistre_fichier_virgule(tableau, nom_fichier):
@@ -96,8 +96,8 @@ def enregistre_fichier_virgule(tableau, nom_fichier):
     et la virgule comme séparateur de décimales
     """
     tableau = tableau.astype(str)
-    tableau = numpy.char.replace(tableau, ".", ",")
-    numpy.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n", fmt="%s")
+    tableau = np.char.replace(tableau, ".", ",")
+    np.savetxt(nom_fichier, tableau, delimiter="\t", newline="\n", fmt="%s")
 
 
 def enregistre_dataframe_point(dataframe, nom_fichier):
@@ -195,7 +195,7 @@ def graphique_3D_creation(tableau8bits, nom_echantillon):
     Affiche le tableau de n spectres normalisés en 256 niveau de gris
     avec la LUT Inferno dans une fenêtre matplotlib.pyplot 3D
     """
-    xx, yy = numpy.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
+    xx, yy = np.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
     #fig = plt.figure(figsize=(15,15))
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -272,7 +272,7 @@ def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D
 #    tableau_extrait=tableau_extrait[:,indice_premier:indice_dernier]
 #    spectre_moyen=tableau_extrait.sum(axis=1)
 #    spectre_moyen=spectre_moyen/tableau_extrait.shape[1]
-#    spectre_moyen=numpy.column_stack((tableau_abscisses,spectre_moyen))
+#    spectre_moyen=np.column_stack((tableau_abscisses,spectre_moyen))
 #    return spectre_moyen
 
 
@@ -286,10 +286,10 @@ def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):
     for i in range(len(liste_bool), 0, -1):
         if liste_bool[i-1] is False:
             print("supprime : " + str(i))
-            tableau_extrait = numpy.delete(tableau_extrait, i-1, axis=1)
+            tableau_extrait = np.delete(tableau_extrait, i-1, axis=1)
     spectre_moyen = tableau_extrait.sum(axis=1)
     spectre_moyen = spectre_moyen/tableau_extrait.shape[1]
-    spectre_moyen = numpy.column_stack((tableau_abscisses, spectre_moyen))
+    spectre_moyen = np.column_stack((tableau_abscisses, spectre_moyen))
     return spectre_moyen
 
 
@@ -305,8 +305,8 @@ def enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes,
             str(bornes[0])+"_"+str(bornes[1])+".mean"
     else:
         nom_fichier = nom_echantillon+"_spectre_moyen_" + str(bornes[0])+"_"+str(bornes[1])+".mean"
-    nom_fichier = str(numpy.char.replace(nom_fichier, " ", "_"))
-    numpy.savetxt(nom_fichier, spectre_moyen, delimiter="\t", newline="\n")
+    nom_fichier = str(np.char.replace(nom_fichier, " ", "_"))
+    np.savetxt(nom_fichier, spectre_moyen, delimiter="\t", newline="\n")
 
 
 def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool,
@@ -318,7 +318,7 @@ def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool
     et retourne le spectre moyen
     """
     os.chdir(rep_travail)
-    tableau = numpy.loadtxt("tableau_brut_points.txt", delimiter="\t",
+    tableau = np.loadtxt("tableau_brut_points.txt", delimiter="\t",
                             dtype=float, encoding="Latin-1")
     if flag_spectres_normalises_moyenne is True:
         print("moyenne des spectres normalisés")
@@ -344,7 +344,7 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
     """
     rep_script = os.getcwd()
     if flag_zone2 == 0:
-        tableau_bornes = numpy.delete(tableau_bornes, (1), axis=0)
+        tableau_bornes = np.delete(tableau_bornes, (1), axis=0)
     creation_sous_repertoire(rep_travail, tableau_bornes, flag_zone2)
     nom_echantillon = creation_nom_echantillon(liste_fichiers)
     for i in range(len(liste_fichiers)):

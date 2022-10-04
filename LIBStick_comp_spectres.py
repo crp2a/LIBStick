@@ -8,8 +8,8 @@ Module outils pour les mesures, la comparaison et la classification des spectres
 
 
 import os
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 #import mpl_toolkits.mplot3d as plt3d
 import LIBStick_outils
@@ -42,7 +42,7 @@ def creer_dataframe_resultats(dataframe_comparatif, lim_zone1, lim_zone2, flag_d
     entre chaque bornes des zones 1 et 2 (option) et leur rapport (option)
     """
     if flag_denominateur == 1:
-        dataframe_tableau_calculs = pandas.DataFrame()
+        dataframe_tableau_calculs = pd.DataFrame()
         sous_dataframe = dataframe_comparatif.loc[:, lim_zone1[0]:lim_zone1[1]]
         dataframe_tableau_calculs["Somme zone 1"] = sous_dataframe.sum(axis=1)
         sous_dataframe = dataframe_comparatif.loc[:, lim_zone2[0]:lim_zone2[1]]
@@ -50,7 +50,7 @@ def creer_dataframe_resultats(dataframe_comparatif, lim_zone1, lim_zone2, flag_d
         dataframe_tableau_calculs["Rapport"] = dataframe_tableau_calculs["Somme zone 1"] / \
             dataframe_tableau_calculs["Somme zone 2"]
     if flag_denominateur == 0:
-        dataframe_tableau_calculs = pandas.DataFrame()
+        dataframe_tableau_calculs = pd.DataFrame()
         sous_dataframe = dataframe_comparatif.loc[:, lim_zone1[0]:lim_zone1[1]]
         dataframe_tableau_calculs["Somme zone 1"] = sous_dataframe.sum(axis=1)
     return dataframe_tableau_calculs
@@ -62,7 +62,7 @@ def convertir_dataframe_resultats_tableau(dataframe_comparatif):
     contenant la mesure ayant servi au classement
     """
     tableau = dataframe_comparatif.values
-    tableau = numpy.delete(tableau, -1, axis=1)
+    tableau = np.delete(tableau, -1, axis=1)
     # print(tableau.shape)
     return tableau
 
@@ -124,7 +124,7 @@ def graphique_3D_creation(tableau8bits, nom_echantillon):
     Affiche le tableau de n spectres classés en 256 niveau de gris
     avec la LUT Inferno dans une fenêtre matplotlib.pyplot 3D
     """
-    xx, yy = numpy.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
+    xx, yy = np.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
     #fig = plt.figure(figsize=(15,15))
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -188,14 +188,14 @@ def main(rep_travail, liste_fichiers, type_fichier, tableau_bornes,
     dataframe_resultats = creer_dataframe_resultats(
         dataframe_comparatif, limites_zone1, limites_zone2, flag_denominateur)
     if flag_denominateur == 1:
-        dataframe_comparatif = pandas.concat(
+        dataframe_comparatif = pd.concat(
             [dataframe_comparatif, dataframe_resultats["Rapport"]], axis=1)
         dataframe_comparatif = dataframe_comparatif.sort_values(by=["Rapport"])
         dataframe_resultats = dataframe_resultats.sort_values(by=["Rapport"])
         enregistre_dataframe_resultats(dataframe_resultats)
 
     if flag_denominateur == 0:
-        dataframe_comparatif = pandas.concat(
+        dataframe_comparatif = pd.concat(
             [dataframe_comparatif, dataframe_resultats["Somme zone 1"]], axis=1)
         dataframe_comparatif = dataframe_comparatif.sort_values(by=["Somme zone 1"])
         dataframe_resultats = dataframe_resultats.sort_values(by=["Somme zone 1"])
