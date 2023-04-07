@@ -16,6 +16,8 @@ de transformations de tableaux et dataframes
 import os
 import numpy as np
 import pandas as pd
+from numba import jit
+
 
 
 ###################################################################################################
@@ -215,6 +217,7 @@ def creer_dataframe_bornes(dataframe, bornes):
 ###################################################################################################
 # normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
 ###################################################################################################
+@jit
 def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans la première colonne
     """
     Normalise un tableau de spectres en colonnes
@@ -228,6 +231,7 @@ def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans l
     return tableau
 
 
+@jit
 def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dans la première colonne
     """
     Normalise un tableau de spectres en colonnes

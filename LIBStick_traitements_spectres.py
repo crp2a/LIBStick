@@ -11,6 +11,7 @@ import os
 import math
 import numpy as np
 import scipy.signal
+from numba import jit
 import LIBStick_outils
 
 
@@ -72,6 +73,7 @@ def creation_spectre_bornes(spectre_entier, tableau_bornes):
 ###################################################################################################
 # fonctions de filtres
 ###################################################################################################
+@jit
 def rolling_ball_fonction(spectre, width_min_max, width_smooth):
     """
     Crée et retourne le fond continu par Rolling-Ball
@@ -155,6 +157,7 @@ def rolling_ball_fonction(spectre, width_min_max, width_smooth):
     return ligne_base
 
 
+@jit
 def SNIP_fonction(spectre, iterations, LLS_flag):
     """
     Crée et retourne le fond continu par SNIP
@@ -223,6 +226,7 @@ def creation_fond(spectre_filtre, fond, param1, param2, param3):
     return fond_continu
 
 
+@jit
 def creation_spectre_corrige(spectre_filtre, fond_continu):
     """
     Retourne le spectre lissé et soustrait du fond continu
@@ -232,6 +236,7 @@ def creation_spectre_corrige(spectre_filtre, fond_continu):
     return spectre_corrige
 
 
+@jit
 def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
     """
     Crée les répertoires de sauvegarde et sauvegarde le spectre traité

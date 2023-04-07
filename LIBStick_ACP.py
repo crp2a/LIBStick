@@ -9,7 +9,9 @@ Module outils pour l'ACP
 
 import pickle as pk
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 import sklearn.decomposition
 #import sklearn.preprocessing
 #from fanalysis.pca import PCA
@@ -39,12 +41,19 @@ def ouvre_ACP(rep_travail):
 ###################################################################################################
 # fonctions d'affichage d'ACP
 ###################################################################################################
-def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
+def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
                 flag_3D, flag_echelle, flag_eboulis):
     """
     Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
     uniquement des individus ayant servi au calcul de l'ACP
     """
+    # print("-----------------------------------------------")
+    # print("treeview_dataframe :")
+    # print(treeview_dataframe)
+    # print("-----------------------------------------------")
+    # print("tableau_ACP :")
+    # print(tableau_ACP)
+    # print("-----------------------------------------------")
     if flag_3D is True:
         dim1 = dim[0]
         dim2 = dim[1]
@@ -72,6 +81,16 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
     max_dim2 = max_tableau_acp[dim2-1]*1.05
 
     inerties = modele_ACP.explained_variance_ratio_*100
+
+    fig_px_matrice = px.scatter_matrix(tableau_ACP, dimensions=range(3),
+                                       color=treeview_dataframe.values[:, -1],
+                                       opacity=0.5,
+                                       hover_name=(treeview_dataframe["nom"]),
+                                       labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
+                                               "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
+                                               "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
+    fig_px_matrice.update_traces(diagonal_visible=False)
+    fig_px_matrice.show()
 
     if flag_3D is False:
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -101,8 +120,18 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
         ax.set_ylabel("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")
         n = tableau_ACP.shape[0]
         for i in range(n):
-            ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], dataframe.index[i])
+            ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], treeview_dataframe.index[i])
         plt.show(block=False)
+
+        fig_px_scatter = px.scatter(tableau_ACP, x=(dim1-1), y=(dim2-1),
+                            color=treeview_dataframe.values[:, -1],
+                            symbol=treeview_dataframe.values[:, -2],
+                            text=treeview_dataframe.index, opacity=0.5,
+                            hover_name=(treeview_dataframe["nom"]),
+                            labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                    "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
+        fig_px_scatter.update_traces(marker_size=20)
+        fig_px_scatter.show()
 
     if flag_3D is True:
         fig3d = plt.figure()
@@ -130,17 +159,40 @@ def affiche_ACP(dataframe, treeview_dataframe, modele_ACP, tableau_ACP, dim,
         n = tableau_ACP.shape[0]
         for i in range(n):
             ax3d.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1],
-                      tableau_ACP[i, dim3-1], dataframe.index[i])
+                      tableau_ACP[i, dim3-1], treeview_dataframe.index[i])
         plt.show(block=False)
 
+        fig_px3D = px.scatter_3d(tableau_ACP,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
+                                 color=treeview_dataframe.values[:, -1],
+                                 symbol=treeview_dataframe.values[:, -2],
+                                 text=treeview_dataframe.index, opacity=0.5,
+                                 hover_name=(treeview_dataframe["nom"]),
+                                 labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                         "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
+                                         "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
+        fig_px3D.update_traces(marker_size=10)
+        fig_px3D.show()
 
-def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe,
+
+def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
                          modele_ACP, tableau_ACP, tableau_ACP_individus_supp,
                          dim, flag_3D, flag_echelle, flag_eboulis):
     """
     Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
     avec les individus supplémentaires n'ayant pas servi au calcul de l'ACP, calculé au préalable
     """
+    # print("-----------------------------------------------")
+    # print("treeview_dataframe :")
+    # print(treeview_dataframe)
+    # print("-----------------------------------------------")
+    # print("-----------------------------------------------")
+    # print("treeview_dataframe_individus_supp :")
+    # print(treeview_dataframe_individus_supp)
+    # print("-----------------------------------------------")
+
+    tableau_complet = np.concatenate([tableau_ACP,tableau_ACP_individus_supp])
+    dataframe_complet = pd.concat([treeview_dataframe,treeview_dataframe_individus_supp])
+
     if flag_3D is True:
         dim1 = dim[0]
         dim2 = dim[1]
@@ -159,23 +211,22 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
         ax1.set_title("Diagramme d'éboulis")
         plt.legend()
 
-    min_tableau_acp = np.min(tableau_ACP, axis=0)
-    max_tableau_acp = np.max(tableau_ACP, axis=0)
-    # print (tableau_ACP)
-    # print("----------------------------")
-    # print (max_tableau_acp)
-    min_tableau_acp_ind_supp = np.min(tableau_ACP_individus_supp, axis=0)
-    max_tableau_acp_ind_sup = np.max(tableau_ACP_individus_supp, axis=0)
+    # min_tableau_acp = np.min(tableau_ACP, axis=0)
+    # max_tableau_acp = np.max(tableau_ACP, axis=0)
+    # min_tableau_acp_ind_supp = np.min(tableau_ACP_individus_supp, axis=0)
+    # max_tableau_acp_ind_sup = np.max(tableau_ACP_individus_supp, axis=0)
+    min_tableau_acp = np.min(tableau_complet, axis=0)
+    max_tableau_acp = np.max(tableau_complet, axis=0)
 
     min_dim1 = min_tableau_acp[dim1-1]*1.05
     max_dim1 = max_tableau_acp[dim1-1]*1.05
     min_dim2 = min_tableau_acp[dim2-1]*1.05
     max_dim2 = max_tableau_acp[dim2-1]*1.05
 
-    min_dim1_ind_supp = min_tableau_acp_ind_supp[dim1-1]*1.05
-    max_dim1_ind_supp = max_tableau_acp_ind_sup[dim1-1]*1.05
-    min_dim2_ind_supp = min_tableau_acp_ind_supp[dim2-1]*1.05
-    max_dim2_ind_supp = max_tableau_acp_ind_sup[dim2-1]*1.05
+    # min_dim1_ind_supp = min_tableau_acp_ind_supp[dim1-1]*1.05
+    # max_dim1_ind_supp = max_tableau_acp_ind_sup[dim1-1]*1.05
+    # min_dim2_ind_supp = min_tableau_acp_ind_supp[dim2-1]*1.05
+    # max_dim2_ind_supp = max_tableau_acp_ind_sup[dim2-1]*1.05
 
     inerties = modele_ACP.explained_variance_ratio_*100
 
@@ -183,8 +234,10 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
         fig, ax = plt.subplots(figsize=(5, 5))
 
         if flag_echelle is True:
-            min_dim = min(min_dim1, min_dim2, min_dim1_ind_supp, min_dim2_ind_supp)
-            max_dim = max(max_dim1, max_dim2, max_dim1_ind_supp, max_dim2_ind_supp)
+            # min_dim = min(min_dim1, min_dim2, min_dim1_ind_supp, min_dim2_ind_supp)
+            # max_dim = max(max_dim1, max_dim2, max_dim1_ind_supp, max_dim2_ind_supp)
+            min_dim = min(min_dim1, min_dim2)
+            max_dim = max(max_dim1, max_dim2)
             ax.axis([min_dim, max_dim, min_dim, max_dim])
             ax.plot([min_dim, max_dim], [0, 0], color="silver", linestyle="--")
             ax.plot([0, 0], [min_dim, max_dim], color="silver", linestyle="--")
@@ -204,13 +257,25 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
         n = tableau_ACP.shape[0]
         print(n)
         for i in range(n):
-            ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], dataframe.index[i])
+            ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], treeview_dataframe.index[i])
         m = tableau_ACP_individus_supp.shape[0]
         print(m)
         for j in range(m):
             ax.text(tableau_ACP_individus_supp[j, dim1-1], tableau_ACP_individus_supp[j, dim2-1],
-                    dataframe_individus_supp.index[j])
+                    treeview_dataframe_individus_supp.index[j])
         plt.show(block=False)
+
+        # tableau_complet = np.concatenate([tableau_ACP,tableau_ACP_individus_supp])
+        # dataframe_complet = pd.concat([treeview_dataframe,treeview_dataframe_individus_supp])
+        fig_px_scatter = px.scatter(tableau_complet, x=(dim1-1), y=(dim2-1),
+                                    color=dataframe_complet.values[:, -1],
+                                    symbol=dataframe_complet.values[:, -2],
+                                    text=dataframe_complet.index, opacity=0.5,
+                                    hover_name=(dataframe_complet["nom"]),
+                                    labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                            "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
+        fig_px_scatter.update_traces(marker_size=20)
+        fig_px_scatter.show()
 
     if flag_3D is True:
         fig3d = plt.figure()
@@ -218,13 +283,15 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
 
         min_dim3 = min_tableau_acp[dim3-1]*1.05
         max_dim3 = max_tableau_acp[dim3-1]*1.05
-        min_dim3_ind_supp = min_tableau_acp_ind_supp[dim3-1]*1.05
-        max_dim3_ind_supp = max_tableau_acp_ind_sup[dim3-1]*1.05
+        # min_dim3_ind_supp = min_tableau_acp_ind_supp[dim3-1]*1.05
+        # max_dim3_ind_supp = max_tableau_acp_ind_sup[dim3-1]*1.05
         if flag_echelle is True:
-            min_dim = min(min_dim1, min_dim2, min_dim3, min_dim1_ind_supp,
-                          min_dim2_ind_supp, min_dim3_ind_supp)
-            max_dim = max(max_dim1, max_dim2, max_dim3, max_dim1_ind_supp,
-                          max_dim2_ind_supp, max_dim3_ind_supp)
+            # min_dim = min(min_dim1, min_dim2, min_dim3, min_dim1_ind_supp,
+            #               min_dim2_ind_supp, min_dim3_ind_supp)
+            # max_dim = max(max_dim1, max_dim2, max_dim3, max_dim1_ind_supp,
+            #               max_dim2_ind_supp, max_dim3_ind_supp)
+            min_dim = min(min_dim1, min_dim2, min_dim3)
+            max_dim = max(max_dim1, max_dim2, max_dim3)
             ax3d.set_xlim3d([min_dim, max_dim])
             ax3d.set_ylim3d([min_dim, max_dim])
             ax3d.set_zlim3d([min_dim, max_dim])
@@ -245,12 +312,23 @@ def affiche_ACP_ind_supp(dataframe, dataframe_individus_supp, treeview_dataframe
         n = tableau_ACP.shape[0]
         for i in range(n):
             ax3d.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], tableau_ACP[i, dim3-1],
-                      dataframe.index[i])
+                      treeview_dataframe.index[i])
         m = tableau_ACP_individus_supp.shape[0]
         for i in range(m):
             ax3d.text(tableau_ACP_individus_supp[i, dim1-1], tableau_ACP_individus_supp[i, dim2-1],
-                      tableau_ACP_individus_supp[i, dim3-1], dataframe_individus_supp.index[i])
+                      tableau_ACP_individus_supp[i, dim3-1], treeview_dataframe_individus_supp.index[i])
         plt.show(block=False)
+
+        fig_px3D = px.scatter_3d(tableau_complet,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
+                                 color=dataframe_complet.values[:, -1],
+                                 symbol=dataframe_complet.values[:, -2],
+                                 text=dataframe_complet.index, opacity=0.5,
+                                 hover_name=(dataframe_complet["nom"]),
+                                 labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                         "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
+                                         "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
+        fig_px3D.update_traces(marker_size=10)
+        fig_px3D.show()
 
 
 ###################################################################################################

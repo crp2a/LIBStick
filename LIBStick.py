@@ -288,7 +288,7 @@ def change_taille_fenetre(event):
 
 def applique_change_taille_fenetre():
     global old_time
-    canevas0_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
+    canevas0_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres+170)
     canevas1_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas0_L_ext.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas1_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres)
@@ -579,7 +579,7 @@ def affiche_position_souris_L_trait(event):
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
     ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
     if flag_zoom_auto_y.get() is False:
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
             0, event.y, largeur_canevas_spectres, event.y, fill="green")
@@ -609,7 +609,7 @@ def affiche_position_souris_motion_L_trait(event):
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
     ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
     if flag_zoom_auto_y.get() is False:
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
             0, event.y, largeur_canevas_spectres, event.y, fill="green")
@@ -650,7 +650,7 @@ def affiche_spectre_L_trait():
                 spectre = np.row_stack((spectre, ligne))
         minimum_spectre_ancien_L_trait = spectre[:, 1].min()
         maximum = (maximum_spectre_ancien_L_trait-minimum_spectre_ancien_L_trait) * \
-            (hauteur_canevas_spectres-coord_zoom_L_trait[1])/hauteur_canevas_spectres
+            (hauteur_canevas_spectres+170-coord_zoom_L_trait[1])/(hauteur_canevas_spectres+170)
         maximum_spectre_ancien_L_trait = maximum_spectre_L_trait = maximum
 
         limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
@@ -693,7 +693,7 @@ def affiche_spectre_L_trait():
         maximum_spectre_ancien_L_trait = maximum_spectre_L_trait = maximum = spectre[:, 1].max()
 
     # dessin du spectre
-    spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
+    spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
     # spectre[:,0] = (spectre[:,0] - spectre[0,0])*largeur_canevas_spectres/(spectre[len(spectre),0]-spectre[0,0])
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
@@ -712,7 +712,7 @@ def affiche_fond_L_trait():
             spectre = np.row_stack((spectre, ligne))
     minimum = minimum_spectre_L_trait
     maximum = maximum_spectre_L_trait
-    spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
+    spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
@@ -733,9 +733,9 @@ def affiche_lignes_spectre_L_trait():
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
     ligne0_1_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
     ligne0_2_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
 
 
 def deplace_lignes_L_trait():
@@ -755,7 +755,7 @@ def deplace_ligne0_1_L_trait():
     x_ligne0_1 = ((variable_1_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
     ligne0_1_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
     if variable_1_L_trait.get() >= variable_2_L_trait.get():
         variable_2_L_trait.set(variable_1_L_trait.get())
         deplace_ligne0_2_L_trait()
@@ -770,7 +770,7 @@ def deplace_ligne0_2_L_trait():
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
     ligne0_2_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
     if variable_2_L_trait.get() <= variable_1_L_trait.get():
         variable_1_L_trait.set(variable_2_L_trait.get())
         deplace_ligne0_1_L_trait()
@@ -1021,7 +1021,7 @@ def zoom_drag_and_drop_L_trait(event):
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
     ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
     if flag_zoom_auto_y.get() is False:
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
             0, event.y, largeur_canevas_spectres, event.y, fill="green")
@@ -3021,8 +3021,8 @@ def choix_fichier_L_ACP():
     global DataFrame_complet_L_ACP
     nom_fichier_L_ACP = fd.askopenfilename(title='Choisissez un fichier spectre',
                                                            initialdir=rep_travail_L_ACP,
-                                                           filetypes=(("fichiers LIBStick moyen", "*.mean"),
-                                                                      ("fichiers LIBStick", "*.tsv"),
+                                                           filetypes=(("fichiers LIBStick", "*.tsv"),
+                                                                      ("fichiers LIBStick moyen", "*.mean"),
                                                                       ("fichiers IVEA", "*.asc"),
                                                                       ("fichiers SciAps", "*.csv")), multiple=False)
     nom_fichier_seul_L_ACP = os.path.basename(nom_fichier_L_ACP)
@@ -3039,6 +3039,7 @@ def choix_fichier_L_ACP():
     lit_affiche_spectre_L_ACP()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ACP)
     bouton_execute_L_ACP.configure(state="normal")
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
     # bouton_ouvre_L_ACP.configure(state="normal")
 
 
@@ -3076,7 +3077,7 @@ def lit_limites_abscisses_L_ACP(spectre):
     return limites_spectre
 
 
-def treeview_dataframe_L_ACP():
+def dataframe_treeview_L_ACP():
     """
     Remplit un DataFrame à partir du tableau (TreeView) de l'interface
     """
@@ -3145,7 +3146,7 @@ def change_flag_traitement_L_ACP():
     """
     Change l'état du bouton +ind supp lorsqu'on change une des cases à cocher Spectres normalisés ou Centré réduit
     """
-    bouton_applique_L_ACP.configure(state="disable")
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def execute_ACP_L_ACP():
@@ -3159,18 +3160,19 @@ def execute_ACP_L_ACP():
     Calcule les facteurs propres corrigées et les affiche dans le canevas1 de la frame3.
     Change l'état du bouton +ind. supp
     """
-    global modele_ACP_L_ACP
+    global modele_ACP_L_ACP, tableau_bornes_L_ACP, tableau_ACP_L_ACP
+    # global dataframe_L_ACP, treeview_dataframe_L_ACP
+    # global dataframe_individus_supp_L_ACP, treeview_dataframe_individus_supp_L_ACP
     global dataframe_facteurs_ACP_L_ACP
     tableau_bornes = creation_tab_bornes_L_ACP()
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
-    treeview_dataframe = treeview_dataframe_L_ACP()
-    dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe, treeview_dataframe,
+    treeview_dataframe = dataframe_treeview_L_ACP()
+    dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe,
+                                                                                                                       treeview_dataframe,
                                                                                                                        tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get() is True:
         dataframe = LIBStick_outils.normalise_dataframe_aire(dataframe)
-        dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(
-            dataframe_individus_supp)
 
     # flag_ACP = True
     # if flag_ACP is True :   # cas normal, ACP et non pas test de l'ICA. Dancs ce cas penser à indenter le bloc suivant
@@ -3187,24 +3189,22 @@ def execute_ACP_L_ACP():
         nbr_composantes = nbr_spectres
 
     tableau = dataframe.values
-    modele_ACP_L_ACP = LIBStick_ACP.calcul_ACP_sklearn(
-        tableau, nbr_composantes, flag_centre_reduit_L_ACP.get())
-    tableau_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
-    LIBStick_ACP.affiche_ACP(dataframe, treeview_dataframe, modele_ACP_L_ACP, tableau_ACP, dim_L_ACP,
+    modele_ACP_L_ACP = LIBStick_ACP.calcul_ACP_sklearn(tableau, nbr_composantes,
+                                                       flag_centre_reduit_L_ACP.get())
+    tableau_ACP_L_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
+    LIBStick_ACP.affiche_ACP(treeview_dataframe, modele_ACP_L_ACP, tableau_ACP_L_ACP, dim_L_ACP,
                              flag_3D_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
 
     valeurs_propres_corrigees = modele_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
     sqrt_valeurs_propres_corrigees = np.sqrt(valeurs_propres_corrigees)
     facteurs_ACP_corrigees = np.zeros((nbr_composantes, nbr_variables))
     for i in range(nbr_composantes):
-        facteurs_ACP_corrigees[i, :] = modele_ACP_L_ACP.components_[
-            i, :] * sqrt_valeurs_propres_corrigees[i]
-    dataframe_facteurs_ACP_L_ACP = pd.DataFrame(
-        facteurs_ACP_corrigees, columns=dataframe.columns)
+        facteurs_ACP_corrigees[i, :] = modele_ACP_L_ACP.components_[i, :] * sqrt_valeurs_propres_corrigees[i]
+    dataframe_facteurs_ACP_L_ACP = pd.DataFrame(facteurs_ACP_corrigees, columns=dataframe.columns)
     affiche_spectres_var_ACP_L_ACP()
     bouton_enregistre_L_ACP.configure(state="normal")
     # bouton_sauve_L_ACP.configure(state="normal")
-    bouton_applique_L_ACP.configure(state="normal")
+    bouton_applique_ind_sup_L_ACP.configure(state="normal")
 
     # if flag_ACP is False : # test de calcul ICA
     #     nbr_composantes = dim_2_L_ACP.get()
@@ -3218,7 +3218,7 @@ def execute_ACP_L_ACP():
     #     affiche_spectres_var_ACP_L_ACP()
 
 
-def applique_ACP_L_ACP():
+def applique_ACP_ind_sup_L_ACP():
     """
     A OPTIMISER AVEC LA FONCTION execute_ACP_L_ACP EN PASSANT dataframe, treeview_dataframe, dataframe_individus_supp
     EN VARIABLES GLOBALES POUR NE PAS REFFAIRE LE CALCUL UNE SECONDE FOIS...
@@ -3231,18 +3231,18 @@ def applique_ACP_L_ACP():
     Affiche les graphes dans des fenêtres matplotlib.pyplot. avec les individus supplémentaires
     Calcule les facteurs propres corrigées et les affiche dans le canevas1 de la frame3.
     """
-    global modele_ACP_L_ACP
+    # global modele_ACP_L_ACP
     global dataframe_facteurs_ACP_L_ACP
     tableau_bornes = creation_tab_bornes_L_ACP()
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
-    treeview_dataframe = treeview_dataframe_L_ACP()
-    dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe, treeview_dataframe,
+    treeview_dataframe = dataframe_treeview_L_ACP()
+    dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe,
+                                                                                                                       treeview_dataframe,
                                                                                                                        tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get() is True:
         dataframe = LIBStick_outils.normalise_dataframe_aire(dataframe)
-        dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(
-            dataframe_individus_supp)
+        dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(dataframe_individus_supp)
 
     if flag_3D_L_ACP.get():
         dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get(), dim_3_L_ACP.get()]
@@ -3255,31 +3255,29 @@ def applique_ACP_L_ACP():
     else:
         nbr_composantes = nbr_spectres
 
-    tableau = dataframe.values
+    # tableau = dataframe.values
     tableau_individus_supp = dataframe_individus_supp.values
-    tableau_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
+    # tableau_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
 
     if tableau_individus_supp.shape[0] != 0:
-        tableau_ACP_individus_supp = LIBStick_ACP.applique_ACP(
-            modele_ACP_L_ACP, tableau_individus_supp)
-        LIBStick_ACP.affiche_ACP_ind_supp(dataframe, dataframe_individus_supp,
+        tableau_ACP_individus_supp = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP,
+                                                               tableau_individus_supp)
+        LIBStick_ACP.affiche_ACP_ind_supp(treeview_dataframe_individus_supp,
                                           treeview_dataframe, modele_ACP_L_ACP,
-                                          tableau_ACP, tableau_ACP_individus_supp,
+                                          tableau_ACP_L_ACP, tableau_ACP_individus_supp,
                                           dim_L_ACP, flag_3D_L_ACP.get(),
                                           flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
     else:
-        LIBStick_ACP.affiche_ACP(dataframe, treeview_dataframe, modele_ACP_L_ACP,
-                                 tableau_ACP, dim_L_ACP, flag_3D_L_ACP.get(),
+        LIBStick_ACP.affiche_ACP(treeview_dataframe, modele_ACP_L_ACP,
+                                 tableau_ACP_L_ACP, dim_L_ACP, flag_3D_L_ACP.get(),
                                  flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
 
     valeurs_propres_corrigees = modele_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
     sqrt_valeurs_propres_corrigees = np.sqrt(valeurs_propres_corrigees)
     facteurs_ACP_corrigees = np.zeros((nbr_composantes, nbr_variables))
     for i in range(nbr_composantes):
-        facteurs_ACP_corrigees[i, :] = modele_ACP_L_ACP.components_[
-            i, :] * sqrt_valeurs_propres_corrigees[i]
-    dataframe_facteurs_ACP_L_ACP = pd.DataFrame(
-        facteurs_ACP_corrigees, columns=dataframe.columns)
+        facteurs_ACP_corrigees[i, :] = modele_ACP_L_ACP.components_[i, :] * sqrt_valeurs_propres_corrigees[i]
+    dataframe_facteurs_ACP_L_ACP = pd.DataFrame(facteurs_ACP_corrigees, columns=dataframe.columns)
     affiche_spectres_var_ACP_L_ACP()
     bouton_enregistre_L_ACP.configure(state="normal")
 
@@ -3297,7 +3295,7 @@ def ouvre_ACP_L_ACP():
     """
     global modele_ACP_L_ACP
     modele_ACP_L_ACP = LIBStick_ACP.ouvre_ACP(rep_travail_L_ACP)
-    bouton_applique_L_ACP.configure(state="normal")
+    bouton_applique_ind_sup_L_ACP.configure(state="normal")
 
 
 def enregistre_facteurs_ACP_L_ACP():
@@ -3509,7 +3507,7 @@ def deplace_ligne0_1_L_ACP():
     if variable_1_L_ACP.get() >= variable_2_L_ACP.get():
         variable_2_L_ACP.set(variable_1_L_ACP.get())
         deplace_ligne0_2_L_ACP()
-    bouton_applique_L_ACP.configure(state="disable")
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def deplace_ligne0_2_L_ACP():
@@ -3525,7 +3523,7 @@ def deplace_ligne0_2_L_ACP():
     if variable_2_L_ACP.get() <= variable_1_L_ACP.get():
         variable_1_L_ACP.set(variable_2_L_ACP.get())
         deplace_ligne0_1_L_ACP()
-    bouton_applique_L_ACP.configure(state="disable")
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def deplace_ligne0_1_return_L_ACP(event):
@@ -3796,7 +3794,7 @@ def selectionne_spectre_L_ACP(event):
     sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
     flag_zoom_auto_y.set(True)
     selection = tree_L_ACP.selection()
-    item = tree_L_ACP.item(selection)["values"]
+    item = tree_L_ACP.item(selection[0])["values"]
 #    print(tree_L_ACP.focus())
 #    print(tree_L_ACP.item(tree_L_ACP.focus()))
     nom_fichier_seul_L_ACP = item[1]
@@ -3862,14 +3860,15 @@ def change_tree_selection_L_ACP(event):
     + ind. supp tant qu'un nouveau calcul n'a pas été fait
     """
     selection = tree_L_ACP.selection()
-    item = tree_L_ACP.item(selection)["values"]
-    if item[2] == "Non":
-        #        tree_L_ACP.item(selection, values=(item[0],item[1], "Oui"))
-        tree_L_ACP.item(selection, values=(item[0], item[1], "Oui", item[3]), tags="select")
-    if item[2] == "Oui":
-        #        tree_L_ACP.item(selection, values=(item[0],item[1],"Non"))
-        tree_L_ACP.item(selection, values=(item[0], item[1], "Non", item[3]), tags="deselect")
-    bouton_applique_L_ACP.configure(state="disable")
+    for selection_i in selection :
+        item = tree_L_ACP.item(selection_i)["values"]
+        if item[2] == "Non":
+            #        tree_L_ACP.item(selection, values=(item[0],item[1], "Oui"))
+            tree_L_ACP.item(selection_i, values=(item[0], item[1], "Oui", item[3]), tags="select")
+        if item[2] == "Oui":
+            #        tree_L_ACP.item(selection, values=(item[0],item[1],"Non"))
+            tree_L_ACP.item(selection_i, values=(item[0], item[1], "Non", item[3]), tags="deselect")
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def ouvre_fenetre_change_tree_label_L_ACP(event):
@@ -3881,30 +3880,31 @@ def ouvre_fenetre_change_tree_label_L_ACP(event):
     global fenetre_label_L_ACP
     global tableau_label_ouvert_flag_L_ACP
     selection = tree_L_ACP.selection()
-    item = tree_L_ACP.item(selection)["values"]
-    if tableau_label_ouvert_flag_L_ACP is False:
-        tableau_label_ouvert_flag_L_ACP = True
-        fenetre_label_L_ACP = tk.Toplevel(fenetre_principale)
-        fenetre_label_L_ACP.geometry("200x150")
-        fenetre_label_L_ACP.resizable(False, False)
-        frame_label_L_ACP = ttk.Frame(fenetre_label_L_ACP)
-        frame_label_L_ACP.pack()
-        label_L_ACP.set(value=item[3])
-        entree_label_L_ACP = ttk.Spinbox(frame_label_L_ACP, from_=0, to=20, increment=1, width=200,
-                                         textvariable=label_L_ACP, foreground="black")
-        entree_label_L_ACP.pack(ipadx=0, ipady=0)
-        buttonFont = font.Font(family='Helvetica', size=30)
-        bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
-                                       command=validation_label_L_ACP)
-        # bouton_label_L_ACP = ttk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
-        #                                     command=validation_label_L_ACP)
-        bouton_label_L_ACP.pack(ipadx=0, ipady=0)
-        fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
-    else:
-        validation_label_L_ACP()
-#        fenetre_label_L_ACP.focus_force()
-#        fenetre_label_L_ACP.focus_set()
-        fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
+    for selection_i in selection :
+        item = tree_L_ACP.item(selection_i)["values"]
+        if tableau_label_ouvert_flag_L_ACP is False:
+            tableau_label_ouvert_flag_L_ACP = True
+            fenetre_label_L_ACP = tk.Toplevel(fenetre_principale)
+            fenetre_label_L_ACP.geometry("200x150")
+            fenetre_label_L_ACP.resizable(False, False)
+            frame_label_L_ACP = ttk.Frame(fenetre_label_L_ACP)
+            frame_label_L_ACP.pack()
+            label_L_ACP.set(value=item[3])
+            entree_label_L_ACP = ttk.Spinbox(frame_label_L_ACP, from_=0, to=20, increment=1, width=200,
+                                             textvariable=label_L_ACP, foreground="black")
+            entree_label_L_ACP.pack(ipadx=0, ipady=0)
+            buttonFont = font.Font(family='Helvetica', size=30)
+            bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
+                                           command=validation_label_L_ACP)
+            # bouton_label_L_ACP = ttk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
+            #                                     command=validation_label_L_ACP)
+            bouton_label_L_ACP.pack(ipadx=0, ipady=0)
+            fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
+        else:
+            validation_label_L_ACP()
+    #        fenetre_label_L_ACP.focus_force()
+    #        fenetre_label_L_ACP.focus_set()
+            fenetre_label_L_ACP.protocol("WM_DELETE_WINDOW", ferme_fenetre_change_tree_label_L_ACP)
 
 
 def ferme_fenetre_change_tree_label_L_ACP():
@@ -3921,8 +3921,9 @@ def validation_label_L_ACP():
     Valide le n° de label dans la colonne dédiée du tableau de l'interface (Treeview)
     """
     selection = tree_L_ACP.selection()
-    item = tree_L_ACP.item(selection)["values"]
-    tree_L_ACP.item(selection, values=(item[0], item[1], item[2], label_L_ACP.get()))
+    for selection_i in selection :
+        item = tree_L_ACP.item(selection_i)["values"]
+        tree_L_ACP.item(selection_i, values=(item[0], item[1], item[2], label_L_ACP.get()))
 
 
 ###################################################################################################
@@ -3988,8 +3989,14 @@ def affiches_lignes_element_L_ele():
     if ID_onglet == 0:
         limites_affichage_spectre = limites_affichage_spectre_L_trait
         affiche_spectre_L_trait()
-        affiche_fond_L_trait()
-        affiche_spectre_corrige_L_trait()
+        try : 
+            affiche_fond_L_trait()
+        except :
+             pass
+        try : 
+            affiche_spectre_corrige_L_trait()
+        except :
+            pass
     if ID_onglet == 1:
         limites_affichage_spectre = limites_affichage_spectre_L_ext
         affiche_spectre_L_ext()
@@ -3999,7 +4006,10 @@ def affiches_lignes_element_L_ele():
     if ID_onglet == 3:
         limites_affichage_spectre = limites_affichage_spectre_L_ACP
         affiche_spectre_L_ACP()
-        affiche_spectres_var_ACP_L_ACP()
+        try :
+            affiche_spectres_var_ACP_L_ACP()
+        except :
+            pass
     if flag_neutres_ions_L_ele.get() == 1:
         couleur_lignes = "magenta2"
     if flag_neutres_ions_L_ele.get() == 2:
@@ -4013,7 +4023,7 @@ def affiches_lignes_element_L_ele():
                 # affiche_ligne_element(long_onde, canevas0_L_ext)
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
                 if ID_onglet == 0:
-                    canevas0_L_trait.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres, fill=couleur_lignes, dash=(4, 1))
+                    canevas0_L_trait.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres+170, fill=couleur_lignes, dash=(4, 1))
                     canevas1_L_trait.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres, fill=couleur_lignes, dash=(4, 1))
                 if ID_onglet == 1:
                     canevas0_L_ext.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres, fill=couleur_lignes, dash=(4, 1))
@@ -4025,7 +4035,7 @@ def affiches_lignes_element_L_ele():
             if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
                 if ID_onglet == 0:
-                    canevas0_L_trait.create_line(x_ligne, hauteur_canevas_spectres/2, x_ligne, hauteur_canevas_spectres,
+                    canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)/2, x_ligne, hauteur_canevas_spectres+170,
                                                  fill=couleur_lignes, dash=(4, 2))
                     canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres/2, x_ligne, hauteur_canevas_spectres,
                                                  fill=couleur_lignes, dash=(4, 2))
@@ -4043,7 +4053,7 @@ def affiches_lignes_element_L_ele():
             if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
                 if ID_onglet == 0:
-                    canevas0_L_trait.create_line(x_ligne, hauteur_canevas_spectres*0.825, x_ligne, hauteur_canevas_spectres,
+                    canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*0.825, x_ligne, hauteur_canevas_spectres+170,
                                                  fill=couleur_lignes, dash=(4, 3))
                     canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres*0.825, x_ligne, hauteur_canevas_spectres,
                                                  fill=couleur_lignes, dash=(4, 3))
@@ -4144,7 +4154,7 @@ def ouvre_fenetre_classification_L_ele():
 
 def ferme_fenetre_classification_L_ele():
     """
-    Feerme la fenêtre Toplevel classification périodique
+    Ferme la fenêtre Toplevel classification périodique
     """
     global tableau_periodique_ouvert_L_ele
     tableau_periodique_ouvert_L_ele = False
@@ -4258,10 +4268,6 @@ onglet1 = ttk.Frame(onglets)
 onglet2 = ttk.Frame(onglets)
 onglet3 = ttk.Frame(onglets)
 onglet4 = ttk.Frame(onglets)
-# onglet1 = ttk.Frame(onglets)
-# onglet2 = ttk.Frame(onglets)
-# onglet3 = ttk.Frame(onglets)
-# onglet4 = ttk.Frame(onglets)
 onglet1.pack()
 onglet2.pack()
 onglet3.pack()
@@ -4398,8 +4404,6 @@ def __________IHM_traitement__________():
 ###################################################################################################
 frame1_L_trait = ttk.Frame(onglet1, borderwidth=2, relief=tk.RAISED)
 frame2_L_trait = ttk.Frame(onglet1, borderwidth=2, relief=tk.RAISED)
-# frame1_L_trait = ttk.Frame(onglet1, borderwidth=2, relief=tk.RAISED)
-# frame2_L_trait = ttk.Frame(onglet1, borderwidth=2, relief=tk.RAISED)
 
 frame1_L_trait.grid(row=10, column=10, sticky="nsew")
 frame2_L_trait.grid(row=20, column=10, sticky="nsew")
@@ -4413,10 +4417,10 @@ frame2_L_trait.grid(row=20, column=10, sticky="nsew")
 # Interface graphique frame1_L_trait :
 ###################################################################################################
 canevas0_L_trait = tk.Canvas(frame1_L_trait, width=largeur_canevas_spectres,
-                             height=hauteur_canevas_spectres, bg="white")
+                             height=(hauteur_canevas_spectres+170), bg="white")
 canevas0_L_trait.grid(row=1, column=1, columnspan=6)
 
-ligne_position_0_x_L_trait = canevas0_L_trait.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
+ligne_position_0_x_L_trait = canevas0_L_trait.create_line(0, 0, 0, hauteur_canevas_spectres+170, fill="white")
 ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
 lambda_texte_L_trait = ttk.Label(
@@ -4513,8 +4517,8 @@ bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisatio
 bouton_rep_L_trait.grid(row=4, column=1, sticky=tk.N)
 bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tk.N)
 
-image_classification = tk.PhotoImage(
-    file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
+image_classification = tk.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
+
 bouton_classification_L_trait = tk.Button(frame1_1_L_trait, image=image_classification,
                                           command=ouvre_fenetre_classification_L_ele)
 bouton_classification_L_trait.grid(row=8, column=1, sticky=tk.S)
@@ -5269,9 +5273,9 @@ bouton_execute_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("ACP"),
                                   command=execute_ACP_L_ACP, state="disable", width=6)
 bouton_execute_L_ACP.grid(row=3, column=1, sticky=tk.W)
 
-bouton_applique_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("+ ind. supp."),
-                                   command=applique_ACP_L_ACP, state="disable", width=6)
-bouton_applique_L_ACP.grid(row=3, column=2, sticky=tk.W)
+bouton_applique_ind_sup_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("+ ind. supp."),
+                                   command=applique_ACP_ind_sup_L_ACP, state="disable", width=6)
+bouton_applique_ind_sup_L_ACP.grid(row=3, column=2, sticky=tk.W)
 
 bouton_ouvre_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("Ouvre"),
                                 command=ouvre_ACP_L_ACP, state="disable", width=6)
