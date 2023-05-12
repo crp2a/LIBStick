@@ -43,6 +43,7 @@ NOM_OS = os.name
 rep_LIBStick = os.getcwd()
 
 # interface graphique
+flag_change_fenetre = False
 largeur_fenetre_principale = 1155
 hauteur_fenetre_principale = 750
 largeur_canevas_spectres = 1000
@@ -75,14 +76,11 @@ nombre_fichiers_L_trait = nombre_fichiers_L_ext = nombre_fichiers_L_comp = nombr
 nombre_fichiers_avant_L_ext = 1
 
 # gestion des zooms
-minimum_spectre_L_trait = maximum_spectre_L_trait = maximum_spectre_ancien_L_trait = maximum_spectre_corrige_ancien_L_trait = 0
-maximum_spectre_ancien_L_ext = 0
-maximum_spectre_ancien_L_comp = 0
-maximum_spectre_ancien_L_ACP = 0
-anciennes_zoom_inf_L_trait = anciennes_zoom_sup_L_trait = 0
-anciennes_zoom_inf_L_ext = anciennes_zoom_sup_L_ext = 0
-anciennes_zoom_inf_L_comp = anciennes_zoom_sup_L_comp = 0
-anciennes_zoom_inf_L_ACP = anciennes_zoom_sup_L_ACP = 0
+minimum_spectre_L_trait = maximum_spectre_L_trait = minimum_spectre_lineaire_L_trait = 0
+maximum_spectre_corrige_L_trait = 0
+# maximum_spectre_ancien_L_ext = 0
+# maximum_spectre_ancien_L_comp = 0
+# maximum_spectre_ancien_L_ACP = 0
 
 # identifiants des lignes
 ligne0_1_L_trait = ligne0_2_L_trait = 0
@@ -191,8 +189,8 @@ def charge_param_interface():
     return style_interface, flag_style
 
 style_interface_LIBStick, flag_style_LIBStick_ini = charge_param_interface()
-print (style_interface_LIBStick)
-print (flag_style_LIBStick_ini)
+# print (style_interface_LIBStick)
+# print (flag_style_LIBStick_ini)
 
 
 def ecrit_fichier_ini():
@@ -307,23 +305,32 @@ def applique_change_taille_fenetre():
 
 
 def remplit_fenetres():
+    global flag_change_fenetre
     ID_onglet = onglets.index("current")
     if ID_onglet == 0:
         try :
+            flag_change_fenetre = True
             affiche_spectre_L_trait()
+            flag_change_fenetre = False
         except :
             pass
         try :
+            flag_change_fenetre = True
             affiche_spectre_corrige_L_trait()
+            flag_change_fenetre = False
         except :
             pass
         try :
+            flag_change_fenetre = True
             affiche_fond_L_trait()
+            flag_change_fenetre = False
         except :
             pass
     if ID_onglet == 1:
         try :
+            flag_change_fenetre = True
             affiche_spectre_L_ext()
+            flag_change_fenetre = False
         except :
             pass
         try :
@@ -340,7 +347,9 @@ def remplit_fenetres():
             pass
     if ID_onglet == 2:
         try :
+            flag_change_fenetre = True
             affiche_spectre_L_comp()
+            flag_change_fenetre = False
         except :
             pass
         try :
@@ -349,11 +358,15 @@ def remplit_fenetres():
             pass
     if ID_onglet == 3:
         try :
+            flag_change_fenetre = True
             affiche_spectre_L_ACP()
+            flag_change_fenetre = False
         except :
             pass
         try :
+            flag_change_fenetre = True
             affiche_spectres_var_ACP_L_ACP()
+            flag_change_fenetre = False
         except :
             pass
 
@@ -392,7 +405,7 @@ def charge_param_L_trait():
 rep_travail_L_trait = charge_param_L_trait()
 
 # limites min et max de l'affichage du spectre
-limites_spectre_L_trait = np.array([198.0, 1013.0])
+limites_spectre_x_L_trait = np.array([198.0, 1013.0])
 # limites de l'affichage du spectre à l'écran
 limites_affichage_spectre_L_trait = np.array([198.0, 1013.0])
 coord_zoom_L_trait = np.array([198, 0, 1013, 0])
@@ -514,36 +527,42 @@ def lit_affiche_spectre_L_trait():
     Lecture d'un fichier spectre et affichage du spectre brut.
     """
     global spectre_entier_L_trait
-    global limites_spectre_L_trait
+    global limites_spectre_x_L_trait, limites_spectre_y_L_trait
+    global maximum_spectre_L_trait, maximum_spectre_corrige_L_trait
     global fond_continu_L_trait
     os.chdir(rep_travail_L_trait)
     spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait,
                                                          type_fichier_L_trait.get())
-    limites_spectre_L_trait = lit_limites_abscisses_L_trait(spectre_entier_L_trait)
+    limites_spectre_x_L_trait, limites_spectre_y_L_trait = lit_limites_L_trait(spectre_entier_L_trait)
+    maximum_spectre_L_trait = maximum_spectre_corrige_L_trait = limites_spectre_y_L_trait[1]
     affiche_spectre_L_trait()
     fond_continu_L_trait = np.zeros((spectre_entier_L_trait.shape[0], 2))
 
 
-def lit_limites_abscisses_L_trait(spectre):
+def lit_limites_L_trait(spectre):
     """
     Lit les limites hautes et basses d'un spectre
     et fixe les valeurs du zoom à ces valeurs min et max
     """
-    tableau_abscisses = spectre[:, 0]
-    limites_spectre = np.zeros((2))
-    limites_spectre[0] = tableau_abscisses[0]             # lit les valeurs min et max du spectre
-    limites_spectre[1] = tableau_abscisses[-1]
+    # tableau_abscisses = spectre[:, 0]
+    # tableau_ordonnees = spectre[:, 1].max()
+    limites_spectre_x = np.zeros((2))
+    limites_spectre_x[0] = spectre[0, 0]             # lit les abscisses min et max du spectre
+    limites_spectre_x[1] = spectre[-1, 0]
+    limites_spectre_y = np.zeros((2))
+    limites_spectre_y[0] = spectre[:, 1].min()             # lit les valeurs min et max du spectre
+    limites_spectre_y[1] = spectre[:, 1].max()
     # fixe les valeurs du zoom à ces valeurs min et max
-    variable_zoom_inf_L_trait.set(limites_spectre[0])
-    variable_zoom_sup_L_trait.set(limites_spectre[1])
+    variable_zoom_inf_L_trait.set(limites_spectre_x[0])
+    variable_zoom_sup_L_trait.set(limites_spectre_x[1])
     # fixe les valeurs limites pour le zoom et la zone de selection
-    entree_zoom_inf_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree_zoom_sup_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
+    entree_zoom_inf_L_trait.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_sup_L_trait.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
     # entree_zoom_inf_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
     # entree_zoom_sup_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree1_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree2_L_trait.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    return limites_spectre
+    entree1_L_trait.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree2_L_trait.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    return limites_spectre_x,limites_spectre_y
 
 
 def affiche_lambda_L_trait(event):
@@ -566,7 +585,7 @@ def affiche_lambda_L_trait(event):
     flag_premier_lamda_L_trait = False
 
 
-def affiche_position_souris_L_trait(event):
+def affiche_position_souris_0_L_trait(event):
     """
     Affiche la position du curseur sur les canevas 0 et 1 lors du déplacement
     sous la forme d'un trait vert verticale si zoom y en automatique
@@ -578,21 +597,20 @@ def affiche_position_souris_L_trait(event):
     global ligne_position_1_y_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ratio_y0 = event.y/(hauteur_canevas_spectres+170)
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, ratio_y0*hauteur_canevas_spectres,
+                                                                  largeur_canevas_spectres, ratio_y0*hauteur_canevas_spectres,
+                                                                  fill="green")
 
 
-def affiche_position_souris_motion_L_trait(event):
+def affiche_position_souris_motion_0_L_trait(event):
     """
     Affiche la position du curseur et la valeur de lambda
     sur les canevas 0 et 1 lors du déplacement avec clic droit maintenu
@@ -608,18 +626,17 @@ def affiche_position_souris_motion_L_trait(event):
     global flag_premier_lamda_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ratio_y0 = event.y/(hauteur_canevas_spectres+170)
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, ratio_y0*hauteur_canevas_spectres,
+                                                                  largeur_canevas_spectres, ratio_y0*hauteur_canevas_spectres,
+                                                                  fill="green")
     if flag_premier_lamda_L_trait is False:
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
@@ -638,63 +655,74 @@ def affiche_spectre_L_trait():
     """
     global limites_affichage_spectre_L_trait
     global delta_limites_L_trait
+    global minimum_spectre_lineaire_L_trait
     global minimum_spectre_L_trait
     global maximum_spectre_L_trait
-    global maximum_spectre_ancien_L_trait
-
+    global flag_echelle_log_L_trait
+    limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
+    limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
     # gestion du zoom avec y personnalisé
-    if flag_zoom_auto_y.get() is False and flag_dezoom_L_trait is False and flag_bouton_zoom_L_trait is False:
+    if flag_zoom_auto_y.get() is False and flag_dezoom_L_trait is False and flag_bouton_zoom_L_trait is False :
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_trait:
-            if (ligne[0] >= anciennes_zoom_inf_L_trait and ligne[0] <= anciennes_zoom_sup_L_trait):
+            if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
-        minimum_spectre_ancien_L_trait = spectre[:, 1].min()
-        maximum = (maximum_spectre_ancien_L_trait-minimum_spectre_ancien_L_trait) * \
-            (hauteur_canevas_spectres+170-coord_zoom_L_trait[1])/(hauteur_canevas_spectres+170)
-        maximum_spectre_ancien_L_trait = maximum_spectre_L_trait = maximum
+        minimum_spectre_L_trait = spectre[:, 1].min()
+        coord_y_min = min(coord_zoom_L_trait[1],coord_zoom_L_trait[3])
+        coord_y_min = (coord_y_min*(hauteur_canevas_spectres+170)/hauteur_canevas_spectres)
+        # print("coord_y0_min = " + str(coord_y_min))
+        ratio_y_0_max = (hauteur_canevas_spectres+170-coord_y_min)/(hauteur_canevas_spectres+170)
+        if  flag_change_fenetre is False :
+            maximum = maximum_spectre_L_trait * ratio_y_0_max
+            # maximum = (maximum_spectre_L_trait-minimum_spectre_L_trait) * ratio_y_0_max
+            maximum_spectre_L_trait = maximum
+        else :
+            maximum = maximum_spectre_L_trait
 
-        limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
-        limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
-        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] - \
-            limites_affichage_spectre_L_trait[0]
+        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] - limites_affichage_spectre_L_trait[0]
         canevas0_L_trait.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_trait.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum_spectre_L_trait = minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_trait is False and flag_bouton_zoom_L_trait is True:
-        maximum = maximum_spectre_L_trait = maximum_spectre_ancien_L_trait
-        limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
-        limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
-        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] - \
-            limites_affichage_spectre_L_trait[0]
+        maximum = maximum_spectre_L_trait
+        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] -  limites_affichage_spectre_L_trait[0]
         canevas0_L_trait.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_trait.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum_spectre_L_trait = minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_trait is True:
-        limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
-        limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
-        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] - \
-            limites_affichage_spectre_L_trait[0]
+        delta_limites_L_trait = limites_affichage_spectre_L_trait[1] - limites_affichage_spectre_L_trait[0]
         canevas0_L_trait.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_trait.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum_spectre_L_trait = minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_trait = maximum_spectre_L_trait = maximum = spectre[:, 1].max()
+        maximum_spectre_L_trait = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
-    # spectre[:,0] = (spectre[:,0] - spectre[0,0])*largeur_canevas_spectres/(spectre[len(spectre),0]-spectre[0,0])
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
@@ -706,12 +734,16 @@ def affiche_fond_L_trait():
     """
     Affichage du fond continu du spectre dans le canevas 0
     """
+    limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
+    limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
     spectre = np.zeros((0, 2))
     for ligne in fond_continu_L_trait:
         if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
             spectre = np.row_stack((spectre, ligne))
     minimum = minimum_spectre_L_trait
     maximum = maximum_spectre_L_trait
+    if flag_echelle_log_L_trait.get() == True :
+        spectre[:,1] = np.log(spectre[:,1]-minimum_spectre_lineaire_L_trait)
     spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
@@ -719,6 +751,11 @@ def affiche_fond_L_trait():
         canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1],
                                      spectre[i+1, 0], spectre[i+1, 1], fill="blue")
     # flag_premier_fond_L_trait = False
+
+
+def mise_a_jour_affichage_L_trait() :
+    affiche_spectre_L_trait()
+    affiche_fond_L_trait()
 
 
 def affiche_lignes_spectre_L_trait():
@@ -859,9 +896,9 @@ def lit_affiche_spectre_numero_L_trait():
     numero = numero_spectre_L_trait.get()-1
     nom_fichier_seul_L_trait = liste_fichiers_L_trait[numero]
     os.chdir(rep_travail_L_trait)
-    spectre_entier_L_trait = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_trait, type_fichier_L_trait.get())
-    affiche_spectre_L_trait()
+    spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait,
+                                                         type_fichier_L_trait.get())
+    #affiche_spectre_L_trait()
     visualisation_L_trait()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_trait)
     flag_zoom_auto_y.set(sauve_flag_zoom_auto_y)
@@ -880,17 +917,23 @@ def affiche_spectre_corrige_L_trait():
     """
     Affichage du spectre corrigé dans le canevas 1 avec gestion du zoom y auto ou non
     """
-    global maximum_spectre_corrige_ancien_L_trait
+    global maximum_spectre_corrige_L_trait
+
     # gestion du zoom avec y personnalisé
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_trait is False and flag_bouton_zoom_L_trait is False:
         spectre = np.zeros((0, 2))
         for ligne in spectre_corrige_L_trait:
-            if (ligne[0] >= anciennes_zoom_inf_L_trait and ligne[0] <= anciennes_zoom_sup_L_trait):
+            if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
-        minimum_spectre_corrige_ancien_L_trait = spectre[:, 1].min()
-        maximum = (maximum_spectre_corrige_ancien_L_trait -
-                   minimum_spectre_corrige_ancien_L_trait) * (hauteur_canevas_spectres-coord_zoom_L_trait[1])/hauteur_canevas_spectres
-        maximum_spectre_corrige_ancien_L_trait = maximum
+        # minimum_spectre_corrige_avant_zoom_L_trait = spectre[:, 1].min()
+        coord_y_min = min(coord_zoom_L_trait[1],coord_zoom_L_trait[3])
+        # print("coord_y1_min = " + str(coord_y_min))
+        ratio_y_1_max = (hauteur_canevas_spectres-coord_y_min)/hauteur_canevas_spectres
+        if  flag_change_fenetre is False :
+            maximum = maximum_spectre_corrige_L_trait * ratio_y_1_max
+            # maximum = (maximum_spectre_corrige_L_trait -minimum_spectre_corrige_avant_zoom_L_trait) * ratio_y_1_max
+        else :
+            maximum = maximum_spectre_corrige_L_trait
 
         canevas1_L_trait.delete("all")
         spectre = np.zeros((0, 2))
@@ -901,12 +944,7 @@ def affiche_spectre_corrige_L_trait():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_trait is False and flag_bouton_zoom_L_trait is True:
-        #        spectre=np.zeros((0,2))
-        #        for ligne in spectre_corrige_L_trait :
-        #            if (ligne[0] >= anciennes_zoom_inf_L_trait and ligne[0] <= anciennes_zoom_sup_L_trait) :
-        #                spectre=np.row_stack((spectre,ligne))
-        #        minimum_spectre_corrige_ancien_L_trait = spectre[:,1].min()
-        maximum = maximum_spectre_corrige_ancien_L_trait
+        maximum = maximum_spectre_corrige_L_trait
         canevas1_L_trait.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_corrige_L_trait:
@@ -922,7 +960,7 @@ def affiche_spectre_corrige_L_trait():
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
         minimum = spectre[:, 1].min()
-        maximum_spectre_corrige_ancien_L_trait = maximum = spectre[:, 1].max()
+        maximum_spectre_corrige_L_trait = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
@@ -931,6 +969,73 @@ def affiche_spectre_corrige_L_trait():
     for i in range(len(spectre) - 1):
         canevas1_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
 
+
+def affiche_position_souris_1_L_trait(event):
+    """
+    Affiche la position du curseur sur les canevas 0 et 1 lors du déplacement
+    sous la forme d'un trait vert verticale si zoom y en automatique
+    sous la forme de deux traits verts vertical et horizontal si pas zoom y auto
+    """
+    global ligne_position_0_x_L_trait
+    global ligne_position_1_x_L_trait
+    global ligne_position_0_y_L_trait
+    global ligne_position_1_y_L_trait
+    canevas0_L_trait.delete(ligne_position_0_x_L_trait)
+    canevas0_L_trait.delete(ligne_position_0_y_L_trait)
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ratio_y1 = event.y/(hauteur_canevas_spectres)
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  largeur_canevas_spectres, ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  fill="green")
+    canevas1_L_trait.delete(ligne_position_1_x_L_trait)
+    canevas1_L_trait.delete(ligne_position_1_y_L_trait)
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
+                                                                  largeur_canevas_spectres, event.y,
+                                                                  fill="green")
+
+
+def affiche_position_souris_motion_1_L_trait(event):
+    """
+    Affiche la position du curseur et la valeur de lambda
+    sur les canevas 0 et 1 lors du déplacement avec clic droit maintenu
+    sous la forme d'un trait vert verticale si zoom y en automatique
+    sous la forme de deux traits verts vertical et horizontal si pas zoom y auto
+    """
+    global ligne_position_0_x_L_trait
+    global ligne_position_1_x_L_trait
+    global ligne_position_0_y_L_trait
+    global ligne_position_1_y_L_trait
+    global lambda_texte_spectre_0_L_trait
+    global lambda_texte_spectre_1_L_trait
+    global flag_premier_lamda_L_trait
+    canevas0_L_trait.delete(ligne_position_0_x_L_trait)
+    canevas0_L_trait.delete(ligne_position_0_y_L_trait)
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ratio_y1 = event.y/(hauteur_canevas_spectres)
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  largeur_canevas_spectres, ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  fill="green")
+    canevas1_L_trait.delete(ligne_position_1_x_L_trait)
+    canevas1_L_trait.delete(ligne_position_1_y_L_trait)
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
+                                                                  largeur_canevas_spectres, event.y,
+                                                                  fill="green")
+    if flag_premier_lamda_L_trait is False:
+        canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
+        canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
+    l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
+        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    flag_premier_lamda_L_trait = False
 
 ###################################################################################################
 # fonctions graphiques de zoom des deux canevas (frame1_L_trait et frame2_L_trait)
@@ -987,19 +1092,19 @@ def change_zoom_sup_return_L_trait(event):
     change_zoom_sup_L_trait()
 
 
-def zoom_clic_L_trait(event):
+def zoom_clic_0_L_trait(event):
     """
     Récupère les coordonnées du curseur lors d'un clic gauche
-    sur le canevas 0 ou 1 (position x et y  en pixels sur le canevas)
+    sur le canevas 0 (position x et y  en pixels sur le canevas)
     et affiche la valeur de lambda
     """
     global coord_zoom_L_trait
     affiche_lambda_L_trait(event)
     coord_zoom_L_trait[0] = event.x
-    coord_zoom_L_trait[1] = event.y
+    coord_zoom_L_trait[1] = event.y*hauteur_canevas_spectres/(hauteur_canevas_spectres+170)
 
 
-def zoom_drag_and_drop_L_trait(event):
+def zoom_drag_and_drop_0_L_trait(event):
     """
     Gestion du zoom ou dé-zoom à l'aide d'un cliqué-glissé avec le
     bouton gauche de la souris
@@ -1013,33 +1118,38 @@ def zoom_drag_and_drop_L_trait(event):
     global lambda_texte_spectre_0_L_trait
     global lambda_texte_spectre_1_L_trait
     global flag_premier_lamda_L_trait
-    global anciennes_zoom_inf_L_trait
-    global anciennes_zoom_sup_L_trait
     global flag_dezoom_L_trait
-    anciennes_zoom_inf_L_trait = variable_zoom_inf_L_trait.get()
-    anciennes_zoom_sup_L_trait = variable_zoom_sup_L_trait.get()
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres+170,
+                                                              fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y,
+                                                                  largeur_canevas_spectres, event.y,
+                                                                  fill="green")
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(
-        event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres,
+                                                              fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ratio_y0 = event.y/(hauteur_canevas_spectres+170)
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, ratio_y0*hauteur_canevas_spectres,
+                                                                  largeur_canevas_spectres,
+                                                                  ratio_y0*hauteur_canevas_spectres,
+                                                                  fill="green")
     coord_zoom_L_trait[2] = event.x
-    coord_zoom_L_trait[3] = event.y
+    coord_zoom_L_trait[3] = event.y*hauteur_canevas_spectres/(hauteur_canevas_spectres+170)
+    if coord_zoom_L_trait[3] < 0 :
+        coord_zoom_L_trait[3] = 0
+    if coord_zoom_L_trait[3] >  hauteur_canevas_spectres :
+        coord_zoom_L_trait[3] = hauteur_canevas_spectres
 
     # drag and drop bouton droit de gauche à droite : zoom
     if coord_zoom_L_trait[2] > coord_zoom_L_trait[0]:
         flag_dezoom_L_trait = False
-        debut = coord_zoom_L_trait[0]*delta_limites_L_trait / \
-            largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        debut = coord_zoom_L_trait[0]*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
         fin = coord_zoom_L_trait[2]*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
         variable_zoom_inf_L_trait.set(format(debut, "4.1f"))
         variable_zoom_sup_L_trait.set(format(fin, "4.1f"))
@@ -1058,8 +1168,90 @@ def zoom_drag_and_drop_L_trait(event):
     # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
     if coord_zoom_L_trait[2] < coord_zoom_L_trait[0]:
         flag_dezoom_L_trait = True
-        variable_zoom_inf_L_trait.set(limites_spectre_L_trait[0])
-        variable_zoom_sup_L_trait.set(limites_spectre_L_trait[1])
+        variable_zoom_inf_L_trait.set(limites_spectre_x_L_trait[0])
+        variable_zoom_sup_L_trait.set(limites_spectre_x_L_trait[1])
+        limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
+        limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
+
+
+def zoom_clic_1_L_trait(event):
+    """
+    Récupère les coordonnées du curseur lors d'un clic gauche
+    sur le canevas 1 (position x et y  en pixels sur le canevas)
+    et affiche la valeur de lambda
+    """
+    global coord_zoom_L_trait
+    affiche_lambda_L_trait(event)
+    coord_zoom_L_trait[0] = event.x
+    coord_zoom_L_trait[1] = event.y
+
+
+def zoom_drag_and_drop_1_L_trait(event):
+    """
+    Gestion du zoom ou dé-zoom à l'aide d'un cliqué-glissé avec le
+    bouton gauche de la souris
+    """
+    global ligne_position_0_x_L_trait
+    global ligne_position_1_x_L_trait
+    global ligne_position_0_y_L_trait
+    global ligne_position_1_y_L_trait
+    global coord_zoom_L_trait
+    global limites_affichage_spectre_L_trait
+    global lambda_texte_spectre_0_L_trait
+    global lambda_texte_spectre_1_L_trait
+    global flag_premier_lamda_L_trait
+    global flag_dezoom_L_trait
+    canevas0_L_trait.delete(ligne_position_0_x_L_trait)
+    canevas0_L_trait.delete(ligne_position_0_y_L_trait)
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres+170,
+                                                              fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ratio_y1 = event.y/(hauteur_canevas_spectres)
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  largeur_canevas_spectres,
+                                                                  ratio_y1*(hauteur_canevas_spectres+170),
+                                                                  fill="green")
+    canevas1_L_trait.delete(ligne_position_1_x_L_trait)
+    canevas1_L_trait.delete(ligne_position_1_y_L_trait)
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres,
+                                                              fill="green")
+    if flag_zoom_auto_y.get() is False:
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
+                                                                  largeur_canevas_spectres, event.y,
+                                                                  fill="green")
+    coord_zoom_L_trait[2] = event.x
+    coord_zoom_L_trait[3] = event.y
+    if coord_zoom_L_trait[3] < 0 :
+        coord_zoom_L_trait[3] = 0
+    if coord_zoom_L_trait[3] >  hauteur_canevas_spectres :
+        coord_zoom_L_trait[3] = hauteur_canevas_spectres
+
+    # drag and drop bouton droit de gauche à droite : zoom
+    if coord_zoom_L_trait[2] > coord_zoom_L_trait[0]:
+        flag_dezoom_L_trait = False
+        debut = coord_zoom_L_trait[0]*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        fin = coord_zoom_L_trait[2]*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        variable_zoom_inf_L_trait.set(format(debut, "4.1f"))
+        variable_zoom_sup_L_trait.set(format(fin, "4.1f"))
+        # affiche la longueur d'onde :
+        if flag_premier_lamda_L_trait is False:
+            canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
+            canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
+        l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
+            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
+            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        flag_premier_lamda_L_trait = False
+
+    # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
+    if coord_zoom_L_trait[2] < coord_zoom_L_trait[0]:
+        flag_dezoom_L_trait = True
+        variable_zoom_inf_L_trait.set(limites_spectre_x_L_trait[0])
+        variable_zoom_sup_L_trait.set(limites_spectre_x_L_trait[1])
         limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
         limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
 
@@ -1070,8 +1262,8 @@ def zoom_clic_release_L_trait(event):
     du clic gauche à la fin du cliqué-glissé pour zoomer
     """
     affiche_spectre_L_trait()
-    affiche_spectre_corrige_L_trait()
     affiche_fond_L_trait()
+    affiche_spectre_corrige_L_trait()
 
 
 ###################################################################################################
@@ -1088,7 +1280,7 @@ def __________L_ext__________():
 ###################################################################################################
 # initialisations
 ###################################################################################################
-limites_spectre_L_ext = np.array([198.0, 1013.0])
+limites_spectre_x_L_ext = np.array([198.0, 1013.0])
 limites_affichage_spectre_L_ext = np.array([198.0, 1013.0])
 coord_zoom_L_ext = np.array([198, 0, 1013, 0])
 delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
@@ -1290,33 +1482,37 @@ def lit_affiche_spectre_L_ext(nom_fichier):
     Lecture d'un fichier spectre et affichage du spectre
     """
     global spectre_entier_L_ext
-    global limites_spectre_L_ext
+    global limites_spectre_x_L_ext, limites_spectre_y_L_ext
+    global maximum_spectre_L_ext
     os.chdir(rep_travail_L_ext)
     spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier, type_fichier_L_ext.get())
-    limites_spectre_L_ext = lit_limites_abscisses_L_ext(spectre_entier_L_ext)
+    limites_spectre_x_L_ext, limites_spectre_y_L_ext = lit_limites_L_ext(spectre_entier_L_ext)
+    maximum_spectre_L_ext = limites_spectre_y_L_ext[1]
     affiche_spectre_L_ext()
 
 
-def lit_limites_abscisses_L_ext(spectre):
+def lit_limites_L_ext(spectre):
     """
     Lit les limites hautes et basses d'un spectre
     et fixe les valeurs du zoom à ces valeurs min et max
     """
-    tableau_abscisses = spectre[:, 0]
-    limites_spectre = np.zeros((2))
-    limites_spectre[0] = tableau_abscisses[0]             # lit le valeurs min et max du spectre
-    limites_spectre[1] = tableau_abscisses[-1]
+    limites_spectre_x = np.zeros((2))
+    limites_spectre_x[0] = spectre[0, 0]             # lit les abscisses min et max du spectre
+    limites_spectre_x[1] = spectre[-1, 0]
+    limites_spectre_y = np.zeros((2))
+    limites_spectre_y[0] = spectre[:, 1].min()             # lit les valeurs min et max du spectre
+    limites_spectre_y[1] = spectre[:, 1].max()
     # fixe les valeurs du zoom à ces valeurs min et max
-    variable_zoom_inf_L_ext.set(limites_spectre[0])
-    variable_zoom_sup_L_ext.set(limites_spectre[1])
+    variable_zoom_inf_L_ext.set(limites_spectre_x[0])
+    variable_zoom_sup_L_ext.set(limites_spectre_x[1])
     # fixe les valeurs limites pour le zoom et la zone de selection
-    entree_zoom_inf_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree_zoom_sup_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree1_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree2_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree3_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree4_L_ext.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    return limites_spectre
+    entree_zoom_inf_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_sup_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree1_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree2_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree3_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree4_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    return limites_spectre_x,limites_spectre_y
 
 
 # def change_flag_2D_L_ext():
@@ -1412,54 +1608,70 @@ def affiche_spectre_L_ext():
     """
     global limites_affichage_spectre_L_ext
     global delta_limites_L_ext
-    global maximum_spectre_ancien_L_ext
-
+    global minimum_spectre_lineaire_L_ext
+    global maximum_spectre_L_ext
+    global flag_echelle_log_L_ext
+    # global minimum_spectre_L_ext
+    limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
+    limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
     # gestion du zoom avec y personnalisé
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ext is False and flag_bouton_zoom_L_ext is False:
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_ext:
-            if (ligne[0] >= anciennes_zoom_inf_L_ext and ligne[0] <= anciennes_zoom_sup_L_ext):
+            if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
-        minimum_spectre_ancien_L_ext = spectre[:, 1].min()
-        maximum = (maximum_spectre_ancien_L_ext-minimum_spectre_ancien_L_ext) * \
-            (hauteur_canevas_spectres-coord_zoom_L_ext[1])/hauteur_canevas_spectres
-        maximum_spectre_ancien_L_ext = maximum
+        # minimum_spectre_L_ext = spectre[:, 1].min()
+        coord_y_min = min(coord_zoom_L_ext[1],coord_zoom_L_ext[3])
+        # print("coord_y1_min = " + str(coord_y_min))
+        ratio_y_max = (hauteur_canevas_spectres-coord_y_min)/hauteur_canevas_spectres
+        if  flag_change_fenetre is False :
+            maximum = maximum_spectre_L_ext * ratio_y_max
+            # maximum = (maximum_spectre_L_ext-minimum_spectre_L_ext) * ratio_y_max
+            maximum_spectre_L_ext = maximum
+        else :
+            maximum = maximum_spectre_L_ext
 
-        limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
-        limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
         delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
         canevas0_L_ext.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_ext.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ext is False and flag_bouton_zoom_L_ext is True:
-        maximum = maximum_spectre_ancien_L_ext
-        limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
-        limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
+        maximum = maximum_spectre_L_ext
         delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
         canevas0_L_ext.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_ext.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_ext is True:
-        limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
-        limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
         delta_limites_L_ext = limites_affichage_spectre_L_ext[1]-limites_affichage_spectre_L_ext[0]
         canevas0_L_ext.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_ext.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_ext = maximum = spectre[:, 1].max()
+        maximum_spectre_L_ext = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
@@ -1467,6 +1679,10 @@ def affiche_spectre_L_ext():
     for i in range(len(spectre) - 1):
         canevas0_L_ext.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_ext()
+
+
+def mise_a_jour_affichage_L_ext() :
+    affiche_spectre_L_ext()
 
 
 def affiche_lignes_spectre_L_ext():
@@ -1714,11 +1930,7 @@ def zoom_drag_and_drop_L_ext(event):
     global limites_affichage_spectre_L_ext
     global lambda_texte_spectre_L_ext
     global flag_premier_lamda_L_ext
-    global anciennes_zoom_inf_L_ext
-    global anciennes_zoom_sup_L_ext
     global flag_dezoom_L_ext
-    anciennes_zoom_inf_L_ext = variable_zoom_inf_L_ext.get()
-    anciennes_zoom_sup_L_ext = variable_zoom_sup_L_ext.get()
     canevas0_L_ext.delete(ligne_position_x_L_ext)
     canevas0_L_ext.delete(ligne_position_y_L_ext)
     ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
@@ -1726,6 +1938,12 @@ def zoom_drag_and_drop_L_ext(event):
         ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
     coord_zoom_L_ext[2] = event.x
     coord_zoom_L_ext[3] = event.y
+    if coord_zoom_L_ext[3] < 0 :
+        coord_zoom_L_ext[3] = 0
+    if coord_zoom_L_ext[3] >  hauteur_canevas_spectres :
+        coord_zoom_L_ext[3] = hauteur_canevas_spectres
+
+    # drag and drop bouton droit de gauche à droite : zoom
     if coord_zoom_L_ext[2] > coord_zoom_L_ext[0]:
         flag_dezoom_L_ext = False
         debut = coord_zoom_L_ext[0]*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
@@ -1740,10 +1958,12 @@ def zoom_drag_and_drop_L_ext(event):
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
         lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
         flag_premier_lamda_L_ext = False
+
+    # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
     if coord_zoom_L_ext[2] < coord_zoom_L_ext[0]:
         flag_dezoom_L_ext = True
-        variable_zoom_inf_L_ext.set(limites_spectre_L_ext[0])
-        variable_zoom_sup_L_ext.set(limites_spectre_L_ext[1])
+        variable_zoom_inf_L_ext.set(limites_spectre_x_L_ext[0])
+        variable_zoom_sup_L_ext.set(limites_spectre_x_L_ext[1])
         limites_affichage_spectre_L_ext[0] = variable_zoom_inf_L_ext.get()
         limites_affichage_spectre_L_ext[1] = variable_zoom_sup_L_ext.get()
 
@@ -2102,7 +2322,7 @@ def __________L_comp__________():
 # initialisations
 ###################################################################################################
 # limites min et max de l'affichage du spectre
-limites_spectre_L_comp = np.array([198.0, 1013.0])
+limites_spectre_x_L_comp = np.array([198.0, 1013.0])
 # limites de l'affichage du spectre à l'écran
 limites_affichage_spectre_L_comp = np.array([198.0, 1013.0])
 coord_zoom_L_comp = np.array([198, 0, 1013, 0])
@@ -2213,34 +2433,38 @@ def lit_affiche_spectre_L_comp():
     Lecture d'un fichier spectre et affichage du spectre
     """
     global spectre_entier_L_comp
-    global limites_spectre_L_comp
+    global limites_spectre_x_L_comp, limites_spectre_y_L_comp
+    global maximum_spectre_L_comp
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_comp, type_fichier_L_comp.get())
-    limites_spectre_L_comp = lit_limites_abscisses_L_comp(spectre_entier_L_comp)
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+                                                        type_fichier_L_comp.get())
+    limites_spectre_x_L_comp, limites_spectre_y_L_comp = lit_limites_L_comp(spectre_entier_L_comp)
+    maximum_spectre_L_comp = limites_spectre_y_L_comp[1]
     affiche_spectre_L_comp()
 
 
-def lit_limites_abscisses_L_comp(spectre):
+def lit_limites_L_comp(spectre):
     """
     Lit les limites hautes et basses d'un spectre
     et fixe les valeurs du zoom à ces valeurs min et max
     """
-    tableau_abscisses = spectre[:, 0]
-    limites_spectre = np.zeros((2))
-    limites_spectre[0] = tableau_abscisses[0]             # lit le valeurs min et max du spectre
-    limites_spectre[1] = tableau_abscisses[-1]
+    limites_spectre_x = np.zeros((2))
+    limites_spectre_x[0] = spectre[0, 0]             # lit les abscisses min et max du spectre
+    limites_spectre_x[1] = spectre[-1, 0]
+    limites_spectre_y = np.zeros((2))
+    limites_spectre_y[0] = spectre[:, 1].min()             # lit les valeurs min et max du spectre
+    limites_spectre_y[1] = spectre[:, 1].max()
     # fixe les valeurs du zoom à ces valeurs min et max
-    variable_zoom_inf_L_comp.set(limites_spectre[0])
-    variable_zoom_sup_L_comp.set(limites_spectre[1])
+    variable_zoom_inf_L_comp.set(limites_spectre_x[0])
+    variable_zoom_sup_L_comp.set(limites_spectre_x[1])
     # fixe les valeurs limites pour le zoom et la zone de selection
-    entree_zoom_inf_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree_zoom_sup_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree1_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree2_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree3_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree4_L_comp.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    return limites_spectre
+    entree_zoom_inf_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_sup_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree1_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree2_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree3_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree4_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    return limites_spectre_x,limites_spectre_y
 
 
 def execute_scripts_L_comp():
@@ -2375,48 +2599,57 @@ def affiche_spectre_L_comp():
     """
     global limites_affichage_spectre_L_comp
     global delta_limites_L_comp
-    global maximum_spectre_ancien_L_comp
-
+    global minimum_spectre_lineaire_L_comp
+    # global minimum_spectre_L_comp
+    global maximum_spectre_L_comp
+    global flag_echelle_log_L_comp
+    limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
+    limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
     # gestion du zoom avec y personnalisé
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_comp is False and flag_bouton_zoom_L_comp is False:
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_comp:
-            if (ligne[0] >= anciennes_zoom_inf_L_comp and ligne[0] <= anciennes_zoom_sup_L_comp):
+            if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
-        minimum_spectre_ancien_L_comp = spectre[:, 1].min()
-        maximum = (maximum_spectre_ancien_L_comp-minimum_spectre_ancien_L_comp) * \
-            (hauteur_canevas_spectres-coord_zoom_L_comp[1])/hauteur_canevas_spectres
-        maximum_spectre_ancien_L_comp = maximum
+        # minimum_spectre_L_comp = spectre[:, 1].min()
+        coord_y_min = min(coord_zoom_L_comp[1],coord_zoom_L_comp[3])
+        ratio_y_max = (hauteur_canevas_spectres-coord_y_min)/hauteur_canevas_spectres
+        if  flag_change_fenetre is False :
+            maximum = maximum_spectre_L_comp * ratio_y_max
+            # maximum = (maximum_spectre_L_comp-minimum_spectre_L_comp) * ratio_y_max
+            maximum_spectre_L_comp = maximum
+        else :
+            maximum = maximum_spectre_L_comp
 
-        limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
-        limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
-        delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - \
-            limites_affichage_spectre_L_comp[0]
+        delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - limites_affichage_spectre_L_comp[0]
         canevas0_L_comp.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_comp.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_comp is False and flag_bouton_zoom_L_comp is True:
-        maximum = maximum_spectre_ancien_L_comp
-        limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
-        limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
-        delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - \
-            limites_affichage_spectre_L_comp[0]
+        maximum = maximum_spectre_L_comp
+        delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - limites_affichage_spectre_L_comp[0]
         canevas0_L_comp.delete("all")
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_comp.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_comp is True:
-        limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
-        limites_affichage_spectre_L_comp[1] = variable_zoom_sup_L_comp.get()
         delta_limites_L_comp = limites_affichage_spectre_L_comp[1] - \
             limites_affichage_spectre_L_comp[0]
         canevas0_L_comp.delete("all")
@@ -2424,8 +2657,12 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_comp.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_comp = maximum = spectre[:, 1].max()
+        maximum_spectre_L_comp = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
@@ -2433,6 +2670,10 @@ def affiche_spectre_L_comp():
     for i in range(len(spectre) - 1):
         canevas0_L_comp.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_comp()
+
+
+def mise_a_jour_affichage_L_comp() :
+    affiche_spectre_L_comp()
 
 
 def affiche_lignes_spectre_L_comp():
@@ -2680,11 +2921,7 @@ def zoom_drag_and_drop_L_comp(event):
     global limites_affichage_spectre_L_comp
     global lambda_texte_spectre_L_comp
     global flag_premier_lamda_L_comp
-    global anciennes_zoom_inf_L_comp
-    global anciennes_zoom_sup_L_comp
     global flag_dezoom_L_comp
-    anciennes_zoom_inf_L_comp = variable_zoom_inf_L_comp.get()
-    anciennes_zoom_sup_L_comp = variable_zoom_sup_L_comp.get()
     canevas0_L_comp.delete(ligne_position_x_L_comp)
     canevas0_L_comp.delete(ligne_position_y_L_comp)
     ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
@@ -2693,6 +2930,12 @@ def zoom_drag_and_drop_L_comp(event):
             0, event.y, largeur_canevas_spectres, event.y, fill="green")
     coord_zoom_L_comp[2] = event.x
     coord_zoom_L_comp[3] = event.y
+    if coord_zoom_L_comp[3] < 0 :
+        coord_zoom_L_comp[3] = 0
+    if coord_zoom_L_comp[3] >  hauteur_canevas_spectres :
+        coord_zoom_L_comp[3] = hauteur_canevas_spectres
+
+    # drag and drop bouton droit de gauche à droite : zoom
     if coord_zoom_L_comp[2] > coord_zoom_L_comp[0]:
         flag_dezoom_L_comp = False
         debut = coord_zoom_L_comp[0]*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
@@ -2707,10 +2950,12 @@ def zoom_drag_and_drop_L_comp(event):
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
         lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
         flag_premier_lamda_L_comp = False
+
+    # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
     if coord_zoom_L_comp[2] < coord_zoom_L_comp[0]:
         flag_dezoom_L_comp = True
-        variable_zoom_inf_L_comp.set(limites_spectre_L_comp[0])
-        variable_zoom_sup_L_comp.set(limites_spectre_L_comp[1])
+        variable_zoom_inf_L_comp.set(limites_spectre_x_L_comp[0])
+        variable_zoom_sup_L_comp.set(limites_spectre_x_L_comp[1])
         # limites_affichage_spectre_L_comp[0]=variable_zoom_inf_L_comp.get()
         # limites_affichage_spectre_L_comp[1]=variable_zoom_sup_L_comp.get()
 
@@ -2766,7 +3011,7 @@ def coord1_to_vars_5_6_L_comp(x, y):
     sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
     flag_zoom_auto_y.set(True)
     variable_5_L_comp.set(format(
-        limites_spectre_L_comp[0] + (x * (limites_spectre_L_comp[1]-limites_spectre_L_comp[0]) / largeur_canevas_spectres), "4.1f"))
+        limites_spectre_x_L_comp[0] + (x * (limites_spectre_x_L_comp[1]-limites_spectre_x_L_comp[0]) / largeur_canevas_spectres), "4.1f"))
     variable_6_L_comp.set(math.ceil(y * nombre_fichiers_L_comp / hauteur_canevas_spectres))
     child_id = tree_resultats_L_comp.get_children()[variable_6_L_comp.get()-1]
     tree_resultats_L_comp.selection_set(child_id)
@@ -2792,8 +3037,7 @@ def vars_5_6_to_coord1_L_comp():
     global nom_fichier_seul_L_comp
     sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
     flag_zoom_auto_y.set(True)
-    x1_L_comp = round(((variable_5_L_comp.get(
-    )-limites_spectre_L_comp[0])*largeur_canevas_spectres) / (limites_spectre_L_comp[1]-limites_spectre_L_comp[0]))
+    x1_L_comp = round(((variable_5_L_comp.get()-limites_spectre_x_L_comp[0])*largeur_canevas_spectres) / (limites_spectre_x_L_comp[1]-limites_spectre_x_L_comp[0]))
     y1_L_comp = round(hauteur_canevas_spectres*(variable_6_L_comp.get()-0.5)/nombre_fichiers_L_comp)
     child_id = tree_resultats_L_comp.get_children()[variable_6_L_comp.get()-1]
     tree_resultats_L_comp.selection_set(child_id)
@@ -2969,7 +3213,7 @@ def charge_param_L_ACP():
 tableau_bornes_init_L_ACP, tableau_bornes_L_ACP, rep_travail_L_ACP = charge_param_L_ACP()
 
 # limites min et max de l'affichage du spectre
-limites_spectre_L_ACP = np.array([198.0, 1013.0])
+limites_spectre_x_L_ACP = np.array([198.0, 1013.0])
 # limites de l'affichage du spectre à l'écran
 limites_affichage_spectre_L_ACP = np.array([198.0, 1013.0])
 coord_zoom_L_ACP = np.array([198, 0, 1013, 0])
@@ -3032,10 +3276,10 @@ def choix_fichier_L_ACP():
                                                                    type_fichier_L_ACP.get())
     nombre_fichiers_L_ACP = len(liste_fichiers_L_ACP)
 #    entree6_L_ACP.configure(from_=1, to=nombre_fichiers_L_ACP)
-    tableau_spectres_L_ACP = LIBStick_outils.creer_tableau_avec_x_colonne1(
-        liste_fichiers_L_ACP, type_fichier_L_ACP.get())
-    DataFrame_complet_L_ACP = LIBStick_outils.creer_dataframe_x_tableau_en_colonnes(
-        tableau_spectres_L_ACP, liste_fichiers_L_ACP)
+    tableau_spectres_L_ACP = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP,
+                                                                           type_fichier_L_ACP.get())
+    DataFrame_complet_L_ACP = LIBStick_outils.creer_dataframe_x_tableau_en_colonnes(tableau_spectres_L_ACP,
+                                                                                    liste_fichiers_L_ACP)
     lit_affiche_spectre_L_ACP()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ACP)
     bouton_execute_L_ACP.configure(state="normal")
@@ -3048,33 +3292,37 @@ def lit_affiche_spectre_L_ACP():
     Lecture d'un fichier spectre et affichage du spectre
     """
     global spectre_entier_L_ACP
-    global limites_spectre_L_ACP
+    global limites_spectre_x_L_ACP, limites_spectre_y_L_ACP
+    global maximum_spectre_L_ACP
     os.chdir(rep_travail_L_ACP)
-    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
-    limites_spectre_L_ACP = lit_limites_abscisses_L_ACP(spectre_entier_L_ACP)
+    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP,
+                                                       type_fichier_L_ACP.get())
+    limites_spectre_x_L_ACP, limites_spectre_y_L_ACP = lit_limites_L_ACP(spectre_entier_L_ACP)
+    maximum_spectre_L_ACP = limites_spectre_y_L_ACP[1]
     affiche_spectre_L_ACP()
     affiche_tableau_L_ACP()
 
 
-def lit_limites_abscisses_L_ACP(spectre):
+def lit_limites_L_ACP(spectre):
     """
     Lit les limites hautes et basses d'un spectre
     et fixe les valeurs du zoom à ces valeurs min et max
     """
-    tableau_abscisses = spectre[:, 0]
-    limites_spectre = np.zeros((2))
-    limites_spectre[0] = tableau_abscisses[0]             # lit le valeurs min et max du spectre
-    limites_spectre[1] = tableau_abscisses[-1]
+    limites_spectre_x = np.zeros((2))
+    limites_spectre_x[0] = spectre[0, 0]             # lit les abscisses min et max du spectre
+    limites_spectre_x[1] = spectre[-1, 0]
+    limites_spectre_y = np.zeros((2))
+    limites_spectre_y[0] = spectre[:, 1].min()             # lit les valeurs min et max du spectre
+    limites_spectre_y[1] = spectre[:, 1].max()
     # fixe les valeurs du zoom à ces valeurs min et max
-    variable_zoom_inf_L_ACP.set(limites_spectre[0])
-    variable_zoom_sup_L_ACP.set(limites_spectre[1])
+    variable_zoom_inf_L_ACP.set(limites_spectre_x[0])
+    variable_zoom_sup_L_ACP.set(limites_spectre_x[1])
     # fixe les valeurs limites pour le zoom et la zone de selection
-    entree_zoom_inf_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree_zoom_sup_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree1_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    entree2_L_ACP.configure(from_=limites_spectre[0], to=limites_spectre[1])
-    return limites_spectre
+    entree_zoom_inf_L_ACP.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_sup_L_ACP.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree1_L_ACP.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree2_L_ACP.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    return limites_spectre_x,limites_spectre_y
 
 
 def dataframe_treeview_L_ACP():
@@ -3083,10 +3331,12 @@ def dataframe_treeview_L_ACP():
     """
     treeview_columns = ["numero", "nom", "calcul ACP", "label"]  # list of names here
     treeview_df = pd.DataFrame(columns=treeview_columns)
+    print (tree_L_ACP)
     for ligne in tree_L_ACP.get_children():
         # each row will come as a list under name "values"
         values = pd.DataFrame([tree_L_ACP.item(ligne)["values"]], columns=treeview_columns)
-        treeview_df = treeview_df.append(values, ignore_index=True)
+        # treeview_df = treeview_df.append(values, ignore_index=True)
+        treeview_df = pd.concat([treeview_df,values], ignore_index=True)
     lignes = treeview_df.shape[0]
     treeview_df = treeview_df.set_index([pd.Index(range(1, lignes+1))])
     return treeview_df
@@ -3407,21 +3657,28 @@ def affiche_spectre_L_ACP():
     """
     global limites_affichage_spectre_L_ACP
     global delta_limites_L_ACP
-    global maximum_spectre_ancien_L_ACP
-
+    global maximum_spectre_L_ACP
+    limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
+    limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
     # gestion du zoom avec y personnalisé
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ACP is False and flag_bouton_zoom_L_ACP is False:
         spectre = np.zeros((0, 2))
         for ligne in spectre_entier_L_ACP:
-            if (ligne[0] >= anciennes_zoom_inf_L_ACP and ligne[0] <= anciennes_zoom_sup_L_ACP):
+            if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
-        minimum_spectre_ancien_L_ACP = spectre[:, 1].min()
-        maximum = (maximum_spectre_ancien_L_ACP-minimum_spectre_ancien_L_ACP) * \
-            (hauteur_canevas_spectres-coord_zoom_L_ACP[1])/hauteur_canevas_spectres
-        maximum_spectre_ancien_L_ACP = maximum
+        coord_y_min = min(coord_zoom_L_ACP[1],coord_zoom_L_ACP[3])
+        ratio_y_max = (hauteur_canevas_spectres-coord_y_min)/hauteur_canevas_spectres
+        if  flag_change_fenetre is False :
+            maximum = maximum_spectre_L_ACP * ratio_y_max
+            # maximum = (maximum_spectre_L_comp-minimum_spectre_L_comp) * ratio_y_max
+            maximum_spectre_L_ACP = maximum
+        else :
+            maximum = maximum_spectre_L_ACP
+        # minimum_spectre_ancien_L_ACP = spectre[:, 1].min()
+        # maximum = (maximum_spectre_L_ACP-minimum_spectre_ancien_L_ACP) * \
+        #     (hauteur_canevas_spectres-coord_zoom_L_ACP[1])/hauteur_canevas_spectres
+        # maximum_spectre_L_ACP = maximum
 
-        limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
-        limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
         delta_limites_L_ACP = limites_affichage_spectre_L_ACP[1]-limites_affichage_spectre_L_ACP[0]
         canevas0_L_ACP.delete("all")
         spectre = np.zeros((0, 2))
@@ -3432,9 +3689,7 @@ def affiche_spectre_L_ACP():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_ACP is False and flag_bouton_zoom_L_ACP is True:
-        maximum = maximum_spectre_ancien_L_ACP
-        limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
-        limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
+        maximum = maximum_spectre_L_ACP
         delta_limites_L_ACP = limites_affichage_spectre_L_ACP[1]-limites_affichage_spectre_L_ACP[0]
         canevas0_L_ACP.delete("all")
         spectre = np.zeros((0, 2))
@@ -3446,8 +3701,6 @@ def affiche_spectre_L_ACP():
 
     # gestion du zoom avec y automatique
     if flag_zoom_auto_y.get() is True or flag_dezoom_L_ACP is True:
-        limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
-        limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
         delta_limites_L_ACP = limites_affichage_spectre_L_ACP[1]-limites_affichage_spectre_L_ACP[0]
         canevas0_L_ACP.delete("all")
         spectre = np.zeros((0, 2))
@@ -3455,7 +3708,7 @@ def affiche_spectre_L_ACP():
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
         minimum = spectre[:, 1].min()
-        maximum_spectre_ancien_L_ACP = maximum = spectre[:, 1].max()
+        maximum_spectre_L_ACP = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
@@ -3699,11 +3952,7 @@ def zoom_drag_and_drop_L_ACP(event):
     global lambda_texte_spectre_0_L_ACP
     global lambda_texte_spectre_1_L_ACP
     global flag_premier_lamda_L_ACP
-    global anciennes_zoom_inf_L_ACP
-    global anciennes_zoom_sup_L_ACP
     global flag_dezoom_L_ACP
-    anciennes_zoom_inf_L_ACP = variable_zoom_inf_L_ACP.get()
-    anciennes_zoom_sup_L_ACP = variable_zoom_sup_L_ACP.get()
     canevas0_L_ACP.delete(ligne_position_x_L_ACP)
     canevas0_L_ACP.delete(ligne_position_y_L_ACP)
     canevas1_L_ACP.delete(ligne_position_1_L_ACP)
@@ -3713,6 +3962,12 @@ def zoom_drag_and_drop_L_ACP(event):
     ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
     coord_zoom_L_ACP[2] = event.x
     coord_zoom_L_ACP[3] = event.y
+    if coord_zoom_L_ACP[3] < 0 :
+        coord_zoom_L_ACP[3] = 0
+    if coord_zoom_L_ACP[3] >  hauteur_canevas_spectres :
+        coord_zoom_L_ACP[3] = hauteur_canevas_spectres
+
+
     if coord_zoom_L_ACP[2] > coord_zoom_L_ACP[0]:
         flag_dezoom_L_ACP = False
         debut = coord_zoom_L_ACP[0]*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
@@ -3732,8 +3987,8 @@ def zoom_drag_and_drop_L_ACP(event):
         flag_premier_lamda_L_ACP = False
     if coord_zoom_L_ACP[2] < coord_zoom_L_ACP[0]:
         flag_dezoom_L_ACP = True
-        variable_zoom_inf_L_ACP.set(limites_spectre_L_ACP[0])
-        variable_zoom_sup_L_ACP.set(limites_spectre_L_ACP[1])
+        variable_zoom_inf_L_ACP.set(limites_spectre_x_L_ACP[0])
+        variable_zoom_sup_L_ACP.set(limites_spectre_x_L_ACP[1])
         # limites_affichage_spectre_L_ACP[0]=variable_zoom_inf_L_ACP.get()
         # limites_affichage_spectre_L_ACP[1]=variable_zoom_sup_L_ACP.get()
 
@@ -3744,7 +3999,10 @@ def zoom_clic_release_L_ACP(event):
     du clic gauche à la fin du cliqué-glissé sur le canevas 0 pour zoomer
     """
     affiche_spectre_L_ACP()
-    affiche_spectres_var_ACP_L_ACP()
+    try :
+        affiche_spectres_var_ACP_L_ACP()
+    except :
+        pass
 
 
 def zoom_clic_release_canevas1_L_ACP(event):
@@ -3985,31 +4243,41 @@ def affiches_lignes_element_L_ele():
     et celles <1%
     L'affichage ne se fait que sur les spectres de l'onglet en cours
     """
+    global flag_bouton_zoom_L_trait, flag_bouton_zoom_L_ext
+    global flag_bouton_zoom_L_comp, flag_bouton_zoom_L_ACP
     ID_onglet = onglets.index("current")
     if ID_onglet == 0:
         limites_affichage_spectre = limites_affichage_spectre_L_trait
+        flag_bouton_zoom_L_trait = True
         affiche_spectre_L_trait()
-        try : 
+        try :
             affiche_fond_L_trait()
         except :
              pass
-        try : 
+        try :
             affiche_spectre_corrige_L_trait()
         except :
             pass
+        flag_bouton_zoom_L_trait = False
     if ID_onglet == 1:
+        flag_bouton_zoom_L_ext = True
         limites_affichage_spectre = limites_affichage_spectre_L_ext
         affiche_spectre_L_ext()
+        flag_bouton_zoom_L_ext = False
     if ID_onglet == 2:
+        flag_bouton_zoom_L_comp = True
         limites_affichage_spectre = limites_affichage_spectre_L_comp
         affiche_spectre_L_comp()
+        flag_bouton_zoom_L_comp = False
     if ID_onglet == 3:
+        flag_bouton_zoom_L_ACP = True
         limites_affichage_spectre = limites_affichage_spectre_L_ACP
         affiche_spectre_L_ACP()
         try :
             affiche_spectres_var_ACP_L_ACP()
         except :
             pass
+        flag_bouton_zoom_L_ACP = False
     if flag_neutres_ions_L_ele.get() == 1:
         couleur_lignes = "magenta2"
     if flag_neutres_ions_L_ele.get() == 2:
@@ -4295,10 +4563,19 @@ menu_fichier.add_command(label=_("Quitter"), command=fenetre_principale.destroy)
 menu_fichier.add_command(label=_("Redémarrer"), command=redemarre_programme)
 
 barre_menus.add_cascade(label=_("Traitement"), menu=menu_traitement)
+flag_echelle_log_L_trait = tk.BooleanVar(value=False)
+menu_traitement.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_trait,
+                                command = mise_a_jour_affichage_L_trait)
 
 barre_menus.add_cascade(label=_("Extraction"), menu=menu_extraction)
+flag_echelle_log_L_ext = tk.BooleanVar(value=False)
+menu_extraction.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_ext,
+                                command = mise_a_jour_affichage_L_ext)
 
 barre_menus.add_cascade(label=_("Comparaison"), menu=menu_comparaison)
+flag_echelle_log_L_comp = tk.BooleanVar(value=False)
+menu_comparaison.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_comp,
+                                command = mise_a_jour_affichage_L_comp)
 
 barre_menus.add_cascade(label=_("Outils"), menu=menu_outils)
 flag_zoom_auto_y = tk.BooleanVar(value=True)
@@ -4509,11 +4786,11 @@ type_fichier_L_trait = tk.StringVar(value=".asc")
 bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
                                     command=choix_fichier_L_trait, width=10)
 bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisation"),
-                                              command=visualisation_L_trait, state="disable", width=10)
+                                          command=visualisation_L_trait, state="disable", width=10)
 # bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
-#                                     command=choix_fichier_L_trait, width=8)
+#                                 command=choix_fichier_L_trait, width=8)
 # bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisation"),
-#                                               command=visualisation_L_trait, state="disable", width=8)
+#                                           command=visualisation_L_trait, state="disable", width=8)
 bouton_rep_L_trait.grid(row=4, column=1, sticky=tk.N)
 bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tk.N)
 
@@ -4573,19 +4850,19 @@ entree_zoom_sup_L_trait.bind("<Tab>", change_zoom_sup_return_L_trait)
 # entree_zoom_inf_L_trait.bind("<Shift-ISO_Left_Tab>", change_zoom_inf_return_L_trait)
 # entree_zoom_sup_L_trait.bind("<Shift-ISO_Left_Tab>", change_zoom_sup_return_L_trait)
 
-canevas0_L_trait.bind("<Button-1>", zoom_clic_L_trait)
-canevas0_L_trait.bind("<B1-Motion>", zoom_drag_and_drop_L_trait)
+canevas0_L_trait.bind("<Button-1>", zoom_clic_0_L_trait)
+canevas0_L_trait.bind("<B1-Motion>", zoom_drag_and_drop_0_L_trait)
 canevas0_L_trait.bind("<ButtonRelease-1>", zoom_clic_release_L_trait)
 canevas0_L_trait.bind("<ButtonRelease-3>", affiche_lambda_L_trait)
-canevas0_L_trait.bind("<Motion>", affiche_position_souris_L_trait)
-canevas0_L_trait.bind("<B3-Motion>", affiche_position_souris_motion_L_trait)
+canevas0_L_trait.bind("<Motion>", affiche_position_souris_0_L_trait)
+canevas0_L_trait.bind("<B3-Motion>", affiche_position_souris_motion_0_L_trait)
 
-canevas1_L_trait.bind("<Button-1>", zoom_clic_L_trait)
-canevas1_L_trait.bind("<B1-Motion>", zoom_drag_and_drop_L_trait)
+canevas1_L_trait.bind("<Button-1>", zoom_clic_1_L_trait)
+canevas1_L_trait.bind("<B1-Motion>", zoom_drag_and_drop_1_L_trait)
 canevas1_L_trait.bind("<ButtonRelease-1>", zoom_clic_release_L_trait)
 canevas1_L_trait.bind("<ButtonRelease-3>", affiche_lambda_L_trait)
-canevas1_L_trait.bind("<Motion>", affiche_position_souris_L_trait)
-canevas1_L_trait.bind("<B3-Motion>", affiche_position_souris_motion_L_trait)
+canevas1_L_trait.bind("<Motion>", affiche_position_souris_1_L_trait)
+canevas1_L_trait.bind("<B3-Motion>", affiche_position_souris_motion_1_L_trait)
 
 entree1_L_trait.bind("<Return>", deplace_ligne0_1_return_L_trait)
 entree2_L_trait.bind("<Return>", deplace_ligne0_2_return_L_trait)
