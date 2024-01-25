@@ -73,8 +73,8 @@ def lit_spectre(fichier, type_fichier):
         if nb_colonnes == 3:
             spectre = np.delete(spectre, 0, axis=1)
     if type_fichier == ".asc":
-        spectre = np.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[
-                                0, 1], dtype=float, encoding="Latin-1")
+        spectre = np.loadtxt(fichier, delimiter="\t", skiprows=64, usecols=[0, 1],
+                             dtype=float, encoding="Latin-1")
         # document=np.loadtxt(fichier,delimiter="\t",skiprows=64,
         #                        usecols=[0,1],dtype=float,encoding="Latin-1")
         # spectre=np.zeros((0,2))
@@ -169,8 +169,9 @@ def creer_dataframe_x_tableau_en_lignes(tableau_en_lignes, liste):
     # INUTILISE !!!! et sûrement FAUX (cf. transpose à vérifier) !!!!
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    dataframe = pd.DataFrame(np.transpose(tableau_en_lignes[1:, :]), index=liste,
-                                 columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
+    dataframe = pd.DataFrame(np.transpose(tableau_en_lignes[1:, :]),
+                             index=liste,
+                             columns=tableau_en_lignes[0, :])  # sûrement FAUX !!!!
     return dataframe
 
 
@@ -183,8 +184,9 @@ def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
     à partir d'un tableau de spectres en colonnes
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    dataframe = pd.DataFrame(np.transpose(
-        tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
+    dataframe = pd.DataFrame(np.transpose(tableau_en_colonnes[:, 1:]),
+                             index=liste,
+                             columns=tableau_en_colonnes[:, 0])
     return dataframe
 
 
@@ -197,8 +199,9 @@ def creer_dataframe_x_tableau_en_colonnes_bornes(tableau_en_colonnes, liste, bor
     à partir d'un tableau de spectres en colonnes
     entre bornes inf et sup
     """
-    dataframe = pd.DataFrame(np.transpose(
-        tableau_en_colonnes[:, 1:]), index=liste, columns=tableau_en_colonnes[:, 0])
+    dataframe = pd.DataFrame(np.transpose(tableau_en_colonnes[:, 1:]),
+                             index=liste,
+                             columns=tableau_en_colonnes[:, 0])
     dataframe_bornes = dataframe.loc[:, bornes[0]:bornes[1]]
     return dataframe_bornes
 

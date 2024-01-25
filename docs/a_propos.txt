@@ -1,0 +1,24 @@
+LIBStick v3.0
+
+LIBStick is intended to process LIBS spectra.
+This package allows to import, inspect and batch-process spectra
+
+Github :
+https://github.com/crp2a/LIBStick
+
+Auteur :
+Yannick LEFRAIS
+yannick.lefrais@u-bordeaux-montaigne.fr
+Archéosciences Bordeaux - UMR 6034
+Université Bordeaux Montaigne, 33607 Pessac, FRANCE
+
+Remerciements :
+Merci à Julien pour son aide pour l'extraction des données NIST-LIBS
+et ses bonnes idées.
+Julien LE GUIRRIEC CORNU 
+https://github.com/JLeGuirriecCornu
+
+Licence :
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+

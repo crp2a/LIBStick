@@ -34,6 +34,7 @@ import LIBStick_traitements_spectres
 import LIBStick_extraction_spectres
 import LIBStick_comp_spectres
 import LIBStick_ACP
+import LIBStick_recherche_elements
 
 
 ###################################################################################################
@@ -41,6 +42,8 @@ import LIBStick_ACP
 ###################################################################################################
 NOM_OS = os.name
 rep_LIBStick = os.getcwd()
+#rep_NIST = "NIST_atomic_spectra"
+rep_NIST = "NIST_LIBS"
 
 # interface graphique
 flag_change_fenetre = False
@@ -108,6 +111,7 @@ spectre_dim1_L_ACP = spectre_dim2_L_ACP = spectre_dim3_L_ACP = pd.DataFrame()
 DataFrame_element_L_ele = pd.DataFrame()
 
 # identifiants des fenêtres
+fenetre_recherche_elements = 0
 fenetre_label_L_ACP = 0
 fenetre_classification_L_ele = 0
 
@@ -169,8 +173,8 @@ def charge_param_langue():
 langue_LIBStick = charge_param_langue()
 try:
     # gettext.find(langue_LIBStick)
-    traduction = gettext.translation(
-        langue_LIBStick, localedir="locale", languages=[langue_LIBStick])
+    traduction = gettext.translation(langue_LIBStick, localedir="locale",
+                                     languages=[langue_LIBStick])
     traduction.install()
     _ = traduction.gettext
 except UnicodeTranslateError:
@@ -573,15 +577,19 @@ def affiche_lambda_L_trait(event):
     global lambda_texte_spectre_0_L_trait
     global lambda_texte_spectre_1_L_trait
     global flag_premier_lamda_L_trait
+    global lambda_elements
     if flag_premier_lamda_L_trait is False:
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
     l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
-    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_recherche_elements_L_rec.set(l)
+    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x,
+                                                                  event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x,
+                                                                  event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_trait = False
 
 
@@ -641,11 +649,14 @@ def affiche_position_souris_motion_0_L_trait(event):
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
     l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
-    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_recherche_elements_L_rec.set(l)
+    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x,
+                                                                  event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x,
+                                                                  event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_trait = False
 
 
@@ -1030,11 +1041,12 @@ def affiche_position_souris_motion_1_L_trait(event):
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
     l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+    lambda_recherche_elements_L_rec.set(l)
     lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
     lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_trait = False
 
 ###################################################################################################
@@ -1158,11 +1170,12 @@ def zoom_drag_and_drop_0_L_trait(event):
             canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
             canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
         l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        lambda_recherche_elements_L_rec.set(l)
         lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
         lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_trait = False
 
     # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
@@ -1240,11 +1253,12 @@ def zoom_drag_and_drop_1_L_trait(event):
             canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
             canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
         l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
+        lambda_recherche_elements_L_rec.set(l)
         lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
         lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_trait = False
 
     # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
@@ -1485,7 +1499,8 @@ def lit_affiche_spectre_L_ext(nom_fichier):
     global limites_spectre_x_L_ext, limites_spectre_y_L_ext
     global maximum_spectre_L_ext
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier, type_fichier_L_ext.get())
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier,
+                                                       type_fichier_L_ext.get())
     limites_spectre_x_L_ext, limites_spectre_y_L_ext = lit_limites_L_ext(spectre_entier_L_ext)
     maximum_spectre_L_ext = limites_spectre_y_L_ext[1]
     affiche_spectre_L_ext()
@@ -1556,9 +1571,11 @@ def affiche_lambda_L_ext(event):
     if flag_premier_lamda_L_ext is False:
         canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
     l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
-    lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_recherche_elements_L_rec.set(l)
+    lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(event.x,
+                                                            event.y,
+                                                            text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_ext = False
 
 
@@ -1596,9 +1613,10 @@ def affiche_position_souris_motion_L_ext(event):
     if flag_premier_lamda_L_ext is False:
         canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
     l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
+    lambda_recherche_elements_L_rec.set(l)
     lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_ext = False
 
 
@@ -1954,9 +1972,10 @@ def zoom_drag_and_drop_L_ext(event):
         if flag_premier_lamda_L_ext is False:
             canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
         l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
+        lambda_recherche_elements_L_rec.set(l)
         lambda_texte_spectre_L_ext = canevas0_L_ext.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_ext = False
 
     # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
@@ -2098,8 +2117,8 @@ def coord1_to_vars_5_6_L_ext(x, y):
     nom_fichier_seul_L_ext = liste_fichiers_L_ext[int(variable_6_L_ext.get())-1]
     flag_spectre_inclus_moyenne_L_ext.set(liste_bool_L_ext[variable_6_L_ext.get()-1])
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext,
+                                                       type_fichier_L_ext.get())
     affiche_spectre_L_ext()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ext)
 
@@ -2125,8 +2144,8 @@ def vars_5_6_to_coord1_L_ext():
     nom_fichier_seul_L_ext = liste_fichiers_L_ext[int(variable_6_L_ext.get())-1]
     flag_spectre_inclus_moyenne_L_ext.set(liste_bool_L_ext[variable_6_L_ext.get()-1])
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext,
+                                                       type_fichier_L_ext.get())
     affiche_spectre_L_ext()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ext)
 
@@ -2188,8 +2207,8 @@ def coord2_to_vars_7_8_L_ext(x, y):
     nom_fichier_seul_L_ext = liste_fichiers_L_ext[int(variable_6_L_ext.get())-1]
     flag_spectre_inclus_moyenne_L_ext.set(liste_bool_L_ext[variable_6_L_ext.get()-1])
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext,
+                                                       type_fichier_L_ext.get())
     affiche_spectre_L_ext()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ext)
 
@@ -2215,8 +2234,8 @@ def vars_7_8_to_coord2_L_ext():
     nom_fichier_seul_L_ext = liste_fichiers_L_ext[int(variable_6_L_ext.get())-1]
     flag_spectre_inclus_moyenne_L_ext.set(liste_bool_L_ext[variable_6_L_ext.get()-1])
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ext, type_fichier_L_ext.get())
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ext,
+                                                       type_fichier_L_ext.get())
     affiche_spectre_L_ext()
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ext)
 
@@ -2545,9 +2564,11 @@ def affiche_lambda_L_comp(event):
     if flag_premier_lamda_L_comp is False:
         canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
     l = event.x*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
-    lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_recherche_elements_L_rec.set(l)
+    lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(event.x,
+                                                              event.y,
+                                                              text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_comp = False
 
 
@@ -2587,9 +2608,10 @@ def affiche_position_souris_motion_L_comp(event):
     if flag_premier_lamda_L_comp is False:
         canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
     l = event.x*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
+    lambda_recherche_elements_L_rec.set(l)
     lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_comp = False
 
 
@@ -2946,9 +2968,10 @@ def zoom_drag_and_drop_L_comp(event):
         if flag_premier_lamda_L_comp is False:
             canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
         l = event.x*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
+        lambda_recherche_elements_L_rec.set(l)
         lambda_texte_spectre_L_comp = canevas0_L_comp.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_comp = False
 
     # drag and drop bouton droit de droite à gauche : dézoom, retour visu de tout le spectre
@@ -3018,8 +3041,8 @@ def coord1_to_vars_5_6_L_comp(x, y):
     selection = tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
     nom_fichier_seul_L_comp = selection[1]
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+                                                        type_fichier_L_comp.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     flag_zoom_auto_y.set(sauve_flag_zoom_auto_y)
@@ -3044,8 +3067,8 @@ def vars_5_6_to_coord1_L_comp():
     selection = tree_resultats_L_comp.item(tree_resultats_L_comp.selection())["values"]
     nom_fichier_seul_L_comp = selection[1]
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+                                                        type_fichier_L_comp.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     deplace_cible1_L_comp()
@@ -3107,8 +3130,8 @@ def selectionne_spectre_L_comp(event):
     nom_fichier_seul_L_comp = item[1]
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+                                                        type_fichier_L_comp.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
 
@@ -3150,8 +3173,8 @@ def selectionne_spectre_down_L_comp(event):
     nom_fichier_seul_L_comp = item[1]
     vars_5_6_to_coord1_L_comp()
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_comp, type_fichier_L_comp.get())
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+                                                        type_fichier_L_comp.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_comp)
     affiche_spectre_L_comp()
     tree_resultats_L_comp.see(selection)
@@ -3593,11 +3616,13 @@ def affiche_lambda_L_ACP(event):
         canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
         canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
     l = event.x*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
+    lambda_recherche_elements_L_rec.set(l)
     lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(event.x,
+                                                              event.y,
+                                                              text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_ACP = False
 
 
@@ -3643,11 +3668,13 @@ def affiche_position_souris_motion_L_ACP(event):
         canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
         canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
     l = event.x*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
+    lambda_recherche_elements_L_rec.set(l)
     lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
         event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+    lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(event.x,
+                                                              event.y,
+                                                              text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_ACP = False
 
 
@@ -3716,6 +3743,10 @@ def affiche_spectre_L_ACP():
     for i in range(len(spectre) - 1):
         canevas0_L_ACP.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_ACP()
+
+
+def mise_a_jour_affichage_L_ACP() :
+    affiche_spectre_L_ACP()
 
 
 def affiche_lignes_spectre_L_ACP():
@@ -3979,11 +4010,13 @@ def zoom_drag_and_drop_L_ACP(event):
             canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
             canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
         l = event.x*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
+        lambda_recherche_elements_L_rec.set(l)
         lambda_texte_spectre_0_L_ACP = canevas0_L_ACP.create_text(
             event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(
-            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.1f") + " nm"))
+        lambda_texte_spectre_1_L_ACP = canevas1_L_ACP.create_text(event.x,
+                                                                  event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_ACP = False
     if coord_zoom_L_ACP[2] < coord_zoom_L_ACP[0]:
         flag_dezoom_L_ACP = True
@@ -4057,8 +4090,8 @@ def selectionne_spectre_L_ACP(event):
 #    print(tree_L_ACP.item(tree_L_ACP.focus()))
     nom_fichier_seul_L_ACP = item[1]
     os.chdir(rep_travail_L_ACP)
-    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
+    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP,
+                                                       type_fichier_L_ACP.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     flag_zoom_auto_y.set(sauve_flag_zoom_auto_y)
@@ -4100,8 +4133,8 @@ def selectionne_spectre_down_L_ACP(event):
     item = tree_L_ACP.item(selection)["values"]
     nom_fichier_seul_L_ACP = item[1]
     os.chdir(rep_travail_L_ACP)
-    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(
-        nom_fichier_seul_L_ACP, type_fichier_L_ACP.get())
+    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP,
+                                                       type_fichier_L_ACP.get())
     fenetre_principale.title("LIBStick v3.0"+"\t spectre : "+nom_fichier_seul_L_ACP)
     affiche_spectre_L_ACP()
     tree_L_ACP.see(selection)
@@ -4186,6 +4219,182 @@ def validation_label_L_ACP():
 
 ###################################################################################################
 ###################################################################################################
+# Fonctions LIBStick_Recherche : fenetre Toplevel
+###################################################################################################
+###################################################################################################
+def __________L_rec__________():
+    """ Fonctions LIBStick_recherche : fenetre Toplevel"""
+###################################################################################################
+###################################################################################################
+
+
+###################################################################################################
+# initialisations
+###################################################################################################
+flag_fenetre_recherche_elements_ouvert_L_rec  = False
+
+
+###################################################################################################
+# fonctions de recherches des éléments pour une longueur d'onde
+###################################################################################################
+def ouvre_fenetre_recherche_elements_event_L_rec(event):
+    ouvre_fenetre_recherche_elements_L_rec()
+
+
+def ouvre_fenetre_recherche_elements_L_rec():
+    """
+    Ouvre un fenêtre Toplevel permettant d'appliquer de faire une recherche les éléments probables
+    pour la longueur d'onde sélectionnée sur le spectre, tant neutre que ionique.
+    les paramètres sont : le delta de longueur d'onde de part et d'autre de la longueur d'onde sélectionnée,
+    le seuil d'intensité rélative au dessus duquel on cherche les résultats
+    """
+    global fenetre_recherche_elements_L_rec
+    global flag_fenetre_recherche_elements_ouvert_L_rec
+    if flag_fenetre_recherche_elements_ouvert_L_rec  == False :
+        fenetre_recherche_elements_L_rec = tk.Toplevel(fenetre_principale)
+        fenetre_recherche_elements_L_rec.geometry("210x165")
+        fenetre_recherche_elements_L_rec.configure(bg="black")
+        fenetre_recherche_elements_L_rec.resizable(False, False)
+        frame_recherche_elements_L_rec = ttk.Frame(fenetre_recherche_elements_L_rec)
+        frame_recherche_elements_L_rec.pack()
+
+        text1_recherche_elements_L_rec = ttk.Label(frame_recherche_elements_L_rec, text=_("Lambda (nm) :"))
+        text2_recherche_elements_L_rec = ttk.Label(frame_recherche_elements_L_rec, text=_("Delta (nm) :"))
+        text3_recherche_elements_L_rec = ttk.Label(frame_recherche_elements_L_rec, text=_("Seuil (> I rela.) :"))
+        text1_recherche_elements_L_rec.grid(row=1, column=1)
+        text2_recherche_elements_L_rec.grid(row=2, column=1)
+        text3_recherche_elements_L_rec.grid(row=3, column=1)
+
+        entree_lambda_L_rec = ttk.Spinbox(frame_recherche_elements_L_rec, from_=180, to=1000, increment=1, width=8,
+                                          textvariable=lambda_recherche_elements_L_rec, foreground="black")
+        entree_delta_L_rec = ttk.Spinbox(frame_recherche_elements_L_rec, from_=0.1, to=5, increment=0.1, width=8,
+                                          textvariable=delta_recherche_elements_L_rec, foreground="black")
+        entree_seuil_L_rec = ttk.Spinbox(frame_recherche_elements_L_rec, from_=0.1, to=100, increment=1, width=8,
+                                          textvariable=seuil_recherche_elements_L_rec, foreground="black")
+        entree_lambda_L_rec.grid(row=1, column=2)
+        entree_delta_L_rec.grid(row=2, column=2)
+        entree_seuil_L_rec.grid(row=3, column=2)
+
+        coche_NIST_LIBS_L_rec = ttk.Checkbutton(frame_recherche_elements_L_rec, text=_("NIST LIBS"),
+                                                variable=flag_NIST_LIBS_L_ele)
+        coche_NIST_LIBS_L_rec.grid(row=4, column=1)
+
+        buttonFont = font.Font(family='Helvetica', size=15)
+        bouton_recherche_elements_L_rec = tk.Button(frame_recherche_elements_L_rec, text="Valider",
+                                                    font=buttonFont, width=10, bg="black", fg="white",
+                                                    command=recherche_elements_L_rec)
+        # bouton_recherche_elements_L_rec = ttk.Button(frame_recherche_elements_L_rec, text="Valider",
+        #                                        width=10, command=recherche_elements)
+        bouton_recherche_elements_L_rec.grid(row=5, column=1, columnspan=2)
+        flag_fenetre_recherche_elements_ouvert_L_rec  = True
+        fenetre_recherche_elements_L_rec.protocol("WM_DELETE_WINDOW",
+                                                  ferme_fenetre_recherche_elements_L_rec)
+    else :
+        fenetre_recherche_elements_L_rec.attributes("-topmost", True)
+        fenetre_recherche_elements_L_rec.attributes("-topmost", False)
+
+
+def recherche_elements_L_rec() :
+    if flag_NIST_LIBS_L_ele.get() == 1 :
+        rep_NIST = "NIST_LIBS"
+    else :
+        rep_NIST = "NIST_atomic_spectra"
+
+    LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
+                                                   delta_recherche_elements_L_rec.get(),
+                                                   seuil_recherche_elements_L_rec.get(),
+                                                   rep_LIBStick, rep_NIST)
+
+
+def ferme_fenetre_recherche_elements_L_rec():
+    """
+    Ferme la fenêtre Toplevel de recherche d'éléments
+    """
+    global flag_fenetre_recherche_elements_ouvert_L_rec
+    flag_fenetre_recherche_elements_ouvert_L_rec  = False
+    fenetre_recherche_elements_L_rec.destroy()
+
+
+###################################################################################################
+###################################################################################################
+# Fonctions LIBStick_Aide : fenetre Toplevel
+###################################################################################################
+###################################################################################################
+def __________L_aide__________():
+    """ Fonctions LIBStick_aide : fenetre Toplevel"""
+###################################################################################################
+###################################################################################################
+
+
+###################################################################################################
+# initialisations
+###################################################################################################
+flag_fenetre_a_propos_L_aide  = False
+
+
+###################################################################################################
+# fonctions de recherches des éléments pour une longueur d'onde
+###################################################################################################
+def ouvre_fenetre_a_propos_event_L_aide(event):
+    ouvre_fenetre_a_propos_L_aide()
+
+
+def ouvre_fenetre_a_propos_L_aide():
+    """
+    Ouvre une fenêtre Toplevel "A propos"
+    """
+    global fenetre_a_propos_L_aide
+    global flag_fenetre_a_propos_L_aide
+    nom_fichier_texte = rep_LIBStick+"/docs/a_propos.txt"
+    fichier_texte=open(nom_fichier_texte,"r")
+    texte=fichier_texte.read()
+
+    if flag_fenetre_a_propos_L_aide  == False :
+        fenetre_a_propos_L_aide = tk.Toplevel(fenetre_principale)
+        fenetre_a_propos_L_aide.geometry("650x475")
+        fenetre_a_propos_L_aide.configure(bg="black")
+        fenetre_a_propos_L_aide.resizable(False, False)
+        frame_a_propos_L_aide = ttk.Frame(fenetre_a_propos_L_aide)
+        frame_a_propos_L_aide.pack(fill=tk.BOTH)
+        zone_texte = tk.Text(frame_a_propos_L_aide)
+        zone_texte.insert("1.0", texte)
+        # zone_texte.pack()
+        zone_texte.grid(row=1,column=1)
+
+        # logo = tk.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/logo_200px.png")
+        # # canevas_L_aide = tk.Canvas(frame_a_propos_L_aide, width=200, height=232)
+        # # item= canevas_L_aide.create_image(100,116, image=logo)
+        # # canevas_L_aide.grid(row=1, column=2, sticky=tk.N)
+
+        # label_logo_L_aide = tk.Label(frame_a_propos_L_aide, image=logo)
+        # label_logo_L_aide.grid(row=1, column=2)
+
+        buttonFont = font.Font(family='Helvetica', size=15)
+        bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide, text="Fermer",
+                                                    font=buttonFont, width=10, bg="black", fg="white",
+                                                    command=ferme_fenetre_a_propos_L_aide)
+        bouton_ferme_fenetre_a_propos_L_aide.grid(row=2, column=1, columnspan=2)
+        # bouton_ferme_fenetre_a_propos_L_aide.grid(row=1, column=1)
+        # bouton_ferme_fenetre_a_propos_L_aide.pack()
+
+        flag_fenetre_a_propos_L_aide  = True
+        fenetre_a_propos_L_aide.protocol("WM_DELETE_WINDOW", ferme_fenetre_a_propos_L_aide)
+    else :
+        fenetre_a_propos_L_aide.attributes("-topmost", True)
+        fenetre_a_propos_L_aide.attributes("-topmost", False)
+
+
+def ferme_fenetre_a_propos_L_aide():
+    """
+    Ferme la fenêtre Toplevel A Propos
+    """
+    global flag_fenetre_a_propos_L_aide
+    flag_fenetre_a_propos_L_aide  = False
+    fenetre_a_propos_L_aide.destroy()
+
+
+###################################################################################################
+###################################################################################################
 # Fonctions LIBStick_elements : fenetre Toplevel
 ###################################################################################################
 ###################################################################################################
@@ -4198,7 +4407,7 @@ def __________L_ele__________():
 ###################################################################################################
 # initialisations
 ###################################################################################################
-tableau_periodique_ouvert_L_ele = False
+flag_tableau_periodique_ouvert_L_ele = False
 
 
 ###################################################################################################
@@ -4221,14 +4430,19 @@ def lit_element_L_ele(symbole):
     contenant les position des raies et leurs intensités relatives.
     Si le fichier de l'élément n'existe pas une fenêtre de message apparait
     """
+    if flag_NIST_LIBS_L_ele.get() == 1 :
+        rep_NIST = "NIST_LIBS"
+    else :
+        rep_NIST = "NIST_atomic_spectra"
+
     try:
         if flag_neutres_ions_L_ele.get() == 1:
             DataFrame_element = pd.read_table(
-                rep_LIBStick+"/LIBStick_datas/elements/"+symbole+".csv")
+                rep_LIBStick+"/LIBStick_datas/" + rep_NIST + "/elements/"+symbole+".csv")
             return DataFrame_element
         if flag_neutres_ions_L_ele.get() == 2:
             DataFrame_element = pd.read_table(
-                rep_LIBStick+"/LIBStick_datas/ions/"+symbole+".csv")
+                rep_LIBStick+"/LIBStick_datas/" + rep_NIST + "/ions/"+symbole+".csv")
             return DataFrame_element
     except:
         messagebox.showinfo(title=_("Attention !"),
@@ -4365,13 +4579,17 @@ def affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele, frame1,
                             colonne, couleur, bouton_affichage_L_ele)
 
 
+def ouvre_fenetre_classification_event_L_ele(event):
+    ouvre_fenetre_classification_L_ele()
+
+
 def ouvre_fenetre_classification_L_ele():
     """
     Ouvre une fenêtre Toplevel et y construit l'interface de la classification périodique
     """
     global fenetre_classification_L_ele
-    global tableau_periodique_ouvert_L_ele
-    if tableau_periodique_ouvert_L_ele is False:
+    global flag_tableau_periodique_ouvert_L_ele
+    if flag_tableau_periodique_ouvert_L_ele is False:
         fenetre_classification_L_ele = tk.Toplevel(fenetre_principale)
         fenetre_classification_L_ele.resizable(False, False)
         frame1_L_ele = ttk.Frame(fenetre_classification_L_ele)
@@ -4382,8 +4600,9 @@ def ouvre_fenetre_classification_L_ele():
         bouton_ferme_L_ele.configure(command=ferme_fenetre_classification_L_ele)
         bouton_ferme_L_ele.grid(row=1, column=3, rowspan=3, columnspan=2)
 
-        bouton_affichage_L_ele = tk.Button(
-            frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1])
+        bouton_affichage_L_ele = tk.Button(frame1_L_ele,
+                                           width=TAILLE_CASE[0],
+                                           height=TAILLE_CASE[1])
         bouton_affichage_L_ele.configure(command=affiches_lignes_element_L_ele)
         bouton_affichage_L_ele.grid(row=1, column=7, rowspan=3, columnspan=2)
 
@@ -4395,6 +4614,11 @@ def ouvre_fenetre_classification_L_ele():
                                                 variable=flag_neutres_ions_L_ele, value=2,
                                                 command=affiches_lignes_neutres_ions_L_ele)
         coche_El_II_L_ele.grid(row=2, column=5, columnspan=3, sticky=tk.W)
+
+        coche_NIST_LIBS_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("NIST LIBS"),
+                                               variable=flag_NIST_LIBS_L_ele,
+                                               command=affiches_lignes_neutres_ions_L_ele)
+        coche_NIST_LIBS_L_ele.grid(row=3, column=5, columnspan=3, sticky=tk.W)
 
         coche_sup10_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("I relative >= 10%"),
                                                 variable=flag_sup10_L_ele,
@@ -4412,9 +4636,9 @@ def ouvre_fenetre_classification_L_ele():
         DataFrame_tableau_periodique_L_ele = lit_tableau_periodique_L_ele()
         affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele,
                                          frame1_L_ele, bouton_affichage_L_ele)
-        tableau_periodique_ouvert_L_ele = True
-        fenetre_classification_L_ele.protocol(
-            "WM_DELETE_WINDOW", ferme_fenetre_classification_L_ele)
+        flag_tableau_periodique_ouvert_L_ele = True
+        fenetre_classification_L_ele.protocol("WM_DELETE_WINDOW",
+                                              ferme_fenetre_classification_L_ele)
     else:
         fenetre_classification_L_ele.attributes("-topmost", True)
         fenetre_classification_L_ele.attributes("-topmost", False)
@@ -4424,8 +4648,8 @@ def ferme_fenetre_classification_L_ele():
     """
     Ferme la fenêtre Toplevel classification périodique
     """
-    global tableau_periodique_ouvert_L_ele
-    tableau_periodique_ouvert_L_ele = False
+    global flag_tableau_periodique_ouvert_L_ele
+    flag_tableau_periodique_ouvert_L_ele = False
     fenetre_classification_L_ele.destroy()
 
 
@@ -4551,16 +4775,21 @@ menu_fichier = tk.Menu(barre_menus)
 menu_traitement = tk.Menu(barre_menus)
 menu_extraction = tk.Menu(barre_menus)
 menu_comparaison = tk.Menu(barre_menus)
+menu_ACP = tk.Menu(barre_menus)
 menu_outils = tk.Menu(barre_menus)
 sous_menu_langue = tk.Menu(menu_outils)
 sous_menu_style = tk.Menu(menu_outils)
+menu_aide = tk.Menu(barre_menus)
 
 barre_menus.add_cascade(label=_("Fichier"), menu=menu_fichier)
-menu_fichier.add_command(label=_("Sauvegarde des paramètres actuels"), command=ecrit_fichier_ini)
-menu_fichier.add_command(
-    label=_("Restaure les paramètres par défaut au prochain démarrage"), command=reset_fichier_ini)
-menu_fichier.add_command(label=_("Quitter"), command=fenetre_principale.destroy)
-menu_fichier.add_command(label=_("Redémarrer"), command=redemarre_programme)
+menu_fichier.add_command(label=_("Sauvegarde des paramètres actuels"),
+                         command=ecrit_fichier_ini)
+menu_fichier.add_command(label=_("Restaure les paramètres par défaut au prochain démarrage"),
+                         command=reset_fichier_ini)
+menu_fichier.add_command(label=_("Quitter"),
+                         command=fenetre_principale.destroy)
+menu_fichier.add_command(label=_("Redémarrer"),
+                         command=redemarre_programme)
 
 barre_menus.add_cascade(label=_("Traitement"), menu=menu_traitement)
 flag_echelle_log_L_trait = tk.BooleanVar(value=False)
@@ -4577,11 +4806,22 @@ flag_echelle_log_L_comp = tk.BooleanVar(value=False)
 menu_comparaison.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_comp,
                                 command = mise_a_jour_affichage_L_comp)
 
+barre_menus.add_cascade(label=_("ACP"), menu=menu_ACP)
+flag_echelle_log_L_ACP = tk.BooleanVar(value=False)
+menu_ACP.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_ACP,
+                                command = mise_a_jour_affichage_L_ACP)
+
 barre_menus.add_cascade(label=_("Outils"), menu=menu_outils)
 flag_zoom_auto_y = tk.BooleanVar(value=True)
 menu_outils.add_checkbutton(label=_("Zoom auto en y"), variable=flag_zoom_auto_y)
 menu_outils.add_command(label=_("Fenetre principale premier plan"),
                         command=fenetre_pricipale_en_avant)
+menu_outils.add_command(label=_("Recherche d'éléments"), underline=0, accelerator="CTRL+R",
+                        command=ouvre_fenetre_recherche_elements_L_rec)
+menu_outils.add_command(label=_("Tableau périodique"), accelerator="CTRL+E",
+                        command=ouvre_fenetre_classification_L_ele)
+menu_outils.bind_all("<Control-r>",ouvre_fenetre_recherche_elements_event_L_rec)
+menu_outils.bind_all("<Control-e>",ouvre_fenetre_classification_event_L_ele)
 
 menu_outils.add_separator()
 menu_outils.add_cascade(label=_("Langue au prochain démarage"), menu=sous_menu_langue)
@@ -4643,6 +4883,12 @@ sous_menu_style.add_radiobutton(label="arc", value="arc", variable=style_menu,
 sous_menu_style.add_radiobutton(label="blue", value="blue", variable=style_menu,
                                  command=ecrit_param_interface)
 
+barre_menus.add_cascade(label=_("Aide"), menu=menu_aide)
+menu_aide.add_command(label=_("Aide (F1)"), underline=0, accelerator="F1",
+                        command=ouvre_fenetre_a_propos_L_aide, state = "disable")
+menu_aide.add_command(label=_("A propos de LIBStick"),
+                        command=ouvre_fenetre_a_propos_L_aide)
+
 fenetre_principale.config(menu=barre_menus)
 
 
@@ -4663,6 +4909,15 @@ def clic_onglets(event):
 
 
 onglets.bind("<ButtonRelease-1>", clic_onglets)
+
+
+###################################################################################################
+# Interface graphique : divers général
+###################################################################################################
+lambda_recherche_elements_L_rec = tk.DoubleVar(value=500.00)
+delta_recherche_elements_L_rec = tk.DoubleVar(value=0.5)
+seuil_recherche_elements_L_rec = tk.IntVar(value=10)
+
 
 
 ###################################################################################################
@@ -4700,8 +4955,8 @@ canevas0_L_trait.grid(row=1, column=1, columnspan=6)
 ligne_position_0_x_L_trait = canevas0_L_trait.create_line(0, 0, 0, hauteur_canevas_spectres+170, fill="white")
 ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
-lambda_texte_L_trait = ttk.Label(
-    frame1_L_trait, text="Lambda = " + str(format(lambda_texte_spectre_0_L_trait, "4.1f") + " nm"))
+lambda_texte_L_trait = ttk.Label(frame1_L_trait,
+                                 text="Lambda = " + str(format(lambda_texte_spectre_0_L_trait, "4.2f") + " nm"))
 lambda_texte_L_trait.grid(row=2, column=5)
 
 text1_L_trait = ttk.Label(frame1_L_trait, text=_("Borne inf :"))
@@ -4776,15 +5031,17 @@ text_zoom_L_trait = ttk.Label(frame1_1_L_trait, text="Zoom : ", width=8)
 text_zoom_L_trait.grid(row=1, column=1, sticky=tk.N)
 variable_zoom_inf_L_trait = tk.DoubleVar(value=198)
 variable_zoom_sup_L_trait = tk.DoubleVar(value=1013)
-entree_zoom_inf_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5, textvariable=variable_zoom_inf_L_trait,
+entree_zoom_inf_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
+                                      textvariable=variable_zoom_inf_L_trait,
                                       command=change_zoom_inf_L_trait, width=8, foreground="black")
-entree_zoom_sup_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5, textvariable=variable_zoom_sup_L_trait,
+entree_zoom_sup_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
+                                      textvariable=variable_zoom_sup_L_trait,
                                       command=change_zoom_sup_L_trait, width=8, foreground="black")
 entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tk.N)
 entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tk.N)
 type_fichier_L_trait = tk.StringVar(value=".asc")
 bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
-                                    command=choix_fichier_L_trait, width=10)
+                                command=choix_fichier_L_trait, width=10)
 bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisation"),
                                           command=visualisation_L_trait, state="disable", width=10)
 # bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
@@ -4817,7 +5074,7 @@ frame2_1_L_trait.grid(row=1, column=5, rowspan=3, sticky=tk.N)
 flag_tous_fichiers_init_L_trait = False
 flag_tous_fichiers_L_trait = tk.BooleanVar(value=flag_tous_fichiers_init_L_trait)
 coche_tous_fichiers_L_trait = ttk.Checkbutton(frame2_1_L_trait, text=_("Appliquer sur\ntous les fichiers\ndu répertoire"),
-                                                  variable=flag_tous_fichiers_L_trait)
+                                              variable=flag_tous_fichiers_L_trait)
 coche_tous_fichiers_L_trait.grid(row=1, column=1)
 
 flag_sauve_fond_init_L_trait = False
@@ -4827,7 +5084,7 @@ coche_sauve_fond_L_trait = ttk.Checkbutton(frame2_1_L_trait, text=_("Sauvegarde 
 coche_sauve_fond_L_trait.grid(row=2, column=1)
 
 bouton_execute_L_trait = ttk.Button(frame2_1_L_trait, text=_("Executer"), state="disable",
-                                        command=execute_L_trait, width=10)
+                                    command=execute_L_trait, width=10)
 bouton_execute_L_trait.grid(row=3, column=1)
 
 text_spectre_L_trait = ttk.Label(frame2_1_L_trait, text=_("Spectre : "))
@@ -4924,8 +5181,8 @@ canevas0_L_ext.grid(row=1, column=1, columnspan=6)
 ligne_position_x_L_ext = canevas0_L_ext.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_ext = canevas0_L_ext.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
-lambda_texte_L_ext = ttk.Label(
-    frame1_L_ext, text="Lambda = " + str(format(lambda_texte_spectre_L_ext, "4.1f") + " nm"))
+lambda_texte_L_ext = ttk.Label(frame1_L_ext,
+                               text="Lambda = " + str(format(lambda_texte_spectre_L_ext, "4.2f") + " nm"))
 lambda_texte_L_ext.grid(row=2, column=5)
 
 text1_L_ext = ttk.Label(frame1_L_ext, text=_("Première borne inf (nm)"))
@@ -4970,9 +5227,11 @@ text_zoom_L_ext = ttk.Label(frame1_1_L_ext, text="Zoom : ", width=8)
 text_zoom_L_ext.grid(row=1, column=1)
 variable_zoom_inf_L_ext = tk.DoubleVar(value=198)
 variable_zoom_sup_L_ext = tk.DoubleVar(value=1013)
-entree_zoom_inf_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_zoom_inf_L_ext,
+entree_zoom_inf_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5,
+                                    textvariable=variable_zoom_inf_L_ext,
                                     command=change_zoom_inf_L_ext, width=8, foreground="black")
-entree_zoom_sup_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5, textvariable=variable_zoom_sup_L_ext,
+entree_zoom_sup_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5,
+                                    textvariable=variable_zoom_sup_L_ext,
                                     command=change_zoom_sup_L_ext, width=8, foreground="black")
 entree_zoom_inf_L_ext.grid(row=2, column=1)
 entree_zoom_sup_L_ext.grid(row=3, column=1)
@@ -5046,12 +5305,14 @@ frame2_1_L_ext.grid(row=1, column=9, rowspan=3, sticky=tk.N)
 
 flag_image_brute_L_ext = tk.BooleanVar(value=flag_image_brute_init_L_ext)
 coche_image_brute_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("Image brute\nspectres non\nnormalisés"),
-                                          variable=flag_image_brute_L_ext, command=change_flag_image_brute_L_ext)
+                                          variable=flag_image_brute_L_ext,
+                                          command=change_flag_image_brute_L_ext)
 coche_image_brute_L_ext.grid(row=1, column=1)
 
 flag_spectre_inclus_moyenne_L_ext = tk.BooleanVar(value=True)
-coche_spectre_inclus_moyenne_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("Spectre inclus\ndans spectre\nmoyen"), variable=flag_spectre_inclus_moyenne_L_ext,
-                                                         command=change_bool_spectre_L_ext)
+coche_spectre_inclus_moyenne_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("Spectre inclus\ndans spectre\nmoyen"),
+                                                     variable=flag_spectre_inclus_moyenne_L_ext,
+                                                     command=change_bool_spectre_L_ext)
 coche_spectre_inclus_moyenne_L_ext.grid(row=2, column=1)
 
 ligne1_vert_L_ext = canevas1_L_ext.create_line(x1_L_ext, 0, x1_L_ext, 200, fill="white")
@@ -5091,8 +5352,9 @@ entree10_L_ext = ttk.Spinbox(frame3_1_L_ext, from_=1, to=hauteur_canevas_spectre
 entree9_L_ext.grid(row=2, column=1)
 entree10_L_ext.grid(row=4, column=1)
 
-bouton_extraction_L_ext = ttk.Button(
-    frame3_1_L_ext, text=_("Extraction"), state="disable", command=creation_spectre_moyen_L_ext, width=10)
+bouton_extraction_L_ext = ttk.Button(frame3_1_L_ext, text=_("Extraction"),
+                                     state="disable",
+                                     command=creation_spectre_moyen_L_ext, width=10)
 bouton_extraction_L_ext.grid(row=5, column=1)
 
 flag_spectres_normalises_moyenne_L_ext = tk.BooleanVar(value=True)
@@ -5200,18 +5462,14 @@ canevas0_L_comp.grid(row=1, column=1, columnspan=6)
 ligne_position_x_L_comp = canevas0_L_comp.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_comp = canevas0_L_comp.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
-lambda_texte_L_comp = ttk.Label(
-    frame1_L_comp, text="Lambda = " + str(format(lambda_texte_spectre_L_comp, "4.1f") + " nm"))
+lambda_texte_L_comp = ttk.Label(frame1_L_comp,
+                                text="Lambda = " + str(format(lambda_texte_spectre_L_comp, "4.2f") + " nm"))
 lambda_texte_L_comp.grid(row=2, column=5)
 
-text1_L_comp = ttk.Label(frame1_L_comp, text=_(
-    "Numérateur borne inf (nm)"))
-text2_L_comp = ttk.Label(frame1_L_comp, text=_(
-    "Numérateur borne sup (nm)"))
-text3_L_comp = ttk.Label(
-    frame1_L_comp, text=_("Dénominateur borne inf (nm)"))
-text4_L_comp = ttk.Label(
-    frame1_L_comp, text=_("Dénominateur borne sup( nm)"))
+text1_L_comp = ttk.Label(frame1_L_comp, text=_("Numérateur borne inf (nm)"))
+text2_L_comp = ttk.Label(frame1_L_comp, text=_("Numérateur borne sup (nm)"))
+text3_L_comp = ttk.Label(frame1_L_comp, text=_("Dénominateur borne inf (nm)"))
+text4_L_comp = ttk.Label(frame1_L_comp, text=_("Dénominateur borne sup( nm)"))
 text1_L_comp.grid(row=2, column=1, sticky=tk.E)
 text2_L_comp.grid(row=2, column=3, sticky=tk.E)
 text3_L_comp.grid(row=3, column=1, sticky=tk.E)
@@ -5235,8 +5493,9 @@ entree3_L_comp.grid(row=3, column=2, sticky=tk.W)
 entree4_L_comp.grid(row=3, column=4, sticky=tk.W)
 
 flag_denominateur_L_comp = tk.IntVar(value=flag_denominateur_init_L_comp)
-coche_denominateur_L_comp = ttk.Checkbutton(frame1_L_comp, text=_("Dénominateur ?"), variable=flag_denominateur_L_comp,
-                                                command=change_flag_denominateur_L_comp)
+coche_denominateur_L_comp = ttk.Checkbutton(frame1_L_comp, text=_("Dénominateur ?"),
+                                            variable=flag_denominateur_L_comp,
+                                            command=change_flag_denominateur_L_comp)
 coche_denominateur_L_comp.grid(row=3, column=5)
 
 bouton_reset_L_comp = ttk.Button(frame1_L_comp, text=_("Reset"),
@@ -5251,9 +5510,11 @@ text_zoom_L_comp = ttk.Label(frame1_1_L_comp, text="Zoom : ", width=8)
 text_zoom_L_comp.grid(row=1, column=1)
 variable_zoom_inf_L_comp = tk.DoubleVar(value=198)
 variable_zoom_sup_L_comp = tk.DoubleVar(value=1013)
-entree_zoom_inf_L_comp = ttk.Spinbox(frame1_1_L_comp, from_=198, to=1013, increment=1, textvariable=variable_zoom_inf_L_comp,
+entree_zoom_inf_L_comp = ttk.Spinbox(frame1_1_L_comp, from_=198, to=1013, increment=1,
+                                     textvariable=variable_zoom_inf_L_comp,
                                      command=change_zoom_inf_L_comp, width=8, foreground="black")
-entree_zoom_sup_L_comp = ttk.Spinbox(frame1_1_L_comp, from_=198, to=1013, increment=1, textvariable=variable_zoom_sup_L_comp,
+entree_zoom_sup_L_comp = ttk.Spinbox(frame1_1_L_comp, from_=198, to=1013, increment=1,
+                                     textvariable=variable_zoom_sup_L_comp,
                                      command=change_zoom_sup_L_comp, width=8, foreground="black")
 entree_zoom_inf_L_comp.grid(row=2, column=1)
 entree_zoom_sup_L_comp.grid(row=3, column=1)
@@ -5264,21 +5525,21 @@ type_fichier_L_comp = tk.StringVar(value=".mean")
 bouton_rep_L_comp = ttk.Button(frame1_1_L_comp, text=_("Fichier"),
                                    command=choix_fichier_L_comp, width=10)
 bouton_execute_L_comp = ttk.Button(frame1_1_L_comp, text=_("Exécute"),
-                                       command=execute_scripts_L_comp,
-                                       state="disable", width=10)
+                                   command=execute_scripts_L_comp,
+                                   state="disable", width=10)
 bouton_rep_L_comp.grid(row=4, column=1)
 bouton_execute_L_comp.grid(row=5, column=1)
 
 flag_2D_L_comp = tk.IntVar(value=flag_2D_init_L_comp)
 coche_2D_L_comp = ttk.Checkbutton(frame1_1_L_comp, text=_("Sortie 2D"),
-                                      variable=flag_2D_L_comp)
+                                  variable=flag_2D_L_comp)
 # coche_2D_L_comp=ttk.Checkbutton(
 #     frame1_1_L_comp, text="Sortie 2D", variable=flag_2D_L_comp, command=change_flag_2D_L_comp)
 coche_2D_L_comp.grid(row=6, column=1)
 
 flag_3D_L_comp = tk.IntVar(value=flag_3D_init_L_comp)
 coche_3D_L_comp = ttk.Checkbutton(frame1_1_L_comp, text=_("Sortie 3D"),
-                                      variable=flag_3D_L_comp)
+                                  variable=flag_3D_L_comp)
 # coche_3D_L_comp=ttk.Checkbutton(
 #     frame1_1_L_comp, text="Sortie 3D", variable=flag_3D_L_comp, command=change_flag_3D_L_comp)
 coche_3D_L_comp.grid(row=7, column=1)
@@ -5317,8 +5578,9 @@ frame2_1_L_comp.grid(row=1, column=5, rowspan=3, sticky=tk.N)
 # text7_L_comp.grid(row=1, column=1)
 
 flag_traitement_L_comp = tk.IntVar(value=flag_traitement_init_L_comp)
-coche_traitement_L_comp = ttk.Checkbutton(
-    frame2_1_L_comp, text=_("Normalisation\ndes spectres"), variable=flag_traitement_L_comp)
+coche_traitement_L_comp = ttk.Checkbutton(frame2_1_L_comp,
+                                          text=_("Normalisation\ndes spectres"),
+                                          variable=flag_traitement_L_comp)
 coche_traitement_L_comp.grid(row=1, column=1)
 
 # type_traitement_L_comp=tk.StringVar(value="Echantillons différents")
@@ -5330,16 +5592,16 @@ coche_traitement_L_comp.grid(row=1, column=1)
 # text8_L_comp.grid(row=3, column=1)
 
 flag_stat_L_comp = tk.IntVar(value=flag_stat_init_L_comp)
-coche_stat_L_comp = ttk.Checkbutton(
-    frame2_1_L_comp, text=_("Statistiques"), variable=flag_stat_L_comp)
+coche_stat_L_comp = ttk.Checkbutton(frame2_1_L_comp,
+                                    text=_("Statistiques"),
+                                    variable=flag_stat_L_comp)
 coche_stat_L_comp.grid(row=2, column=1)
 
 ligne1_vert_L_comp = canevas1_L_comp.create_line(x1_L_comp, 0, x1_L_comp, hauteur_canevas_spectres, fill="white")
 ligne1_hori_L_comp = canevas1_L_comp.create_line(0, y1_L_comp, largeur_canevas_spectres/2, y1_L_comp, fill="white")
 
 text5_L_comp = ttk.Label(frame2_1_L_comp, text=_("\nPosition x (nm) : "))
-text6_L_comp = ttk.Label(
-    frame2_1_L_comp, text=_("Position y \n(n° de spectre) : "))
+text6_L_comp = ttk.Label(frame2_1_L_comp, text=_("Position y \n(n° de spectre) : "))
 text5_L_comp.grid(row=4, column=1)
 text6_L_comp.grid(row=6, column=1)
 
@@ -5462,8 +5724,8 @@ canevas0_L_ACP.grid(row=1, column=1, columnspan=6)
 ligne_position_x_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
-lambda_texte_L_ACP = ttk.Label(
-    frame1_L_ACP, text="Lambda = " + str(format(lambda_texte_spectre_0_L_ACP, "4.1f") + " nm"))
+lambda_texte_L_ACP = ttk.Label(frame1_L_ACP,
+                               text="Lambda = " + str(format(lambda_texte_spectre_0_L_ACP, "4.2f") + " nm"))
 lambda_texte_L_ACP.grid(row=2, column=5)
 
 text1_L_ACP = ttk.Label(frame1_L_ACP, text=_("Borne inf :"))
@@ -5537,12 +5799,14 @@ frame2_1_L_ACP = ttk.Frame(frame2_L_ACP)
 frame2_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tk.N)
 
 flag_normalise_L_ACP = tk.BooleanVar(value=True)
-coche_normalise_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Spectres normalisés"), variable=flag_normalise_L_ACP,
-                                            command=change_flag_traitement_L_ACP)
+coche_normalise_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Spectres normalisés"),
+                                        variable=flag_normalise_L_ACP,
+                                        command=change_flag_traitement_L_ACP)
 coche_normalise_L_ACP.grid(row=1, column=1, sticky=tk.W, columnspan=2)
 
 flag_centre_reduit_L_ACP = tk.BooleanVar(value=False)
-coche_centre_reduit_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Centré reduit"), variable=flag_centre_reduit_L_ACP,
+coche_centre_reduit_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Centré reduit"),
+                                            variable=flag_centre_reduit_L_ACP,
                                             command=change_flag_traitement_L_ACP)
 coche_centre_reduit_L_ACP.grid(row=2, column=1, sticky=tk.W, columnspan=2)
 
@@ -5605,8 +5869,8 @@ frame3_1_L_ACP = ttk.Frame(frame3_L_ACP)
 frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tk.N)
 
 bouton_enregistre_L_ACP = ttk.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"),
-                                         command=enregistre_facteurs_ACP_L_ACP,
-                                         state="disable", width=10)
+                                     command=enregistre_facteurs_ACP_L_ACP,
+                                     state="disable", width=10)
 bouton_enregistre_L_ACP.grid(row=1, column=1)
 
 ligne_position_1_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
@@ -5668,6 +5932,7 @@ def __________IHM_tableau_periodique__________():
 
 
 flag_neutres_ions_L_ele = tk.IntVar(value=1)
+flag_NIST_LIBS_L_ele = tk.IntVar(value=1)
 
 flag_sup10_L_ele = tk.IntVar(value=1)
 flag_sup1_L_ele = tk.IntVar(value=1)

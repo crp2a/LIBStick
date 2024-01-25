@@ -351,6 +351,7 @@ def calcul_ACP_sklearn(tableau, nbr_composantes, flag_centre_reduit):
     # if flag_centre_reduit == True:
     if flag_centre_reduit:
         tableau = creation_tableau_centre_reduit(tableau)
+    # acp = sklearn.decomposition.PCA(n_components=nbr_composantes, svd_solver="randomized")
     acp = sklearn.decomposition.PCA(n_components=nbr_composantes)
     modele_ACP = acp.fit(tableau)
 #    tableau_ACP=modele_acp.fit_transform(tableau)
