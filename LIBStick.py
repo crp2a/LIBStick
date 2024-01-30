@@ -4295,6 +4295,7 @@ def ouvre_fenetre_recherche_elements_L_rec():
 
 
 def recherche_elements_L_rec() :
+    global rep_NIST
     if flag_NIST_LIBS_L_ele.get() == 1 :
         rep_NIST = "NIST_LIBS"
     else :
@@ -4351,31 +4352,36 @@ def ouvre_fenetre_a_propos_L_aide():
 
     if flag_fenetre_a_propos_L_aide  == False :
         fenetre_a_propos_L_aide = tk.Toplevel(fenetre_principale)
-        fenetre_a_propos_L_aide.geometry("650x475")
+        fenetre_a_propos_L_aide.geometry("670x450")
         fenetre_a_propos_L_aide.configure(bg="black")
         fenetre_a_propos_L_aide.resizable(False, False)
+
         frame_a_propos_L_aide = ttk.Frame(fenetre_a_propos_L_aide)
         frame_a_propos_L_aide.pack(fill=tk.BOTH)
-        zone_texte = tk.Text(frame_a_propos_L_aide)
-        zone_texte.insert("1.0", texte)
-        # zone_texte.pack()
-        zone_texte.grid(row=1,column=1)
 
-        # logo = tk.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/logo_200px.png")
-        # # canevas_L_aide = tk.Canvas(frame_a_propos_L_aide, width=200, height=232)
-        # # item= canevas_L_aide.create_image(100,116, image=logo)
-        # # canevas_L_aide.grid(row=1, column=2, sticky=tk.N)
+        vscroll_bar_texte_L_aide = tk.Scrollbar(frame_a_propos_L_aide)
+        vscroll_bar_texte_L_aide.grid(row=1, column=2,sticky=tk.N+tk.S)
 
+        zone_texte_L_aide = tk.Text(frame_a_propos_L_aide, wrap=tk.WORD,
+                                    yscrollcommand=vscroll_bar_texte_L_aide.set)
+        # zone_texte_L_aide.place(x = 0, y = 0, height = 200, width = 200)
+        zone_texte_L_aide.insert("1.0", texte)
+        zone_texte_L_aide.grid(row=1,column=1)
+
+        logo = tk.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/logo.png")
+        zone_texte_L_aide.image_create("2.0", image=logo)
+        zone_texte_L_aide.image=logo
+        vscroll_bar_texte_L_aide.config(command=zone_texte_L_aide.yview)
         # label_logo_L_aide = tk.Label(frame_a_propos_L_aide, image=logo)
+        # label_logo_L_aide.image= logo
         # label_logo_L_aide.grid(row=1, column=2)
 
         buttonFont = font.Font(family='Helvetica', size=15)
-        bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide, text="Fermer",
-                                                    font=buttonFont, width=10, bg="black", fg="white",
-                                                    command=ferme_fenetre_a_propos_L_aide)
+        bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide,
+                                                         text="Fermer", font=buttonFont,
+                                                         width=10, bg="black", fg="white",
+                                                         command=ferme_fenetre_a_propos_L_aide)
         bouton_ferme_fenetre_a_propos_L_aide.grid(row=2, column=1, columnspan=2)
-        # bouton_ferme_fenetre_a_propos_L_aide.grid(row=1, column=1)
-        # bouton_ferme_fenetre_a_propos_L_aide.pack()
 
         flag_fenetre_a_propos_L_aide  = True
         fenetre_a_propos_L_aide.protocol("WM_DELETE_WINDOW", ferme_fenetre_a_propos_L_aide)
@@ -4430,6 +4436,7 @@ def lit_element_L_ele(symbole):
     contenant les position des raies et leurs intensités relatives.
     Si le fichier de l'élément n'existe pas une fenêtre de message apparait
     """
+    global rep_NIST
     if flag_NIST_LIBS_L_ele.get() == 1 :
         rep_NIST = "NIST_LIBS"
     else :
@@ -4467,7 +4474,7 @@ def affiches_lignes_element_L_ele():
         try :
             affiche_fond_L_trait()
         except :
-             pass
+            pass
         try :
             affiche_spectre_corrige_L_trait()
         except :
