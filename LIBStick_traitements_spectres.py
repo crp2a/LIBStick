@@ -11,8 +11,11 @@ import os
 import math
 import numpy as np
 import scipy.signal
-from numba import jit
 import LIBStick_outils
+try :
+    from numba import jit
+except :
+    pass
 
 
 ###################################################################################################
@@ -73,112 +76,217 @@ def creation_spectre_bornes(spectre_entier, tableau_bornes):
 ###################################################################################################
 # fonctions de filtres
 ###################################################################################################
-@jit
-def rolling_ball_fonction(spectre, width_min_max, width_smooth):
-    """
-    Crée et retourne le fond continu par Rolling-Ball
-    https://rdrr.io/cran/baseline/man/baseline.rollingBall.html
-    width_min_max 	Width of local window for minimization/maximization
-    width_smooth 	Width of local window for smoothing
-    """
-    # initialisations
-    taille_spectre = spectre.shape[0]
-    ligne_base = spectre.copy()
-    ordonnees = spectre[:, 1]
-    minima = np.zeros(taille_spectre)
-    maxima = np.zeros(taille_spectre)
-    start_window, end_window, somme_ordo_window = 0, 0, 0
-    ########## Minimise ##########
-    start_window = math.ceil((width_min_max+1)/2)
-    minima[0] = np.min(ordonnees[0:start_window])
-    for i in range(1, width_min_max):   # -- Start of spectrum --
-        end_window = start_window + 1 + (i % 2)
-        minima[i] = min(np.min(ordonnees[start_window:end_window]), minima[i-1])  # Check if new is smaller
-        start_window = end_window
-    for i in range(width_min_max, taille_spectre-width_min_max):   # -- Main part of spectrum --
-        if ((ordonnees[start_window] <= minima[i-1])
-                and (ordonnees[start_window-width_min_max] != minima[i-1])):
-            minima[i] = ordonnees[start_window]   # Next is smaller
-        else:
-            minima[i] = np.min(ordonnees[(i-width_min_max):(i+width_min_max)])
-        start_window = start_window + 1
-    start_window = (taille_spectre - 2*width_min_max - 1)
-    for i in range(taille_spectre-width_min_max, taille_spectre):   # -- End of spectrum --
-        end_window = start_window + 1 + (i % 2)
-        if (np.min(ordonnees[start_window:(end_window)])) > minima[i-1]:
-            minima[i] = minima[i-1]   # Removed is larger
-        else:
-            minima[i] = np.min(ordonnees[end_window:taille_spectre])
-        start_window = end_window
-    ########## Maximise ##########
-    start_window = math.ceil((width_min_max+1)/2)
-    maxima[0] = np.max(minima[0:start_window])
-    for i in range(1, width_min_max):                # -- Start of spectrum --
-        end_window = start_window + 1 + (i % 2)
-        #end_window = start_window +1
-        maxima[i] = max(np.max(minima[start_window:end_window]), maxima[i-1])  # Check if new is larger
-        start_window = end_window
-    for i in range(width_min_max, taille_spectre-width_min_max):     # -- Main part of spectrum --
-        if ((minima[start_window] >= maxima[i-1]) and (minima[start_window-width_min_max] != maxima[i-1])):
-            maxima[i] = minima[start_window]  # Next is larger
-        else:
-            maxima[i] = np.max(minima[i-width_min_max: i+width_min_max])
-        start_window = start_window + 1
-    start_window = (taille_spectre - 2*width_min_max - 1)
-    for i in range(taille_spectre - width_min_max, taille_spectre):   # -- End of spectrum --
-        end_window = start_window + 1 + (i % 2)
-        if np.max(minima[start_window:end_window]) < maxima[i-1]:
-            maxima[i] = maxima[i-1]   # Removed is smaller
-        else:
-            maxima[i] = np.max(minima[end_window: taille_spectre])
-        start_window = end_window
-    ########## Lissage ##########
-    start_window = math.ceil((width_min_max+1)/2)
-    somme_ordo_window = np.sum(maxima[0:start_window])
-    for i in range(0, width_smooth):                 # -- Start of spectrum --
-        end_window = start_window + 1 + (i % 2)
-        somme_ordo_window = somme_ordo_window + np.sum(maxima[start_window:end_window])
-        ligne_base[i, 1] = somme_ordo_window/end_window
-        start_window = end_window
-    somme_ordo_window = np.sum(maxima[0:2*width_smooth])
-    ligne_base[width_smooth, 1] = somme_ordo_window/(2*width_smooth)
-    for i in range(width_smooth, taille_spectre-width_smooth):    # -- Main part of spectrum --
-        somme_ordo_window = somme_ordo_window - maxima[i-width_smooth] + maxima[i+width_smooth]
-        ligne_base[i, 1] = somme_ordo_window/(2*width_smooth)
-    start_window = taille_spectre - 2*width_smooth
-    somme_ordo_window = somme_ordo_window-maxima[start_window]
-    ligne_base[taille_spectre - width_smooth, 1] = somme_ordo_window/(2*width_smooth)
-    for i in range(taille_spectre-width_smooth, taille_spectre):    # -- End of spectrum --
-        end_window = start_window + 1 + ((i+1) % 2)
-        somme_ordo_window = somme_ordo_window-np.sum(maxima[start_window:end_window])
-        ligne_base[i, 1] = somme_ordo_window/(taille_spectre - end_window)
-        start_window = end_window
-    ########## retour ##########
-    return ligne_base
+try :
+    @jit
+    def rolling_ball_fonction(spectre, width_min_max, width_smooth):
+        """
+        Crée et retourne le fond continu par Rolling-Ball
+        https://rdrr.io/cran/baseline/man/baseline.rollingBall.html
+        width_min_max 	Width of local window for minimization/maximization
+        width_smooth 	Width of local window for smoothing
+        """
+        # initialisations
+        taille_spectre = spectre.shape[0]
+        ligne_base = spectre.copy()
+        ordonnees = spectre[:, 1]
+        minima = np.zeros(taille_spectre)
+        maxima = np.zeros(taille_spectre)
+        start_window, end_window, somme_ordo_window = 0, 0, 0
+        ########## Minimise ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        minima[0] = np.min(ordonnees[0:start_window])
+        for i in range(1, width_min_max):   # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            minima[i] = min(np.min(ordonnees[start_window:end_window]), minima[i-1])  # Check if new is smaller
+            start_window = end_window
+        for i in range(width_min_max, taille_spectre-width_min_max):   # -- Main part of spectrum --
+            if ((ordonnees[start_window] <= minima[i-1])
+                    and (ordonnees[start_window-width_min_max] != minima[i-1])):
+                minima[i] = ordonnees[start_window]   # Next is smaller
+            else:
+                minima[i] = np.min(ordonnees[(i-width_min_max):(i+width_min_max)])
+            start_window = start_window + 1
+        start_window = (taille_spectre - 2*width_min_max - 1)
+        for i in range(taille_spectre-width_min_max, taille_spectre):   # -- End of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            if (np.min(ordonnees[start_window:(end_window)])) > minima[i-1]:
+                minima[i] = minima[i-1]   # Removed is larger
+            else:
+                minima[i] = np.min(ordonnees[end_window:taille_spectre])
+            start_window = end_window
+        ########## Maximise ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        maxima[0] = np.max(minima[0:start_window])
+        for i in range(1, width_min_max):                # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            #end_window = start_window +1
+            maxima[i] = max(np.max(minima[start_window:end_window]), maxima[i-1])  # Check if new is larger
+            start_window = end_window
+        for i in range(width_min_max, taille_spectre-width_min_max):     # -- Main part of spectrum --
+            if ((minima[start_window] >= maxima[i-1]) and (minima[start_window-width_min_max] != maxima[i-1])):
+                maxima[i] = minima[start_window]  # Next is larger
+            else:
+                maxima[i] = np.max(minima[i-width_min_max: i+width_min_max])
+            start_window = start_window + 1
+        start_window = (taille_spectre - 2*width_min_max - 1)
+        for i in range(taille_spectre - width_min_max, taille_spectre):   # -- End of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            if np.max(minima[start_window:end_window]) < maxima[i-1]:
+                maxima[i] = maxima[i-1]   # Removed is smaller
+            else:
+                maxima[i] = np.max(minima[end_window: taille_spectre])
+            start_window = end_window
+        ########## Lissage ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        somme_ordo_window = np.sum(maxima[0:start_window])
+        for i in range(0, width_smooth):                 # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            somme_ordo_window = somme_ordo_window + np.sum(maxima[start_window:end_window])
+            ligne_base[i, 1] = somme_ordo_window/end_window
+            start_window = end_window
+        somme_ordo_window = np.sum(maxima[0:2*width_smooth])
+        ligne_base[width_smooth, 1] = somme_ordo_window/(2*width_smooth)
+        for i in range(width_smooth, taille_spectre-width_smooth):    # -- Main part of spectrum --
+            somme_ordo_window = somme_ordo_window - maxima[i-width_smooth] + maxima[i+width_smooth]
+            ligne_base[i, 1] = somme_ordo_window/(2*width_smooth)
+        start_window = taille_spectre - 2*width_smooth
+        somme_ordo_window = somme_ordo_window-maxima[start_window]
+        ligne_base[taille_spectre - width_smooth, 1] = somme_ordo_window/(2*width_smooth)
+        for i in range(taille_spectre-width_smooth, taille_spectre):    # -- End of spectrum --
+            end_window = start_window + 1 + ((i+1) % 2)
+            somme_ordo_window = somme_ordo_window-np.sum(maxima[start_window:end_window])
+            ligne_base[i, 1] = somme_ordo_window/(taille_spectre - end_window)
+            start_window = end_window
+        ########## retour ##########
+        return ligne_base
+except :
+    def rolling_ball_fonction(spectre, width_min_max, width_smooth):
+        """
+        Crée et retourne le fond continu par Rolling-Ball
+        https://rdrr.io/cran/baseline/man/baseline.rollingBall.html
+        width_min_max 	Width of local window for minimization/maximization
+        width_smooth 	Width of local window for smoothing
+        """
+        # initialisations
+        taille_spectre = spectre.shape[0]
+        ligne_base = spectre.copy()
+        ordonnees = spectre[:, 1]
+        minima = np.zeros(taille_spectre)
+        maxima = np.zeros(taille_spectre)
+        start_window, end_window, somme_ordo_window = 0, 0, 0
+        ########## Minimise ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        minima[0] = np.min(ordonnees[0:start_window])
+        for i in range(1, width_min_max):   # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            minima[i] = min(np.min(ordonnees[start_window:end_window]), minima[i-1])  # Check if new is smaller
+            start_window = end_window
+        for i in range(width_min_max, taille_spectre-width_min_max):   # -- Main part of spectrum --
+            if ((ordonnees[start_window] <= minima[i-1])
+                    and (ordonnees[start_window-width_min_max] != minima[i-1])):
+                minima[i] = ordonnees[start_window]   # Next is smaller
+            else:
+                minima[i] = np.min(ordonnees[(i-width_min_max):(i+width_min_max)])
+            start_window = start_window + 1
+        start_window = (taille_spectre - 2*width_min_max - 1)
+        for i in range(taille_spectre-width_min_max, taille_spectre):   # -- End of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            if (np.min(ordonnees[start_window:(end_window)])) > minima[i-1]:
+                minima[i] = minima[i-1]   # Removed is larger
+            else:
+                minima[i] = np.min(ordonnees[end_window:taille_spectre])
+            start_window = end_window
+        ########## Maximise ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        maxima[0] = np.max(minima[0:start_window])
+        for i in range(1, width_min_max):                # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            #end_window = start_window +1
+            maxima[i] = max(np.max(minima[start_window:end_window]), maxima[i-1])  # Check if new is larger
+            start_window = end_window
+        for i in range(width_min_max, taille_spectre-width_min_max):     # -- Main part of spectrum --
+            if ((minima[start_window] >= maxima[i-1]) and (minima[start_window-width_min_max] != maxima[i-1])):
+                maxima[i] = minima[start_window]  # Next is larger
+            else:
+                maxima[i] = np.max(minima[i-width_min_max: i+width_min_max])
+            start_window = start_window + 1
+        start_window = (taille_spectre - 2*width_min_max - 1)
+        for i in range(taille_spectre - width_min_max, taille_spectre):   # -- End of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            if np.max(minima[start_window:end_window]) < maxima[i-1]:
+                maxima[i] = maxima[i-1]   # Removed is smaller
+            else:
+                maxima[i] = np.max(minima[end_window: taille_spectre])
+            start_window = end_window
+        ########## Lissage ##########
+        start_window = math.ceil((width_min_max+1)/2)
+        somme_ordo_window = np.sum(maxima[0:start_window])
+        for i in range(0, width_smooth):                 # -- Start of spectrum --
+            end_window = start_window + 1 + (i % 2)
+            somme_ordo_window = somme_ordo_window + np.sum(maxima[start_window:end_window])
+            ligne_base[i, 1] = somme_ordo_window/end_window
+            start_window = end_window
+        somme_ordo_window = np.sum(maxima[0:2*width_smooth])
+        ligne_base[width_smooth, 1] = somme_ordo_window/(2*width_smooth)
+        for i in range(width_smooth, taille_spectre-width_smooth):    # -- Main part of spectrum --
+            somme_ordo_window = somme_ordo_window - maxima[i-width_smooth] + maxima[i+width_smooth]
+            ligne_base[i, 1] = somme_ordo_window/(2*width_smooth)
+        start_window = taille_spectre - 2*width_smooth
+        somme_ordo_window = somme_ordo_window-maxima[start_window]
+        ligne_base[taille_spectre - width_smooth, 1] = somme_ordo_window/(2*width_smooth)
+        for i in range(taille_spectre-width_smooth, taille_spectre):    # -- End of spectrum --
+            end_window = start_window + 1 + ((i+1) % 2)
+            somme_ordo_window = somme_ordo_window-np.sum(maxima[start_window:end_window])
+            ligne_base[i, 1] = somme_ordo_window/(taille_spectre - end_window)
+            start_window = end_window
+        ########## retour ##########
+        return ligne_base
 
-
-@jit
-def SNIP_fonction(spectre, iterations, LLS_flag):
-    """
-    Crée et retourne le fond continu par SNIP
-    """
-    ########## LLS ##########
-    if LLS_flag is True:
-        spectre[:, 1] = np.log(np.log(np.sqrt(spectre[:, 1] + 1) + 1) + 1)
-    ########## SNIP ##########
-    dim_spectre = spectre.shape[0]
-    fond = spectre.copy()
-    for p in range(0, iterations):
-        for i in range(p, dim_spectre-p):
-            start_window = spectre[i, 1]
-            end_window = (spectre[i-p, 1] + spectre[i+p, 1]) / 2
-            fond[i, 1] = min(start_window, end_window)
-        spectre[:, 1] = fond[:, 1]
-    ########## inverse LLS ##########
-    if LLS_flag is True:
-        fond[:, 1] = (np.exp(np.exp(fond[:, 1]) - 1) - 1)**2 - 1
-    ########## retour ##########
-    return fond
+try :
+    @jit
+    def SNIP_fonction(spectre, iterations, LLS_flag):
+        """
+        Crée et retourne le fond continu par SNIP
+        """
+        ########## LLS ##########
+        if LLS_flag is True:
+            spectre[:, 1] = np.log(np.log(np.sqrt(spectre[:, 1] + 1) + 1) + 1)
+        ########## SNIP ##########
+        dim_spectre = spectre.shape[0]
+        fond = spectre.copy()
+        for p in range(0, iterations):
+            for i in range(p, dim_spectre-p):
+                start_window = spectre[i, 1]
+                end_window = (spectre[i-p, 1] + spectre[i+p, 1]) / 2
+                fond[i, 1] = min(start_window, end_window)
+            spectre[:, 1] = fond[:, 1]
+        ########## inverse LLS ##########
+        if LLS_flag is True:
+            fond[:, 1] = (np.exp(np.exp(fond[:, 1]) - 1) - 1)**2 - 1
+        ########## retour ##########
+        return fond
+except :
+    def SNIP_fonction(spectre, iterations, LLS_flag):
+        """
+        Crée et retourne le fond continu par SNIP
+        """
+        ########## LLS ##########
+        if LLS_flag is True:
+            spectre[:, 1] = np.log(np.log(np.sqrt(spectre[:, 1] + 1) + 1) + 1)
+        ########## SNIP ##########
+        dim_spectre = spectre.shape[0]
+        fond = spectre.copy()
+        for p in range(0, iterations):
+            for i in range(p, dim_spectre-p):
+                start_window = spectre[i, 1]
+                end_window = (spectre[i-p, 1] + spectre[i+p, 1]) / 2
+                fond[i, 1] = min(start_window, end_window)
+            spectre[:, 1] = fond[:, 1]
+        ########## inverse LLS ##########
+        if LLS_flag is True:
+            fond[:, 1] = (np.exp(np.exp(fond[:, 1]) - 1) - 1)**2 - 1
+        ########## retour ##########
+        return fond
 
 
 ###################################################################################################
@@ -226,27 +334,48 @@ def creation_fond(spectre_filtre, fond, param1, param2, param3):
     return fond_continu
 
 
-@jit
-def creation_spectre_corrige(spectre_filtre, fond_continu):
-    """
-    Retourne le spectre lissé et soustrait du fond continu
-    """
-    spectre_corrige = spectre_filtre.copy()
-    spectre_corrige[:, 1] = spectre_filtre[:, 1]-fond_continu[:, 1]
-    return spectre_corrige
+try :
+    @jit
+    def creation_spectre_corrige(spectre_filtre, fond_continu):
+        """
+        Retourne le spectre lissé et soustrait du fond continu
+        """
+        spectre_corrige = spectre_filtre.copy()
+        spectre_corrige[:, 1] = spectre_filtre[:, 1]-fond_continu[:, 1]
+        return spectre_corrige
+except :
+    def creation_spectre_corrige(spectre_filtre, fond_continu):
+        """
+        Retourne le spectre lissé et soustrait du fond continu
+        """
+        spectre_corrige = spectre_filtre.copy()
+        spectre_corrige[:, 1] = spectre_filtre[:, 1]-fond_continu[:, 1]
+        return spectre_corrige
 
 
-@jit
-def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
-    """
-    Crée les répertoires de sauvegarde et sauvegarde le spectre traité
-    actuellement affiché (fond en option)
-    """
-    repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
-    enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
-    if flag_sauve_fond is True:
-        repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
-        enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
+try :
+    @jit
+    def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
+        """
+        Crée les répertoires de sauvegarde et sauvegarde le spectre traité
+        actuellement affiché (fond en option)
+        """
+        repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
+        enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
+        if flag_sauve_fond is True:
+            repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
+            enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
+except:
+    def execute(rep_travail, spectre_corrige, fond_continu, nom_fichier, flag_sauve_fond):
+        """
+        Crée les répertoires de sauvegarde et sauvegarde le spectre traité
+        actuellement affiché (fond en option)
+        """
+        repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
+        enregistre_fichier(spectre_corrige, repertoire_sauvegarde, nom_fichier)
+        if flag_sauve_fond is True:
+            repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
+            enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
 
 
 def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre,

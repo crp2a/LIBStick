@@ -83,12 +83,12 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
     inerties = modele_ACP.explained_variance_ratio_*100
 
     fig_px_matrice = px.scatter_matrix(tableau_ACP, dimensions=range(3),
-                                       color=treeview_dataframe.values[:, -1],
-                                       opacity=0.5,
-                                       hover_name=(treeview_dataframe["nom"]),
-                                       labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
-                                               "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
-                                               "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
+                                        color=treeview_dataframe.values[:, -1],
+                                        opacity=0.5,
+                                        hover_name=(treeview_dataframe["nom"]),
+                                        labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
+                                                "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
+                                                "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
     fig_px_matrice.update_traces(diagonal_visible=False)
     fig_px_matrice.show()
 
@@ -135,7 +135,7 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
 
     if flag_3D is True:
         fig3d = plt.figure()
-        ax3d = fig3d.gca(projection='3d')
+        ax3d = fig3d.add_subplot(projection='3d')
 
         min_dim3 = min_tableau_acp[dim3-1]*1.05
         max_dim3 = max_tableau_acp[dim3-1]*1.05
@@ -163,13 +163,13 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
         plt.show(block=False)
 
         fig_px3D = px.scatter_3d(tableau_ACP,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
-                                 color=treeview_dataframe.values[:, -1],
-                                 symbol=treeview_dataframe.values[:, -2],
-                                 text=treeview_dataframe.index, opacity=0.5,
-                                 hover_name=(treeview_dataframe["nom"]),
-                                 labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
-                                         "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
-                                         "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
+                                  color=treeview_dataframe.values[:, -1],
+                                  symbol=treeview_dataframe.values[:, -2],
+                                  text=treeview_dataframe.index, opacity=0.5,
+                                  hover_name=(treeview_dataframe["nom"]),
+                                  labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                          "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
+                                          "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
         fig_px3D.update_traces(marker_size=10)
         fig_px3D.show()
 
@@ -279,7 +279,7 @@ def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
 
     if flag_3D is True:
         fig3d = plt.figure()
-        ax3d = fig3d.gca(projection='3d')
+        ax3d = fig3d.add_subplot(projection='3d')
 
         min_dim3 = min_tableau_acp[dim3-1]*1.05
         max_dim3 = max_tableau_acp[dim3-1]*1.05

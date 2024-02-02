@@ -35,6 +35,7 @@ import LIBStick_extraction_spectres
 import LIBStick_comp_spectres
 import LIBStick_ACP
 import LIBStick_recherche_elements
+import LIBStick_graduations
 
 
 ###################################################################################################
@@ -51,6 +52,7 @@ largeur_fenetre_principale = 1155
 hauteur_fenetre_principale = 750
 largeur_canevas_spectres = 1000
 hauteur_canevas_spectres = 200
+espacement_en_pixels = 100
 
 COULEUR_INTERFACE = "papaya whip"
 # COULEUR_INTERFACE="linen"
@@ -100,6 +102,20 @@ ligne2_vert_L_ext = ligne2_hori_L_ext = 0
 ligne_position_x_L_comp = ligne_position_y_L_comp = 0
 ligne1_vert_L_comp = ligne1_hori_L_comp = 0
 ligne_position_x_L_ACP = ligne_position_y_L_ACP = ligne_position_1_L_ACP = 0
+
+# position des graduations sur les spectres
+liste_0_lignes_grad_L_trait=[]
+liste_1_lignes_grad_L_trait=[]
+liste_0_textes_grad_L_trait=[]
+liste_1_textes_grad_L_trait=[]
+liste_0_lignes_grad_L_ext=[]
+liste_0_textes_grad_L_ext=[]
+liste_0_lignes_grad_L_comp=[]
+liste_0_textes_grad_L_comp=[]
+liste_0_lignes_grad_L_ACP=[]
+liste_1_lignes_grad_L_ACP=[]
+liste_0_textes_grad_L_ACP=[]
+liste_1_textes_grad_L_ACP=[]
 
 # identifiants des photos
 image1_zoom_L_ext = image2_zoom_L_ext = image_zoom_L_comp = 0
@@ -740,6 +756,54 @@ def affiche_spectre_L_trait():
         canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_trait()
 
+    # ajout des graduations
+    affiche_graduation_L_trait()
+
+
+def affiche_graduation_L_trait():
+    """
+    Affichage des graduations dans les canevas 0 et 1
+    """
+    global liste_0_lignes_grad_L_trait
+    global liste_0_textes_grad_L_trait
+    global liste_1_lignes_grad_L_trait
+    global liste_1_textes_grad_L_trait
+    liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
+                                                                                                          limites_affichage_spectre_L_trait,
+                                                                                                          espacement_en_pixels)
+    for ligne in liste_0_lignes_grad_L_trait :
+        canevas0_L_trait.delete(ligne)
+        # canevas0_L_trait.delete(texte)
+    liste_0_lignes_grad_L_trait=[]
+    # liste_0_textes_grad_L_trait=[]
+    for x in liste_graduations_en_pixels :
+       liste_0_lignes_grad_L_trait.append(canevas0_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
+                                                                       fill="blue", dash=(1,2)))
+
+    for texte in liste_0_textes_grad_L_trait :
+        canevas0_L_trait.delete(texte)
+        liste_0_textes_grad_L_trait=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_0_textes_grad_L_trait.append(canevas0_L_trait.create_text(liste_graduations_en_pixels[i], 10,
+                                                                       text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                       fill="blue"))
+
+    for ligne in liste_1_lignes_grad_L_trait :
+        canevas1_L_trait.delete(ligne)
+        # canevas0_L_trait.delete(texte)
+    liste_1_lignes_grad_L_trait=[]
+    # liste_1_textes_grad_L_trait=[]
+    for x in liste_graduations_en_pixels :
+       liste_1_lignes_grad_L_trait.append(canevas1_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
+                                                                       fill="blue", dash=(1,2)))
+
+    for texte in liste_1_textes_grad_L_trait :
+        canevas1_L_trait.delete(texte)
+        liste_1_textes_grad_L_trait=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_1_textes_grad_L_trait.append(canevas1_L_trait.create_text(liste_graduations_en_pixels[i], 10,
+                                                                       text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                       fill="blue"))
 
 def affiche_fond_L_trait():
     """
@@ -979,6 +1043,9 @@ def affiche_spectre_corrige_L_trait():
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
         canevas1_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+
+    # ajout des graduations
+    affiche_graduation_L_trait()
 
 
 def affiche_position_souris_1_L_trait(event):
@@ -1697,6 +1764,34 @@ def affiche_spectre_L_ext():
     for i in range(len(spectre) - 1):
         canevas0_L_ext.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_ext()
+
+    # ajout des graduations
+    affiche_graduation_L_ext()
+
+
+def affiche_graduation_L_ext():
+    """
+    Affichage des graduations dans le canevas 0
+    """
+    global liste_0_lignes_grad_L_ext
+    global liste_0_textes_grad_L_ext
+    liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
+                                                                                                          limites_affichage_spectre_L_ext,
+                                                                                                          espacement_en_pixels)
+    for ligne in liste_0_lignes_grad_L_ext :
+        canevas0_L_ext.delete(ligne)
+    liste_0_lignes_grad_L_ext=[]
+    for x in liste_graduations_en_pixels :
+       liste_0_lignes_grad_L_ext.append(canevas0_L_ext.create_line(x, 0, x, hauteur_canevas_spectres,
+                                                                   fill="blue", dash=(1,2)))
+
+    for texte in liste_0_textes_grad_L_ext :
+        canevas0_L_ext.delete(texte)
+        liste_0_textes_grad_L_ext=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_0_textes_grad_L_ext.append(canevas0_L_ext.create_text(liste_graduations_en_pixels[i], 10,
+                                                                   text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                   fill="blue"))
 
 
 def mise_a_jour_affichage_L_ext() :
@@ -2692,6 +2787,35 @@ def affiche_spectre_L_comp():
     for i in range(len(spectre) - 1):
         canevas0_L_comp.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_comp()
+
+    # ajout des graduations
+    affiche_graduation_L_comp()
+
+
+def affiche_graduation_L_comp():
+    """
+    Affichage des graduations dans le canevas 0
+    """
+    global liste_0_lignes_grad_L_comp
+    global liste_0_textes_grad_L_comp
+    liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
+                                                                                                          limites_affichage_spectre_L_comp,
+                                                                                                          espacement_en_pixels)
+    for ligne in liste_0_lignes_grad_L_comp :
+        canevas0_L_comp.delete(ligne)
+    liste_0_lignes_grad_L_comp=[]
+    for x in liste_graduations_en_pixels :
+       liste_0_lignes_grad_L_comp.append(canevas0_L_comp.create_line(x, 0, x, hauteur_canevas_spectres,
+                                                                   fill="blue", dash=(1,2)))
+
+    for texte in liste_0_textes_grad_L_comp :
+        canevas0_L_comp.delete(texte)
+        liste_0_textes_grad_L_comp=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_0_textes_grad_L_comp.append(canevas0_L_comp.create_text(liste_graduations_en_pixels[i], 10,
+                                                                   text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                   fill="blue"))
+
 
 
 def mise_a_jour_affichage_L_comp() :
@@ -3744,6 +3868,55 @@ def affiche_spectre_L_ACP():
         canevas0_L_ACP.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
     affiche_lignes_spectre_L_ACP()
 
+    # ajout des graduations
+    affiche_graduation_L_ACP()
+
+
+def affiche_graduation_L_ACP():
+    """
+    Affichage des graduations dans les canevas 0 et 1
+    """
+    global liste_0_lignes_grad_L_ACP
+    global liste_0_textes_grad_L_ACP
+    global liste_1_lignes_grad_L_ACP
+    global liste_1_textes_grad_L_ACP
+    liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
+                                                                                                          limites_affichage_spectre_L_ACP,
+                                                                                                          espacement_en_pixels)
+    for ligne in liste_0_lignes_grad_L_ACP :
+        canevas0_L_ACP.delete(ligne)
+        # canevas0_L_ACP.delete(texte)
+    liste_0_lignes_grad_L_ACP=[]
+    # liste_0_textes_grad_L_ACP=[]
+    for x in liste_graduations_en_pixels :
+       liste_0_lignes_grad_L_ACP.append(canevas0_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres+170,
+                                                                       fill="blue", dash=(1,2)))
+
+    for texte in liste_0_textes_grad_L_ACP :
+        canevas0_L_ACP.delete(texte)
+        liste_0_textes_grad_L_ACP=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_0_textes_grad_L_ACP.append(canevas0_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
+                                                                       text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                       fill="blue"))
+
+    for ligne in liste_1_lignes_grad_L_ACP :
+        canevas1_L_ACP.delete(ligne)
+        # canevas0_L_ACP.delete(texte)
+    liste_1_lignes_grad_L_ACP=[]
+    # liste_1_textes_grad_L_ACP=[]
+    for x in liste_graduations_en_pixels :
+       liste_1_lignes_grad_L_ACP.append(canevas1_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres+170,
+                                                                       fill="blue", dash=(1,2)))
+
+    for texte in liste_1_textes_grad_L_ACP :
+        canevas1_L_ACP.delete(texte)
+        liste_1_textes_grad_L_ACP=[]
+    for i in range(len(liste_graduations_en_pixels)) :
+       liste_1_textes_grad_L_ACP.append(canevas1_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
+                                                                       text=str(format(liste_graduations_en_nm[i], "4.1f")),
+                                                                       fill="blue"))
+
 
 def mise_a_jour_affichage_L_ACP() :
     affiche_spectre_L_ACP()
@@ -3902,6 +4075,8 @@ def affiche_spectres_var_ACP_L_ACP():
     y = (hauteur_canevas_spectres-(0 - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
     canevas1_L_ACP.create_line(0, y, largeur_canevas_spectres, y, fill="grey")
 
+    # ajout des graduations
+    affiche_graduation_L_ACP()
 
 ###################################################################################################
 # fonctions graphiques de zoom du caneva du spectre (frame1_L_ACP)

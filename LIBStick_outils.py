@@ -16,8 +16,10 @@ de transformations de tableaux et dataframes
 import os
 import numpy as np
 import pandas as pd
-from numba import jit
-
+try :
+    from numba import jit
+except :
+    pass
 
 
 ###################################################################################################
@@ -220,33 +222,59 @@ def creer_dataframe_bornes(dataframe, bornes):
 ###################################################################################################
 # normalisation des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
 ###################################################################################################
-@jit
-def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans la première colonne
-    """
-    Normalise un tableau de spectres en colonnes
-    Minimum à 0 et divise par l'aire sous la courbe (ainsi aire du spectre = 1)
-    """
-    for colonne in range(tableau.shape[1]-1):
-        minimum = tableau[:, colonne+1].min()
-        tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
-        aire = tableau[:, colonne+1].sum()
-        tableau[:, colonne+1] = (tableau[:, colonne+1] / aire)
-    return tableau
+try :
+    @jit
+    def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans la première colonne
+        """
+        Normalise un tableau de spectres en colonnes
+        Minimum à 0 et divise par l'aire sous la courbe (ainsi aire du spectre = 1)
+        """
+        for colonne in range(tableau.shape[1]-1):
+            minimum = tableau[:, colonne+1].min()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
+            aire = tableau[:, colonne+1].sum()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] / aire)
+        return tableau
+except :
+    def normalise_tableau_x_aire(tableau):  # données en colonnes, abscisses dans la première colonne
+        """
+        Normalise un tableau de spectres en colonnes
+        Minimum à 0 et divise par l'aire sous la courbe (ainsi aire du spectre = 1)
+        """
+        for colonne in range(tableau.shape[1]-1):
+            minimum = tableau[:, colonne+1].min()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
+            aire = tableau[:, colonne+1].sum()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] / aire)
+        return tableau
 
-
-@jit
-def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dans la première colonne
-    """
-    Normalise un tableau de spectres en colonnes
-    Minimum à 0 et divise par le maximum du spectre
-    """
-    for colonne in range(tableau.shape[1]-1):
-        minimum = tableau[:, colonne+1].min()
-        tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
-#        aire=tableau[:,colonne+1].sum()
-#        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
-    tableau = tableau/tableau.max()  # A ne pas faire car dépend de la liste à un instant t !!!
-    return tableau
+try :
+    @jit
+    def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dans la première colonne
+        """
+        Normalise un tableau de spectres en colonnes
+        Minimum à 0 et divise par le maximum du spectre
+        """
+        for colonne in range(tableau.shape[1]-1):
+            minimum = tableau[:, colonne+1].min()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
+    #        aire=tableau[:,colonne+1].sum()
+    #        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
+        tableau = tableau/tableau.max()  # A ne pas faire car dépend de la liste à un instant t !!!
+        return tableau
+except :
+    def normalise_tableau_x_maximum(tableau):  # données en colonnes, abscisses dans la première colonne
+        """
+        Normalise un tableau de spectres en colonnes
+        Minimum à 0 et divise par le maximum du spectre
+        """
+        for colonne in range(tableau.shape[1]-1):
+            minimum = tableau[:, colonne+1].min()
+            tableau[:, colonne+1] = (tableau[:, colonne+1] - minimum)
+    #        aire=tableau[:,colonne+1].sum()
+    #        tableau[:,colonne+1] = (tableau[:,colonne+1] /aire)
+        tableau = tableau/tableau.max()  # A ne pas faire car dépend de la liste à un instant t !!!
+        return tableau
 
 
 ###################################################################################################
