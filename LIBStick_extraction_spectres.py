@@ -198,7 +198,7 @@ def graphique_3D_creation(tableau8bits, nom_echantillon):
     xx, yy = np.mgrid[0:tableau8bits.shape[0], 0:tableau8bits.shape[1]]
     #fig = plt.figure(figsize=(15,15))
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     ax.plot_surface(xx, yy, tableau8bits, rstride=1, cstride=1,
                     cmap="inferno", linewidth=0, antialiased=False)
     ax.view_init(80, 30)
@@ -225,7 +225,7 @@ def graphique_sauvegarde(tableau8bits):
 
 
 ###################################################################################################
-# ex-LIBStick_creation_tableau_norm
+# ex-LIBStick_creation_tableau_norm525.0
 ###################################################################################################
 def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D):
     """
