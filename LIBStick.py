@@ -52,7 +52,8 @@ largeur_fenetre_principale = 1155
 hauteur_fenetre_principale = 750
 largeur_canevas_spectres = 1000
 hauteur_canevas_spectres = 200
-espacement_en_pixels = 100
+# espacement_en_pixels = 50
+# multiple_du_pas_en_nm = 10
 
 COULEUR_INTERFACE = "papaya whip"
 # COULEUR_INTERFACE="linen"
@@ -130,8 +131,10 @@ DataFrame_element_L_ele = pd.DataFrame()
 fenetre_recherche_elements = 0
 fenetre_label_L_ACP = 0
 fenetre_classification_L_ele = 0
+fenetre_a_propos_L_aide = 0
 
 # divers
+texte_neutres_L_rec = texte_ions_L_rec = ""
 symbole_L_ele = ""
 old_time = time.time()
 
@@ -280,6 +283,18 @@ def fenetre_pricipale_en_avant():
     """
     fenetre_principale.attributes("-topmost", True)
     fenetre_principale.attributes("-topmost", False)
+
+
+def mise_a_jour_affichage_onglet_actif():
+    onglet_actif = onglets.index(onglets.select())
+    if onglet_actif == 0:
+        mise_a_jour_affichage_L_trait()
+    if onglet_actif == 1:
+        mise_a_jour_affichage_L_ext()
+    if onglet_actif == 2:
+        mise_a_jour_affichage_L_comp()
+    if onglet_actif == 3:
+        mise_a_jour_affichage_L_ACP()
 
 
 def change_taille_fenetre(event):
@@ -770,7 +785,8 @@ def affiche_graduation_L_trait():
     global liste_1_textes_grad_L_trait
     liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
                                                                                                           limites_affichage_spectre_L_trait,
-                                                                                                          espacement_en_pixels)
+                                                                                                          espacement_en_pixels.get(),
+                                                                                                          multiple_du_pas_en_nm.get())
     for ligne in liste_0_lignes_grad_L_trait :
         canevas0_L_trait.delete(ligne)
         # canevas0_L_trait.delete(texte)
@@ -1777,7 +1793,8 @@ def affiche_graduation_L_ext():
     global liste_0_textes_grad_L_ext
     liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
                                                                                                           limites_affichage_spectre_L_ext,
-                                                                                                          espacement_en_pixels)
+                                                                                                          espacement_en_pixels.get(),
+                                                                                                          multiple_du_pas_en_nm.get())
     for ligne in liste_0_lignes_grad_L_ext :
         canevas0_L_ext.delete(ligne)
     liste_0_lignes_grad_L_ext=[]
@@ -2160,8 +2177,8 @@ def change_bool_spectre_L_ext():
     """
     global liste_bool_L_ext
     liste_bool_L_ext[variable_6_L_ext.get()-1] = flag_spectre_inclus_moyenne_L_ext.get()
-    print("==================================")
-    print(liste_bool_L_ext)
+    # print("==================================")
+    # print(liste_bool_L_ext)
 
 
 ###################################################################################################
@@ -2800,7 +2817,8 @@ def affiche_graduation_L_comp():
     global liste_0_textes_grad_L_comp
     liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
                                                                                                           limites_affichage_spectre_L_comp,
-                                                                                                          espacement_en_pixels)
+                                                                                                          espacement_en_pixels.get(),
+                                                                                                          multiple_du_pas_en_nm.get())
     for ligne in liste_0_lignes_grad_L_comp :
         canevas0_L_comp.delete(ligne)
     liste_0_lignes_grad_L_comp=[]
@@ -3249,7 +3267,7 @@ def selectionne_spectre_L_comp(event):
     global nom_fichier_seul_L_comp
     selection = tree_resultats_L_comp.selection()
     item = tree_resultats_L_comp.item(selection)["values"]
-    print(item)
+    # print(item)
     variable_6_L_comp.set(item[0])
     nom_fichier_seul_L_comp = item[1]
     vars_5_6_to_coord1_L_comp()
@@ -3270,7 +3288,7 @@ def selectionne_spectre_up_L_comp(event):
     global nom_fichier_seul_L_comp
     selection = tree_resultats_L_comp.prev(tree_resultats_L_comp.selection())
     item = tree_resultats_L_comp.item(selection)["values"]
-    print(item)
+    # print(item)
     variable_6_L_comp.set(item[0])
     nom_fichier_seul_L_comp = item[1]
     vars_5_6_to_coord1_L_comp()
@@ -3292,7 +3310,7 @@ def selectionne_spectre_down_L_comp(event):
     global nom_fichier_seul_L_comp
     selection = tree_resultats_L_comp.next(tree_resultats_L_comp.selection())
     item = tree_resultats_L_comp.item(selection)["values"]
-    print(item)
+    # print(item)
     variable_6_L_comp.set(item[0])
     nom_fichier_seul_L_comp = item[1]
     vars_5_6_to_coord1_L_comp()
@@ -3478,7 +3496,7 @@ def dataframe_treeview_L_ACP():
     """
     treeview_columns = ["numero", "nom", "calcul ACP", "label"]  # list of names here
     treeview_df = pd.DataFrame(columns=treeview_columns)
-    print (tree_L_ACP)
+    # print (tree_L_ACP)
     for ligne in tree_L_ACP.get_children():
         # each row will come as a list under name "values"
         values = pd.DataFrame([tree_L_ACP.item(ligne)["values"]], columns=treeview_columns)
@@ -3882,7 +3900,8 @@ def affiche_graduation_L_ACP():
     global liste_1_textes_grad_L_ACP
     liste_graduations_en_nm, liste_graduations_en_pixels = LIBStick_graduations.calcul_tableaux_graduation(largeur_canevas_spectres,
                                                                                                           limites_affichage_spectre_L_ACP,
-                                                                                                          espacement_en_pixels)
+                                                                                                          espacement_en_pixels.get(),
+                                                                                                          multiple_du_pas_en_nm.get())
     for ligne in liste_0_lignes_grad_L_ACP :
         canevas0_L_ACP.delete(ligne)
         # canevas0_L_ACP.delete(texte)
@@ -4423,11 +4442,11 @@ def ouvre_fenetre_recherche_elements_L_rec():
     les paramètres sont : le delta de longueur d'onde de part et d'autre de la longueur d'onde sélectionnée,
     le seuil d'intensité rélative au dessus duquel on cherche les résultats
     """
-    global fenetre_recherche_elements_L_rec
+    global fenetre_recherche_elements_L_rec, zone_texte_L_rec
     global flag_fenetre_recherche_elements_ouvert_L_rec
     if flag_fenetre_recherche_elements_ouvert_L_rec  == False :
         fenetre_recherche_elements_L_rec = tk.Toplevel(fenetre_principale)
-        fenetre_recherche_elements_L_rec.geometry("210x165")
+        fenetre_recherche_elements_L_rec.geometry("660x490")
         fenetre_recherche_elements_L_rec.configure(bg="black")
         fenetre_recherche_elements_L_rec.resizable(False, False)
         frame_recherche_elements_L_rec = ttk.Frame(fenetre_recherche_elements_L_rec)
@@ -4437,8 +4456,8 @@ def ouvre_fenetre_recherche_elements_L_rec():
         text2_recherche_elements_L_rec = ttk.Label(frame_recherche_elements_L_rec, text=_("Delta (nm) :"))
         text3_recherche_elements_L_rec = ttk.Label(frame_recherche_elements_L_rec, text=_("Seuil (> I rela.) :"))
         text1_recherche_elements_L_rec.grid(row=1, column=1)
-        text2_recherche_elements_L_rec.grid(row=2, column=1)
-        text3_recherche_elements_L_rec.grid(row=3, column=1)
+        text2_recherche_elements_L_rec.grid(row=1, column=3)
+        text3_recherche_elements_L_rec.grid(row=1, column=5)
 
         entree_lambda_L_rec = ttk.Spinbox(frame_recherche_elements_L_rec, from_=180, to=1000, increment=1, width=8,
                                           textvariable=lambda_recherche_elements_L_rec, foreground="black")
@@ -4447,20 +4466,26 @@ def ouvre_fenetre_recherche_elements_L_rec():
         entree_seuil_L_rec = ttk.Spinbox(frame_recherche_elements_L_rec, from_=0.1, to=100, increment=1, width=8,
                                           textvariable=seuil_recherche_elements_L_rec, foreground="black")
         entree_lambda_L_rec.grid(row=1, column=2)
-        entree_delta_L_rec.grid(row=2, column=2)
-        entree_seuil_L_rec.grid(row=3, column=2)
+        entree_delta_L_rec.grid(row=1, column=4)
+        entree_seuil_L_rec.grid(row=1, column=6)
+
+        vscroll_bar_texte_L_rec = tk.Scrollbar(frame_recherche_elements_L_rec, orient="vertical")
+        vscroll_bar_texte_L_rec.grid(row=2, column=7,sticky=tk.N+tk.S, )
+        zone_texte_L_rec = tk.Text(frame_recherche_elements_L_rec, wrap=tk.WORD,
+                                   yscrollcommand=vscroll_bar_texte_L_rec.set)
+        zone_texte_L_rec.grid(row=2,column=1, columnspan=6)
+        vscroll_bar_texte_L_rec.config(command=zone_texte_L_rec.yview)
 
         coche_NIST_LIBS_L_rec = ttk.Checkbutton(frame_recherche_elements_L_rec, text=_("NIST LIBS"),
                                                 variable=flag_NIST_LIBS_L_ele)
-        coche_NIST_LIBS_L_rec.grid(row=4, column=1)
+        coche_NIST_LIBS_L_rec.grid(row=3, column=1, columnspan=2)
 
         buttonFont = font.Font(family='Helvetica', size=15)
         bouton_recherche_elements_L_rec = tk.Button(frame_recherche_elements_L_rec, text="Valider",
                                                     font=buttonFont, width=10, bg="black", fg="white",
                                                     command=recherche_elements_L_rec)
-        # bouton_recherche_elements_L_rec = ttk.Button(frame_recherche_elements_L_rec, text="Valider",
-        #                                        width=10, command=recherche_elements)
-        bouton_recherche_elements_L_rec.grid(row=5, column=1, columnspan=2)
+        bouton_recherche_elements_L_rec.grid(row=3, column=3, columnspan=2)
+
         flag_fenetre_recherche_elements_ouvert_L_rec  = True
         fenetre_recherche_elements_L_rec.protocol("WM_DELETE_WINDOW",
                                                   ferme_fenetre_recherche_elements_L_rec)
@@ -4471,15 +4496,21 @@ def ouvre_fenetre_recherche_elements_L_rec():
 
 def recherche_elements_L_rec() :
     global rep_NIST
+    global texte_neutres_L_rec, texte_ions_L_rec
     if flag_NIST_LIBS_L_ele.get() == 1 :
         rep_NIST = "NIST_LIBS"
     else :
         rep_NIST = "NIST_atomic_spectra"
-
-    LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
-                                                   delta_recherche_elements_L_rec.get(),
-                                                   seuil_recherche_elements_L_rec.get(),
-                                                   rep_LIBStick, rep_NIST)
+    texte_neutres_L_rec, texte_ions_L_rec = LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
+                                                                               delta_recherche_elements_L_rec.get(),
+                                                                               seuil_recherche_elements_L_rec.get(),
+                                                                               rep_LIBStick, rep_NIST)
+    zone_texte_L_rec.insert("1.0", "\n\n")
+    zone_texte_L_rec.insert("1.0", texte_ions_L_rec)
+    zone_texte_L_rec.insert("1.0", "\n")
+    zone_texte_L_rec.insert("1.0", texte_neutres_L_rec)
+    # print(texte_neutres_L_rec)
+    # print(texte_ions_L_rec)
 
 
 def ferme_fenetre_recherche_elements_L_rec():
@@ -4539,7 +4570,6 @@ def ouvre_fenetre_a_propos_L_aide():
 
         zone_texte_L_aide = tk.Text(frame_a_propos_L_aide, wrap=tk.WORD,
                                     yscrollcommand=vscroll_bar_texte_L_aide.set)
-        # zone_texte_L_aide.place(x = 0, y = 0, height = 200, width = 200)
         zone_texte_L_aide.insert("1.0", texte)
         zone_texte_L_aide.grid(row=1,column=1)
 
@@ -4547,9 +4577,6 @@ def ouvre_fenetre_a_propos_L_aide():
         zone_texte_L_aide.image_create("2.0", image=logo)
         zone_texte_L_aide.image=logo
         vscroll_bar_texte_L_aide.config(command=zone_texte_L_aide.yview)
-        # label_logo_L_aide = tk.Label(frame_a_propos_L_aide, image=logo)
-        # label_logo_L_aide.image= logo
-        # label_logo_L_aide.grid(row=1, column=2)
 
         buttonFont = font.Font(family='Helvetica', size=15)
         bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide,
@@ -4887,7 +4914,7 @@ class case_classification(tk.Button):
             size=TAILLE_FONT_CLASSIFICATION, weight="bold"))
         DataFrame_element_L_ele = lit_element_L_ele(symbole)
         affiches_lignes_element_L_ele()
-        print(nom)
+        # print(nom)
 
 
 ###################################################################################################
@@ -4959,6 +4986,7 @@ menu_extraction = tk.Menu(barre_menus)
 menu_comparaison = tk.Menu(barre_menus)
 menu_ACP = tk.Menu(barre_menus)
 menu_outils = tk.Menu(barre_menus)
+sous_menu_graduations = tk.Menu(menu_outils)
 sous_menu_langue = tk.Menu(menu_outils)
 sous_menu_style = tk.Menu(menu_outils)
 menu_aide = tk.Menu(barre_menus)
@@ -4996,14 +5024,34 @@ menu_ACP.add_checkbutton(label=_("Echelle log y"), variable=flag_echelle_log_L_A
 barre_menus.add_cascade(label=_("Outils"), menu=menu_outils)
 flag_zoom_auto_y = tk.BooleanVar(value=True)
 menu_outils.add_checkbutton(label=_("Zoom auto en y"), variable=flag_zoom_auto_y)
-menu_outils.add_command(label=_("Fenetre principale premier plan"),
-                        command=fenetre_pricipale_en_avant)
+menu_outils.add_cascade(label=_("Graduations"), menu=sous_menu_graduations)
+multiple_du_pas_en_nm = tk.IntVar(value=10)
+sous_menu_graduations.add_radiobutton(label=_("Pas multiple de 10"), value=10, variable=multiple_du_pas_en_nm,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Pas multiple de 5"), value=5, variable=multiple_du_pas_en_nm,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Pas multiple de 2"), value=2, variable=multiple_du_pas_en_nm,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Pas multiple de 1"), value=1, variable=multiple_du_pas_en_nm,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_separator()
+espacement_en_pixels = tk.IntVar(value=100)
+sous_menu_graduations.add_radiobutton(label=_("Espacement mini 100 pixels"), value=100, variable=espacement_en_pixels,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Espacement mini 50 pixels"), value=50, variable=espacement_en_pixels,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Espacement mini 20 pixels"), value=20, variable=espacement_en_pixels,
+                                 command=mise_a_jour_affichage_onglet_actif)
+
+menu_outils.add_separator()
 menu_outils.add_command(label=_("Recherche d'éléments"), underline=0, accelerator="CTRL+R",
                         command=ouvre_fenetre_recherche_elements_L_rec)
 menu_outils.add_command(label=_("Tableau périodique"), accelerator="CTRL+E",
                         command=ouvre_fenetre_classification_L_ele)
 menu_outils.bind_all("<Control-r>",ouvre_fenetre_recherche_elements_event_L_rec)
 menu_outils.bind_all("<Control-e>",ouvre_fenetre_classification_event_L_ele)
+menu_outils.add_command(label=_("Fenetre principale premier plan"),
+                        command=fenetre_pricipale_en_avant)
 
 menu_outils.add_separator()
 menu_outils.add_cascade(label=_("Langue au prochain démarage"), menu=sous_menu_langue)
@@ -5017,11 +5065,10 @@ sous_menu_langue.add_radiobutton(label=_("Espagnol"), value="es", variable=langu
 sous_menu_langue.add_radiobutton(label=_("Italien"), value="it", variable=langue_menu,
                                  command=ecrit_param_langue)
 
-menu_outils.add_separator()
 menu_outils.add_cascade(label=_("Style au prochain démarage"), menu=sous_menu_style)
 flag_style_LIBStick_couleur = tk.BooleanVar(value=flag_style_LIBStick_ini)
 sous_menu_style.add_checkbutton(label=_("Couleur de LIBStick"), variable=flag_style_LIBStick_couleur,
-                            command=ecrit_param_interface)
+                                command=ecrit_param_interface)
 sous_menu_style.add_separator()
 style_menu = tk.StringVar(value=style_interface_LIBStick)
 sous_menu_style.add_radiobutton(label="keramik", value="keramik", variable=style_menu,
@@ -5088,7 +5135,6 @@ def clic_onglets(event):
         affiche_nom_spectre_onglet3()
     if onglet_actif == 3:
         affiche_nom_spectre_onglet4()
-
 
 onglets.bind("<ButtonRelease-1>", clic_onglets)
 

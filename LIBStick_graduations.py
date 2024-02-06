@@ -20,7 +20,7 @@ import numpy as np
 ###################################################
 # Calcul du pas en nm
 ###################################################
-def calcul_pas_nm (taille_canevas_en_pixels, limites_spectre_en_nm, x_pixels) :
+def calcul_pas_nm (taille_canevas_en_pixels, limites_spectre_en_nm, x_pixels, x_du_pas_en_nm) :
     """
     Calcule un pas rond en nm en fonction des limites du spectre et de la résolution en pixels
     du canevas d'affichage du spectre
@@ -29,14 +29,14 @@ def calcul_pas_nm (taille_canevas_en_pixels, limites_spectre_en_nm, x_pixels) :
 
     delta_spectre_en_nm = limites_spectre_en_nm[1]-limites_spectre_en_nm[0]
     lim_spectre_arondies=  np.zeros((2))
-    lim_spectre_arondies[0] = ((limites_spectre_en_nm[0]//10) +1)*10
-    lim_spectre_arondies[1] = (limites_spectre_en_nm[1]//10)*10
-    print(limites_spectre_en_nm)
-    print(lim_spectre_arondies)
+    lim_spectre_arondies[0] = ((limites_spectre_en_nm[0]//x_du_pas_en_nm) +1)*x_du_pas_en_nm
+    lim_spectre_arondies[1] = (limites_spectre_en_nm[1]//x_du_pas_en_nm)*x_du_pas_en_nm
+    # print(limites_spectre_en_nm)
+    # print(lim_spectre_arondies)
     delta_spectre_arondi =lim_spectre_arondies[1] - lim_spectre_arondies[0]
     pas_en_nm = int(delta_spectre_arondi//nombre_de_marques)
     # print(pas_en_nm)
-    pas_en_nm = (np.round((pas_en_nm)/10))*10+10
+    pas_en_nm = (np.round((pas_en_nm)/x_du_pas_en_nm))*x_du_pas_en_nm+x_du_pas_en_nm
     # print(pas_en_nm)
     return delta_spectre_en_nm, lim_spectre_arondies, pas_en_nm
 
@@ -60,9 +60,9 @@ def creation_tableau_graduations_nm(limites_spectre_x, lim_spectre_arondies, pas
     liste_graduations_arange = np.arange(int(lim_spectre_arondies[0]),
                                           int(limites_spectre_x[1]),
                                           int(pas_en_nm))
-    print ("liste_graduations_arange = ")
-    print(liste_graduations_arange)
-    print("___________________")
+    # print ("liste_graduations_arange = ")
+    # print(liste_graduations_arange)
+    # print("___________________")
 
     # for i in range(int(limites_spectre_arondies[0]),
     #                int(limites_spectre_arondies[1]),
@@ -96,14 +96,15 @@ def conversion_nm_pixels (limites_spectre_en_nm,
 ###################################################
 # Programme principal de calcul de 2 tableaux de graduation (en nm et en pixels)
 ###################################################
-def calcul_tableaux_graduation(largeur_canevas_spectres, limites_spectre_x, espacement_en_pixels) :
+def calcul_tableaux_graduation(largeur_canevas_spectres, limites_spectre_x, espacement_en_pixels, multiple_du_pas) :
     """
     Fonction principale appelant les autres fonctions et retournant les deux listes
     de gradautions en nm et en pixels
     """
     delta_spectre_en_nm, limites_spectre_arondies, pas = calcul_pas_nm (largeur_canevas_spectres,
                                                                               limites_spectre_x,
-                                                                              espacement_en_pixels)
+                                                                              espacement_en_pixels,
+                                                                              multiple_du_pas)
     liste_graduations_en_nm = creation_tableau_graduations_nm (limites_spectre_x,
                                                                limites_spectre_arondies,
                                                                pas)

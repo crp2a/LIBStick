@@ -14,8 +14,11 @@ import LIBStick_outils
 # Recherche de dorrespondance longueur d'onde -> éléments
 ###################################################################################################
 def recherche_elements(long_onde, delta, seuil, repertoire, rep_NIST):
-    recherche_elements_neutres_ions(long_onde, delta,seuil, False, repertoire, rep_NIST)
-    recherche_elements_neutres_ions(long_onde, delta,seuil, True, repertoire, rep_NIST)
+    texte_neutres = recherche_elements_neutres_ions(long_onde, delta,seuil, False, repertoire, rep_NIST)
+    texte_ions = recherche_elements_neutres_ions(long_onde, delta,seuil, True, repertoire, rep_NIST)
+    # print(texte_neutres)
+    # print(texte_ions)
+    return texte_neutres, texte_ions
 
 
 def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, repertoire, rep_NIST):
@@ -25,14 +28,16 @@ def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, repertoire, re
     # Chemin vers les fichiers des éléments
     if ions == False :
         elements_path = repertoire + "/LIBStick_datas/" + rep_NIST + "/elements"
-        print("--------------------------")
-        print ("Neutres :")
-        print("--------------------------")
+        texte ="--------------------------" + "\n" + "Neutres :" + "\n" + "--------------------------"
+        # print("--------------------------")
+        # print ("Neutres :")
+        # print("--------------------------")
     else :
         elements_path = repertoire + "/LIBStick_datas/" + rep_NIST + "/ions"
-        print("--------------------------")
-        print ("Ions :")
-        print("--------------------------")
+        texte ="--------------------------" + "\n" + "Ions :" + "\n" + "--------------------------"
+        # print("--------------------------")
+        # print ("Ions :")
+        # print("--------------------------")
     # Lister les fichiers
     # Retourne une liste de chemins
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(elements_path,".csv")
@@ -70,9 +75,10 @@ def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, repertoire, re
             if ((wavelength[j] > borneinf) & (wavelength[j] < bornesup) & (intensity[j] >= seuil)) == True :
                 # print(str(noms_elements[i]) + " : " + str(wavelength[j]) + "   "  + str(intensity[j]))
                 resultat_df.loc[len(resultat_df)] = [noms_elements[i],wavelength[j],intensity[j]]
-    print (resultat_df.to_markdown())
+    texte = texte + "\n" + resultat_df.to_markdown()+ "\n"
     resultat_df.sort_values(by="I relative",ascending=(False), inplace = True)
-    print (resultat_df.to_markdown())
+    texte = texte + "\n" + resultat_df.to_markdown() + "\n"
+    return texte
 
 
 
