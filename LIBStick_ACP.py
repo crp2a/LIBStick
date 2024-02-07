@@ -42,7 +42,7 @@ def ouvre_ACP(rep_travail):
 # fonctions d'affichage d'ACP
 ###################################################################################################
 def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
-                flag_3D, flag_echelle, flag_eboulis):
+                flag_3D, flag_echelle, flag_eboulis, flag_plotly):
     """
     Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
     uniquement des individus ayant servi au calcul de l'ACP
@@ -82,15 +82,16 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
 
     inerties = modele_ACP.explained_variance_ratio_*100
 
-    fig_px_matrice = px.scatter_matrix(tableau_ACP, dimensions=range(3),
-                                        color=treeview_dataframe.values[:, -1],
-                                        opacity=0.5,
-                                        hover_name=(treeview_dataframe["nom"]),
-                                        labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
-                                                "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
-                                                "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
-    fig_px_matrice.update_traces(diagonal_visible=False)
-    fig_px_matrice.show()
+    if flag_plotly is True :
+        fig_px_matrice = px.scatter_matrix(tableau_ACP, dimensions=range(3),
+                                            color=treeview_dataframe.values[:, -1],
+                                            opacity=0.5,
+                                            hover_name=(treeview_dataframe["nom"]),
+                                            labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
+                                                    "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
+                                                    "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
+        fig_px_matrice.update_traces(diagonal_visible=False)
+        fig_px_matrice.show()
 
     if flag_3D is False:
         fig, ax = plt.subplots(figsize=(5, 5))
@@ -123,15 +124,16 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
             ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], treeview_dataframe.index[i])
         plt.show(block=False)
 
-        fig_px_scatter = px.scatter(tableau_ACP, x=(dim1-1), y=(dim2-1),
-                            color=treeview_dataframe.values[:, -1],
-                            symbol=treeview_dataframe.values[:, -2],
-                            text=treeview_dataframe.index, opacity=0.5,
-                            hover_name=(treeview_dataframe["nom"]),
-                            labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
-                                    "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
-        fig_px_scatter.update_traces(marker_size=20)
-        fig_px_scatter.show()
+        if flag_plotly is True :
+            fig_px_scatter = px.scatter(tableau_ACP, x=(dim1-1), y=(dim2-1),
+                                color=treeview_dataframe.values[:, -1],
+                                symbol=treeview_dataframe.values[:, -2],
+                                text=treeview_dataframe.index, opacity=0.5,
+                                hover_name=(treeview_dataframe["nom"]),
+                                labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                        "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
+            fig_px_scatter.update_traces(marker_size=20)
+            fig_px_scatter.show()
 
     if flag_3D is True:
         fig3d = plt.figure()
@@ -162,21 +164,22 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
                       tableau_ACP[i, dim3-1], treeview_dataframe.index[i])
         plt.show(block=False)
 
-        fig_px3D = px.scatter_3d(tableau_ACP,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
-                                  color=treeview_dataframe.values[:, -1],
-                                  symbol=treeview_dataframe.values[:, -2],
-                                  text=treeview_dataframe.index, opacity=0.5,
-                                  hover_name=(treeview_dataframe["nom"]),
-                                  labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
-                                          "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
-                                          "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
-        fig_px3D.update_traces(marker_size=10)
-        fig_px3D.show()
+        if flag_plotly is True :
+            fig_px3D = px.scatter_3d(tableau_ACP,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
+                                      color=treeview_dataframe.values[:, -1],
+                                      symbol=treeview_dataframe.values[:, -2],
+                                      text=treeview_dataframe.index, opacity=0.5,
+                                      hover_name=(treeview_dataframe["nom"]),
+                                      labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                              "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
+                                              "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
+            fig_px3D.update_traces(marker_size=10)
+            fig_px3D.show()
 
 
 def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
                          modele_ACP, tableau_ACP, tableau_ACP_individus_supp,
-                         dim, flag_3D, flag_echelle, flag_eboulis):
+                         dim, flag_3D, flag_echelle, flag_eboulis, flag_plotly):
     """
     Affiche les graphes de l'ACP(2D ou 3D, ébouli) dans des fenêtres matplotlib.pyplot,
     avec les individus supplémentaires n'ayant pas servi au calcul de l'ACP, calculé au préalable
@@ -267,15 +270,16 @@ def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
 
         # tableau_complet = np.concatenate([tableau_ACP,tableau_ACP_individus_supp])
         # dataframe_complet = pd.concat([treeview_dataframe,treeview_dataframe_individus_supp])
-        fig_px_scatter = px.scatter(tableau_complet, x=(dim1-1), y=(dim2-1),
-                                    color=dataframe_complet.values[:, -1],
-                                    symbol=dataframe_complet.values[:, -2],
-                                    text=dataframe_complet.index, opacity=0.5,
-                                    hover_name=(dataframe_complet["nom"]),
-                                    labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
-                                            "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
-        fig_px_scatter.update_traces(marker_size=20)
-        fig_px_scatter.show()
+        if flag_plotly is True :
+            fig_px_scatter = px.scatter(tableau_complet, x=(dim1-1), y=(dim2-1),
+                                        color=dataframe_complet.values[:, -1],
+                                        symbol=dataframe_complet.values[:, -2],
+                                        text=dataframe_complet.index, opacity=0.5,
+                                        hover_name=(dataframe_complet["nom"]),
+                                        labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                                "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
+            fig_px_scatter.update_traces(marker_size=20)
+            fig_px_scatter.show()
 
     if flag_3D is True:
         fig3d = plt.figure()
@@ -319,16 +323,17 @@ def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
                       tableau_ACP_individus_supp[i, dim3-1], treeview_dataframe_individus_supp.index[i])
         plt.show(block=False)
 
-        fig_px3D = px.scatter_3d(tableau_complet,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
-                                 color=dataframe_complet.values[:, -1],
-                                 symbol=dataframe_complet.values[:, -2],
-                                 text=dataframe_complet.index, opacity=0.5,
-                                 hover_name=(dataframe_complet["nom"]),
-                                 labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
-                                         "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
-                                         "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
-        fig_px3D.update_traces(marker_size=10)
-        fig_px3D.show()
+        if flag_plotly is True :
+            fig_px3D = px.scatter_3d(tableau_complet,  x=(dim1-1), y=(dim2-1), z=(dim3-1),
+                                     color=dataframe_complet.values[:, -1],
+                                     symbol=dataframe_complet.values[:, -2],
+                                     text=dataframe_complet.index, opacity=0.5,
+                                     hover_name=(dataframe_complet["nom"]),
+                                     labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
+                                             "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
+                                             "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})
+            fig_px3D.update_traces(marker_size=10)
+            fig_px3D.show()
 
 
 ###################################################################################################

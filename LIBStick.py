@@ -775,6 +775,29 @@ def affiche_spectre_L_trait():
     affiche_graduation_L_trait()
 
 
+def affiche_fond_L_trait():
+    """
+    Affichage du fond continu du spectre dans le canevas 0
+    """
+    limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
+    limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
+    spectre = np.zeros((0, 2))
+    for ligne in fond_continu_L_trait:
+        if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
+            spectre = np.row_stack((spectre, ligne))
+    minimum = minimum_spectre_L_trait
+    maximum = maximum_spectre_L_trait
+    if flag_echelle_log_L_trait.get() == True :
+        spectre[:,1] = np.log(spectre[:,1]-minimum_spectre_lineaire_L_trait)
+    spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
+    spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
+        largeur_canevas_spectres/delta_limites_L_trait
+    for i in range(len(spectre) - 1):
+        canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1],
+                                     spectre[i+1, 0], spectre[i+1, 1], fill="blue")
+    # flag_premier_fond_L_trait = False
+
+
 def affiche_graduation_L_trait():
     """
     Affichage des graduations dans les canevas 0 et 1
@@ -820,28 +843,6 @@ def affiche_graduation_L_trait():
        liste_1_textes_grad_L_trait.append(canevas1_L_trait.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
-
-def affiche_fond_L_trait():
-    """
-    Affichage du fond continu du spectre dans le canevas 0
-    """
-    limites_affichage_spectre_L_trait[0] = variable_zoom_inf_L_trait.get()
-    limites_affichage_spectre_L_trait[1] = variable_zoom_sup_L_trait.get()
-    spectre = np.zeros((0, 2))
-    for ligne in fond_continu_L_trait:
-        if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
-            spectre = np.row_stack((spectre, ligne))
-    minimum = minimum_spectre_L_trait
-    maximum = maximum_spectre_L_trait
-    if flag_echelle_log_L_trait.get() == True :
-        spectre[:,1] = np.log(spectre[:,1]-minimum_spectre_lineaire_L_trait)
-    spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
-    spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
-        largeur_canevas_spectres/delta_limites_L_trait
-    for i in range(len(spectre) - 1):
-        canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1],
-                                     spectre[i+1, 0], spectre[i+1, 1], fill="blue")
-    # flag_premier_fond_L_trait = False
 
 
 def mise_a_jour_affichage_L_trait() :
@@ -2734,7 +2735,6 @@ def affiche_spectre_L_comp():
     global limites_affichage_spectre_L_comp
     global delta_limites_L_comp
     global minimum_spectre_lineaire_L_comp
-    # global minimum_spectre_L_comp
     global maximum_spectre_L_comp
     global flag_echelle_log_L_comp
     limites_affichage_spectre_L_comp[0] = variable_zoom_inf_L_comp.get()
@@ -3608,7 +3608,10 @@ def execute_ACP_L_ACP():
                                                        flag_centre_reduit_L_ACP.get())
     tableau_ACP_L_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
     LIBStick_ACP.affiche_ACP(treeview_dataframe, modele_ACP_L_ACP, tableau_ACP_L_ACP, dim_L_ACP,
-                             flag_3D_L_ACP.get(), flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+                             flag_3D_L_ACP.get(),
+                             flag_echelle_L_ACP.get(),
+                             flag_eboulis_L_ACP.get(),
+                             flag_plotly_L_ACP.get())
 
     valeurs_propres_corrigees = modele_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
     sqrt_valeurs_propres_corrigees = np.sqrt(valeurs_propres_corrigees)
@@ -3681,11 +3684,15 @@ def applique_ACP_ind_sup_L_ACP():
                                           treeview_dataframe, modele_ACP_L_ACP,
                                           tableau_ACP_L_ACP, tableau_ACP_individus_supp,
                                           dim_L_ACP, flag_3D_L_ACP.get(),
-                                          flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+                                          flag_echelle_L_ACP.get(),
+                                          flag_eboulis_L_ACP.get(),
+                                          flag_plotly_L_ACP.get())
     else:
         LIBStick_ACP.affiche_ACP(treeview_dataframe, modele_ACP_L_ACP,
                                  tableau_ACP_L_ACP, dim_L_ACP, flag_3D_L_ACP.get(),
-                                 flag_echelle_L_ACP.get(), flag_eboulis_L_ACP.get())
+                                 flag_echelle_L_ACP.get(),
+                                 flag_eboulis_L_ACP.get(),
+                                 flag_plotly_L_ACP.get())
 
     valeurs_propres_corrigees = modele_ACP_L_ACP.explained_variance_ * (nbr_spectres-1)/nbr_spectres
     sqrt_valeurs_propres_corrigees = np.sqrt(valeurs_propres_corrigees)
@@ -3827,6 +3834,8 @@ def affiche_spectre_L_ACP():
     global limites_affichage_spectre_L_ACP
     global delta_limites_L_ACP
     global maximum_spectre_L_ACP
+    global minimum_spectre_lineaire_L_ACP
+    global flag_echelle_log_L_ACP
     limites_affichage_spectre_L_ACP[0] = variable_zoom_inf_L_ACP.get()
     limites_affichage_spectre_L_ACP[1] = variable_zoom_sup_L_ACP.get()
     # gestion du zoom avec y personnalisé
@@ -3854,6 +3863,10 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_ACP.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
@@ -3865,7 +3878,10 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
-
+        if flag_echelle_log_L_ACP.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
 
     # gestion du zoom avec y automatique
@@ -3876,6 +3892,10 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
+        if flag_echelle_log_L_ACP.get() == True :
+            spectre[spectre<0] = 0
+            minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
+            spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
         minimum = spectre[:, 1].min()
         maximum_spectre_L_ACP = maximum = spectre[:, 1].max()
 
@@ -6096,10 +6116,14 @@ canevas1_L_ACP.grid(row=1, column=1, columnspan=6)
 frame3_1_L_ACP = ttk.Frame(frame3_L_ACP)
 frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tk.N)
 
+flag_plotly_L_ACP = tk.BooleanVar(value=True)
+coche_plotly_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("Diag. plotly"), variable=flag_plotly_L_ACP)
+coche_plotly_L_ACP.grid(row=1, column=1)
+
 bouton_enregistre_L_ACP = ttk.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"),
                                      command=enregistre_facteurs_ACP_L_ACP,
                                      state="disable", width=10)
-bouton_enregistre_L_ACP.grid(row=1, column=1)
+bouton_enregistre_L_ACP.grid(row=2, column=1)
 
 ligne_position_1_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 
