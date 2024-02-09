@@ -4399,7 +4399,7 @@ def ouvre_fenetre_change_tree_label_L_ACP(event):
                                              textvariable=label_L_ACP, foreground="black")
             entree_label_L_ACP.pack(ipadx=0, ipady=0)
             buttonFont = font.Font(family='Helvetica', size=30)
-            bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
+            bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text=_("Valider"), font=buttonFont, width=200, height=100,
                                            command=validation_label_L_ACP)
             # bouton_label_L_ACP = ttk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
             #                                     command=validation_label_L_ACP)
