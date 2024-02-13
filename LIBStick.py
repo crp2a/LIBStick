@@ -48,6 +48,10 @@ rep_NIST = "NIST_LIBS"
 
 # interface graphique
 flag_change_fenetre = False
+flag_bouton_efface_L_trait = True
+flag_bouton_efface_L_ext = True
+flag_bouton_efface_L_comp = True
+flag_bouton_efface_L_ACP = True
 largeur_fenetre_principale = 1155
 hauteur_fenetre_principale = 750
 largeur_canevas_spectres = 1000
@@ -782,7 +786,7 @@ def affiche_spectre_L_trait():
 
     # ajout des graduations
     affiche_graduation_L_trait()
-    affiches_lignes_element_L_ele()
+    affiche_lignes_element_L_ele()
 
 def affiche_fond_L_trait():
     """
@@ -1072,6 +1076,7 @@ def affiche_spectre_corrige_L_trait():
 
     # ajout des graduations
     affiche_graduation_L_trait()
+    affiche_lignes_element_L_ele()
 
 
 def affiche_position_souris_1_L_trait(event):
@@ -1526,7 +1531,7 @@ def execute_scripts_L_ext():
 def creation_spectre_moyen_L_ext():
     """
     Crée et sauvegarde le(s) spectre(s) moyen(s)
-    et les affiches dans les canevas 3 (et 4)
+    et les affiche dans les canevas 3 (et 4)
     ATTENTION : A REVOIR DANS LE CAS OU UNE SEULE ZONE EXTRAITE !!!!
     """
     global spectre_moyen_1, spectre_moyen_2
@@ -1793,7 +1798,7 @@ def affiche_spectre_L_ext():
 
     # ajout des graduations
     affiche_graduation_L_ext()
-    affiches_lignes_element_L_ele()
+    affiche_lignes_element_L_ele()
 
 
 def affiche_graduation_L_ext():
@@ -2817,7 +2822,7 @@ def affiche_spectre_L_comp():
 
     # ajout des graduations
     affiche_graduation_L_comp()
-    affiches_lignes_element_L_ele()
+    affiche_lignes_element_L_ele()
 
 
 def affiche_graduation_L_comp():
@@ -3919,7 +3924,7 @@ def affiche_spectre_L_ACP():
 
     # ajout des graduations
     affiche_graduation_L_ACP()
-    affiches_lignes_element_L_ele()
+    affiche_lignes_element_L_ele()
 
 
 def affiche_graduation_L_ACP():
@@ -4675,7 +4680,6 @@ def lit_element_L_ele(symbole):
         rep_NIST = "NIST_LIBS"
     else :
         rep_NIST = "NIST_atomic_spectra"
-
     try:
         if flag_neutres_ions_L_ele.get() == 1:
             DataFrame_element = pd.read_table(
@@ -4690,7 +4694,54 @@ def lit_element_L_ele(symbole):
                             message=_("Pas d'informations pour cet élément."))
 
 
+def lignes_elements_flag_FALSE_L_ele() :
+    """
+    Passe le flag_bouton_efface de l'onglet en cours à False
+    de manière à afficher les raies des éléments
+    """
+    global flag_bouton_efface_L_trait
+    global flag_bouton_efface_L_ext
+    global flag_bouton_efface_L_comp
+    global flag_bouton_efface_L_ACP
+    efface_lignes_elements_L_ele()
+    ID_onglet = onglets.index("current")
+    if ID_onglet == 0:
+        flag_bouton_efface_L_trait = False
+    if ID_onglet == 1:
+        flag_bouton_efface_L_ext = False
+    if ID_onglet == 2:
+        flag_bouton_efface_L_comp = False
+    if ID_onglet == 3:
+        flag_bouton_efface_L_ACP = False
+
+
+def lignes_elements_flag_TRUE_L_ele() :
+    """
+    Passe le flag_bouton_efface de l'onglet en cours à True
+    de manière à ne plus afficher les raies des éléments tant qu'un
+    bouton de la classification n'a pas été à nouveau cliqué
+    """
+    global flag_bouton_efface_L_trait
+    global flag_bouton_efface_L_ext
+    global flag_bouton_efface_L_comp
+    global flag_bouton_efface_L_ACP
+    efface_lignes_elements_L_ele()
+    ID_onglet = onglets.index("current")
+    if ID_onglet == 0:
+        flag_bouton_efface_L_trait = True
+    if ID_onglet == 1:
+        flag_bouton_efface_L_ext = True
+    if ID_onglet == 2:
+        flag_bouton_efface_L_comp = True
+    if ID_onglet == 3:
+        flag_bouton_efface_L_ACP = True
+
+
 def efface_lignes_elements_L_ele() :
+    """
+    Efface les lignes neutres ou ioniques des spectres de l'onglet en cours
+    et efface la liste des identifiants de des lignes
+    """
     global liste_0_lignes_element_L_trait
     global liste_1_lignes_element_L_trait
     global liste_0_lignes_element_L_ext
@@ -4722,55 +4773,32 @@ def efface_lignes_elements_L_ele() :
         liste_1_lignes_element_L_ACP = []
 
 
-def affiches_lignes_element_L_ele():
+def affiche_lignes_element_L_ele():
     """
     Affiche les positions des raies de l'élément sélectionné dans la classification périodique
     L'affichage différencie les raies dont l'intensité relative est >10%, entre 1% et 10%
     et celles <1%
     L'affichage ne se fait que sur les spectres de l'onglet en cours
     """
-    global flag_bouton_zoom_L_trait, flag_bouton_zoom_L_ext
-    global flag_bouton_zoom_L_comp, flag_bouton_zoom_L_ACP
+    # global flag_bouton_zoom_L_trait, flag_bouton_zoom_L_ext
+    # global flag_bouton_zoom_L_comp, flag_bouton_zoom_L_ACP
     global liste_0_lignes_element_L_trait
     global liste_1_lignes_element_L_trait
     global liste_0_lignes_element_L_ext
     global liste_0_lignes_element_L_comp
     global liste_0_lignes_element_L_ACP
     global liste_1_lignes_element_L_ACP
+
     efface_lignes_elements_L_ele()
     ID_onglet = onglets.index("current")
     if ID_onglet == 0:
         limites_affichage_spectre = limites_affichage_spectre_L_trait
-        # flag_bouton_zoom_L_trait = True
-        # affiche_spectre_L_trait()
-        # try :
-        #     affiche_fond_L_trait()
-        # except :
-        #     pass
-        # try :
-        #     affiche_spectre_corrige_L_trait()
-        # except :
-        #     pass
-        # flag_bouton_zoom_L_trait = False
     if ID_onglet == 1:
         limites_affichage_spectre = limites_affichage_spectre_L_ext
-        # flag_bouton_zoom_L_ext = True
-        # affiche_spectre_L_ext()
-        # flag_bouton_zoom_L_ext = False
     if ID_onglet == 2:
         limites_affichage_spectre = limites_affichage_spectre_L_comp
-        # flag_bouton_zoom_L_comp = True
-        # affiche_spectre_L_comp()
-        # flag_bouton_zoom_L_comp = False
     if ID_onglet == 3:
         limites_affichage_spectre = limites_affichage_spectre_L_ACP
-        # flag_bouton_zoom_L_ACP = True
-        # affiche_spectre_L_ACP()
-        # try :
-        #     affiche_spectres_var_ACP_L_ACP()
-        # except :
-        #     pass
-        # flag_bouton_zoom_L_ACP = False
 
     if flag_neutres_ions_L_ele.get() == 1:
         couleur_lignes = "magenta2"
@@ -4785,22 +4813,22 @@ def affiches_lignes_element_L_ele():
             if intensite_relative >= 10 and flag_sup10_L_ele.get() == 1:
                 # affiche_ligne_element(long_onde, canevas0_L_ext)
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
-                if ID_onglet == 0:
+                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
                                                                                        fill=couleur_lignes, dash=(4, 1)))
                     liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres,
                                                                                        fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 1:
+                if ID_onglet == 1 and flag_bouton_efface_L_ext is False:
                     liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, 0,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 2:
+                if ID_onglet == 2 and flag_bouton_efface_L_comp is False:
                     liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, 0,
                                                                                      x_ligne, hauteur_canevas_spectres,
                                                                                      fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 3:
+                if ID_onglet == 3 and flag_bouton_efface_L_ACP is False:
                     liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, 0,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 1)))
@@ -4809,22 +4837,22 @@ def affiches_lignes_element_L_ele():
                                                                                    fill=couleur_lignes, dash=(4, 1)))
             if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
-                if ID_onglet == 0:
+                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)/2,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
                                                                                        fill=couleur_lignes, dash=(4, 2)))
                     liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres/2,
                                                                                        x_ligne, hauteur_canevas_spectres,
                                                                                        fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 1:
+                if ID_onglet == 1 and flag_bouton_efface_L_ext is False:
                     liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres/2,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 2:
+                if ID_onglet == 2 and flag_bouton_efface_L_comp is False:
                     liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres/2,
                                                                                      x_ligne, hauteur_canevas_spectres,
                                                                                      fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 3:
+                if ID_onglet == 3 and flag_bouton_efface_L_ACP is False:
                     liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres/2,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 2)))
@@ -4833,22 +4861,22 @@ def affiches_lignes_element_L_ele():
                                                                                    fill=couleur_lignes, dash=(4, 1)))
             if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
                 x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
-                if ID_onglet == 0:
+                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*0.825,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
                                                                                        fill=couleur_lignes, dash=(4, 3)))
                     liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres*0.825,
                                                                                        x_ligne, hauteur_canevas_spectres,
                                                                                        fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 1:
+                if ID_onglet == 1 and flag_bouton_efface_L_ext is False:
                     liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres*0.825,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 2:
+                if ID_onglet == 2 and flag_bouton_efface_L_comp is False:
                     liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres*0.825,
                                                                                      x_ligne, hauteur_canevas_spectres,
                                                                                      fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 3:
+                if ID_onglet == 3 and flag_bouton_efface_L_ACP is False:
                     liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres*0.825,
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 3)))
@@ -4857,14 +4885,24 @@ def affiches_lignes_element_L_ele():
                                                                                    fill=couleur_lignes, dash=(4, 1)))
 
 
-def affiches_lignes_neutres_ions_L_ele():
+def affiche_lignes_neutres_ions_NIST_L_ele():
     """
     Met à jour l'affichage des raies de l'élément sélectionné lors d'un changement
-    sur les boutons radio
+    sur les boutons radio neutres/ions et case à cocher NIST LIBS
     """
     global DataFrame_element_L_ele
     DataFrame_element_L_ele = lit_element_L_ele(symbole_L_ele)
-    affiches_lignes_element_L_ele()
+    lignes_elements_flag_FALSE_L_ele()
+    affiche_lignes_element_L_ele()
+
+
+def affiche_lignes_bouton_central_L_ele():
+    """
+    Met à jour l'affichage des raies de l'élément sélectionné lors d'un clic
+    sur le bouton central du dernier element selectionné dans la fenêtre de tableau périodique
+    """
+    lignes_elements_flag_FALSE_L_ele()
+    affiche_lignes_element_L_ele()
 
 
 def affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele, frame1, bouton_affichage_L_ele):
@@ -4901,42 +4939,45 @@ def ouvre_fenetre_classification_L_ele():
         frame1_L_ele = ttk.Frame(fenetre_classification_L_ele)
         frame1_L_ele.pack()
 
-        bouton_ferme_L_ele = tk.Button(frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1],
-                                       text=_("Ferme"), font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
-        bouton_ferme_L_ele.configure(command=ferme_fenetre_classification_L_ele)
-        bouton_ferme_L_ele.grid(row=1, column=3, rowspan=3, columnspan=2)
+        # bouton_ferme_L_ele = tk.Button(frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1],
+        #                                text=_("Ferme"), font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
+        # bouton_ferme_L_ele.configure(command=ferme_fenetre_classification_L_ele)
+        bouton_efface_L_ele = tk.Button(frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1],
+                                       text=_("Efface"), font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
+        bouton_efface_L_ele.configure(command=lignes_elements_flag_TRUE_L_ele)
+        bouton_efface_L_ele.grid(row=1, column=3, rowspan=3, columnspan=2)
 
         bouton_affichage_L_ele = tk.Button(frame1_L_ele,
                                            width=TAILLE_CASE[0],
                                            height=TAILLE_CASE[1])
-        bouton_affichage_L_ele.configure(command=affiches_lignes_element_L_ele)
+        bouton_affichage_L_ele.configure(command=affiche_lignes_bouton_central_L_ele)
         bouton_affichage_L_ele.grid(row=1, column=7, rowspan=3, columnspan=2)
 
         coche_El_I_L_ele = ttk.Radiobutton(frame1_L_ele, text=_("Neutres"),
                                                variable=flag_neutres_ions_L_ele, value=1,
-                                               command=affiches_lignes_neutres_ions_L_ele)
+                                               command=affiche_lignes_neutres_ions_NIST_L_ele)
         coche_El_I_L_ele.grid(row=1, column=5, columnspan=3, sticky=tk.W)
         coche_El_II_L_ele = ttk.Radiobutton(frame1_L_ele, text=_("Ions +"),
                                                 variable=flag_neutres_ions_L_ele, value=2,
-                                                command=affiches_lignes_neutres_ions_L_ele)
+                                                command=affiche_lignes_neutres_ions_NIST_L_ele)
         coche_El_II_L_ele.grid(row=2, column=5, columnspan=3, sticky=tk.W)
 
         coche_NIST_LIBS_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("NIST LIBS"),
                                                variable=flag_NIST_LIBS_L_ele,
-                                               command=affiches_lignes_neutres_ions_L_ele)
+                                               command=affiche_lignes_neutres_ions_NIST_L_ele)
         coche_NIST_LIBS_L_ele.grid(row=3, column=5, columnspan=3, sticky=tk.W)
 
         coche_sup10_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("I relative >= 10%"),
                                                 variable=flag_sup10_L_ele,
-                                                command=affiches_lignes_element_L_ele)
+                                                command=affiche_lignes_element_L_ele)
         coche_sup10_L_ele.grid(row=1, column=9, columnspan=4, sticky=tk.W)
         coche_sup1_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("1% <= I relative < 10%"),
                                                variable=flag_sup1_L_ele,
-                                               command=affiches_lignes_element_L_ele)
+                                               command=affiche_lignes_element_L_ele)
         coche_sup1_L_ele.grid(row=2, column=9, columnspan=4, sticky=tk.W)
         coche_inf1_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("I relative < 1%"),
                                                variable=flag_inf1_L_ele,
-                                               command=affiches_lignes_element_L_ele)
+                                               command=affiche_lignes_element_L_ele)
         coche_inf1_L_ele.grid(row=3, column=9, columnspan=4, sticky=tk.W)
 
         DataFrame_tableau_periodique_L_ele = lit_tableau_periodique_L_ele()
@@ -4990,27 +5031,37 @@ class AutoScrollbar(ttk.Scrollbar):
 
 
 class case_classification(tk.Button):
-    # TAILLE_CASE = [2,2]
+    """
+    Nouvelle classe de boutons pour le tableau périodique
+    """
     def __init__(self, boss, nom, symbole,  Z, ligne, colonne, couleur, bouton_affichage):
         texte = "    "+str(Z)+"\n"+symbole
-        tk.Button.__init__(self, boss, text=texte, bg=couleur, command=lambda: self.affiche_pics(
-            nom, symbole, Z, couleur, bouton_affichage))
+        tk.Button.__init__(self, boss, text=texte, bg=couleur,
+                           command=lambda: self.affiche_pics(nom, symbole, Z, couleur,
+                                                             bouton_affichage))
         self.configure(width=TAILLE_CASE[0], height=TAILLE_CASE[1])
         self.config(font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
         self.grid(row=ligne, column=colonne)
 
     def affiche_pics(self, nom, symbole, Z, couleur, bouton_affichage):
+        """
+        méthode appelée lorsqu'on clique sur un élément du tableau périodique :
+        Met à jour le bouton central affichant le dernier élément cliqué
+        Lit le fichier correspondant à l'élément
+        Change le flag d'affichage des lignes de l'onglet en cours
+        Affiche les lignes
+        """
         global symbole_L_ele
         global DataFrame_element_L_ele
         symbole_L_ele = symbole
         texte = "     "+str(Z)+"\n"+symbole
         bouton_affichage.configure(text=texte, bg=couleur,
                                    width=TAILLE_CASE[0], height=TAILLE_CASE[1])
-        # bouton_affichage.config(font=font.Font(weight="bold"))
-        bouton_affichage.config(font=font.Font(
-            size=TAILLE_FONT_CLASSIFICATION, weight="bold"))
+        bouton_affichage.config(font=font.Font(size=TAILLE_FONT_CLASSIFICATION,
+                                               weight="bold"))
         DataFrame_element_L_ele = lit_element_L_ele(symbole)
-        affiches_lignes_element_L_ele()
+        lignes_elements_flag_FALSE_L_ele()
+        affiche_lignes_element_L_ele()
         # print(nom)
 
 
@@ -6273,7 +6324,7 @@ flag_inf1_L_ele = tk.IntVar(value=0)
 # LIBStick : interface principale
 ###################################################################################################
 ###################################################################################################
-def __________IHM_divers__________():
+def __________IHM_interface_principale__________():
     """ LIBStick : interface principale"""
 ###################################################################################################
 ###################################################################################################
