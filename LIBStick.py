@@ -43,6 +43,7 @@ import LIBStick_graduations
 ###################################################################################################
 NOM_OS = os.name
 rep_LIBStick = os.getcwd()
+# print(rep_LIBStick)
 #rep_NIST = "NIST_atomic_spectra"
 rep_NIST = "NIST_LIBS"
 
@@ -52,10 +53,18 @@ flag_bouton_efface_L_trait = True
 flag_bouton_efface_L_ext = True
 flag_bouton_efface_L_comp = True
 flag_bouton_efface_L_ACP = True
-largeur_fenetre_principale = 1155
-hauteur_fenetre_principale = 750
-largeur_canevas_spectres = 1000
-hauteur_canevas_spectres = 200
+
+# largeur_ecran = tk.winfo_width()
+# hauteur_ecran = tk.winfo_height()
+# if largeur_ecran <= 1100 :
+#     largeur_fenetre_principale = 1155
+#     hauteur_fenetre_principale = 750
+# else :
+#     largeur_fenetre_principale = 1350
+#     hauteur_fenetre_principale = 790
+
+largeur_canevas_spectres = 0
+hauteur_canevas_spectres = 0
 # espacement_en_pixels = 50
 # multiple_du_pas_en_nm = 10
 
@@ -65,7 +74,7 @@ COULEUR_INTERFACE = "papaya whip"
 LARGEUR_LIGNES = 2
 # taille_font= 10
 if NOM_OS == "posix" :
-    TAILLE_CASE = [2,2]
+    TAILLE_CASE = [3,2]
 if NOM_OS == "nt" :
     TAILLE_CASE = [4, 2]
 TAILLE_FONT_CLASSIFICATION = 8
@@ -316,19 +325,28 @@ def change_taille_fenetre(event):
     """
     global largeur_canevas_spectres
     global hauteur_canevas_spectres
-    # global old_time
-    if fenetre_principale.winfo_width() < 1150 :
-        largeur_canevas_spectres = 1000
+
+    if largeur_ecran <= 1921 :
+        if fenetre_principale.winfo_width() < 1150 :
+            largeur_canevas_spectres = largeur_canevas_spectres_reference
+        else :
+            largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1155
+
+        if fenetre_principale.winfo_height() < 750 :
+            hauteur_canevas_spectres = hauteur_canevas_spectres_reference
+        else :
+            hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 750)/2)
     else :
-        largeur_canevas_spectres = 1000 + fenetre_principale.winfo_width() - 1150
-    if fenetre_principale.winfo_height() < 750 :
-        hauteur_canevas_spectres = 200
-    else :
-        hauteur_canevas_spectres = 200 + (fenetre_principale.winfo_height() - 750)/2
-    # cur_time = time.time()
-    # if (cur_time - old_time) > 0.001 :
-    #     applique_change_taille_fenetre()
-    #     old_time = time.time()
+        if fenetre_principale.winfo_width() < 1250 :
+            largeur_canevas_spectres = largeur_canevas_spectres_reference
+        else :
+            largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1250
+
+        if fenetre_principale.winfo_height() < 770 :
+            hauteur_canevas_spectres = hauteur_canevas_spectres_reference
+        else :
+            hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 770)/2)
+
     applique_change_taille_fenetre()
 
 
@@ -339,8 +357,8 @@ def applique_change_taille_fenetre():
     canevas0_L_ext.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas1_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres)
     canevas2_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres)
-    canevas3_L_ext.config(width=largeur_canevas_spectres/2, height=200)
-    canevas4_L_ext.config(width=largeur_canevas_spectres/2, height=200)
+    canevas3_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres_reference)
+    canevas4_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres_reference)
     canevas0_L_comp.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas1_L_comp.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas0_L_ACP.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
@@ -504,11 +522,11 @@ def choix_fichier_L_trait():
     global liste_fichiers_L_trait
     global nombre_fichiers_L_trait
     nom_fichier_L_trait = fd.askopenfilename(initialdir=rep_travail_L_trait,
-                                                             title=_('Choisissez un fichier spectre'),
-                                                             filetypes=(("fichiers IVEA", "*.asc"),
-                                                                        ("fichiers SciAps", "*.csv"),
-                                                                        ("fichiers LIBStick", "*.tsv"),
-                                                                        ("fichiers LIBStick moyen", "*.mean")))
+                                             title=_('Choisissez un fichier spectre'),
+                                             filetypes=(("fichiers IVEA", "*.asc"),
+                                                        ("fichiers SciAps", "*.csv"),
+                                                        ("fichiers LIBStick", "*.tsv"),
+                                                        ("fichiers LIBStick moyen", "*.mean")))
     nom_fichier_seul_L_trait = os.path.basename(nom_fichier_L_trait)
     type_fichier_L_trait.set(pathlib.Path(nom_fichier_seul_L_trait).suffix)
     rep_travail_L_trait = os.path.dirname(nom_fichier_L_trait)
@@ -4416,7 +4434,8 @@ def ouvre_fenetre_change_tree_label_L_ACP(event):
                                              textvariable=label_L_ACP, foreground="black")
             entree_label_L_ACP.pack(ipadx=0, ipady=0)
             buttonFont = font.Font(family='Helvetica', size=30)
-            bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text=_("Valider"), font=buttonFont, width=200, height=100,
+            bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text=_("Valider"),
+                                           font=buttonFont, width=200, height=100,
                                            command=validation_label_L_ACP)
             # bouton_label_L_ACP = ttk.Button(frame_label_L_ACP, text="Valider", font=buttonFont, width=200, height=100,
             #                                     command=validation_label_L_ACP)
@@ -4483,9 +4502,12 @@ def ouvre_fenetre_recherche_elements_L_rec():
     global flag_fenetre_recherche_elements_ouvert_L_rec
     if flag_fenetre_recherche_elements_ouvert_L_rec  == False :
         fenetre_recherche_elements_L_rec = tk.Toplevel(fenetre_principale)
-        fenetre_recherche_elements_L_rec.geometry("660x490")
+        if largeur_ecran <= 1921 :
+            fenetre_recherche_elements_L_rec.geometry("660x490")
+        else :
+            fenetre_recherche_elements_L_rec.geometry("905x640")
         fenetre_recherche_elements_L_rec.configure(bg="black")
-        fenetre_recherche_elements_L_rec.resizable(False, False)
+        fenetre_recherche_elements_L_rec.resizable(True, True)
         frame_recherche_elements_L_rec = ttk.Frame(fenetre_recherche_elements_L_rec)
         frame_recherche_elements_L_rec.pack()
 
@@ -4518,7 +4540,7 @@ def ouvre_fenetre_recherche_elements_L_rec():
         coche_NIST_LIBS_L_rec.grid(row=3, column=1, columnspan=2)
 
         buttonFont = font.Font(family='Helvetica', size=15)
-        bouton_recherche_elements_L_rec = tk.Button(frame_recherche_elements_L_rec, text="Valider",
+        bouton_recherche_elements_L_rec = tk.Button(frame_recherche_elements_L_rec, text=_("Valider"),
                                                     font=buttonFont, width=10, bg="black", fg="white",
                                                     command=recherche_elements_L_rec)
         bouton_recherche_elements_L_rec.grid(row=3, column=3, columnspan=2)
@@ -4595,7 +4617,8 @@ def ouvre_fenetre_a_propos_L_aide():
 
     if flag_fenetre_a_propos_L_aide  == False :
         fenetre_a_propos_L_aide = tk.Toplevel(fenetre_principale)
-        fenetre_a_propos_L_aide.geometry("670x450")
+        fenetre_a_propos_L_aide.geometry("700x500")
+        # fenetre_a_propos_L_aide.geometry("670x450")
         fenetre_a_propos_L_aide.configure(bg="black")
         fenetre_a_propos_L_aide.resizable(False, False)
 
@@ -4617,7 +4640,7 @@ def ouvre_fenetre_a_propos_L_aide():
 
         buttonFont = font.Font(family='Helvetica', size=15)
         bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide,
-                                                         text="Fermer", font=buttonFont,
+                                                         text=_("Fermer"), font=buttonFont,
                                                          width=10, bg="black", fg="white",
                                                          command=ferme_fenetre_a_propos_L_aide)
         bouton_ferme_fenetre_a_propos_L_aide.grid(row=2, column=1, columnspan=2)
@@ -4935,6 +4958,12 @@ def ouvre_fenetre_classification_L_ele():
     global flag_tableau_periodique_ouvert_L_ele
     if flag_tableau_periodique_ouvert_L_ele is False:
         fenetre_classification_L_ele = tk.Toplevel(fenetre_principale)
+        # if largeur_ecran <= 1281 :
+        #     fenetre_classification_L_ele.geometry("660x490")
+        # elif largeur_ecran <= 1921:
+        #     fenetre_classification_L_ele.geometry("780x565")
+        # else :
+        #     fenetre_classification_L_ele.geometry("905x640")
         fenetre_classification_L_ele.resizable(False, False)
         frame1_L_ele = ttk.Frame(fenetre_classification_L_ele)
         frame1_L_ele.pack()
@@ -4971,7 +5000,7 @@ def ouvre_fenetre_classification_L_ele():
                                                 variable=flag_sup10_L_ele,
                                                 command=affiche_lignes_element_L_ele)
         coche_sup10_L_ele.grid(row=1, column=9, columnspan=4, sticky=tk.W)
-        coche_sup1_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("1% <= I relative < 10%"),
+        coche_sup1_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("1% <= I rel < 10%"),
                                                variable=flag_sup1_L_ele,
                                                command=affiche_lignes_element_L_ele)
         coche_sup1_L_ele.grid(row=2, column=9, columnspan=4, sticky=tk.W)
@@ -5020,7 +5049,6 @@ class AutoScrollbar(ttk.Scrollbar):
     # a scrollbar that hides itself if it's not needed.  only
     # works if you use the grid geometry manager.
     # cf. : http://effbot.org/zone/tk-autoscrollbar.htm
-
     def set(self, lo, hi):
         if float(lo) <= 0.0 and float(hi) >= 1.0:
             # grid_remove is currently missing from tk!
@@ -5028,6 +5056,16 @@ class AutoScrollbar(ttk.Scrollbar):
         else:
             self.grid()
         tk.Scrollbar.set(self, lo, hi)
+
+    # Defining pack method
+    def pack(self, **kw):
+        # If pack is used it throws an error
+        raise (tk.TclError,"pack cannot be used with this widget")
+
+    # Defining place method
+    def place(self, **kw):
+        # If place is used it throws an error
+        raise (tk.TclError, "place cannot be used  with this widget")
 
 
 class case_classification(tk.Button):
@@ -5070,7 +5108,45 @@ class case_classification(tk.Button):
 ###################################################################################################
 # fenetre_principale = tk.Tk()
 fenetre_principale =ThemedTk(theme = style_interface_LIBStick)
+
+largeur_ecran = fenetre_principale.winfo_screenwidth()
+hauteur_ecran = fenetre_principale.winfo_screenheight()
+# dpi_ecran= fenetre_principale.winfo_fpixels('1i')
+# echelle_ecran= fenetre_principale.winfo_geometry()
+# largeur_ecran_mm =  fenetre_principale.winfo_screenmmwidth()
+# hauteur_ecran_mm = fenetre_principale.winfo_screenmmheight()
+# print("largeur_ecran : " + str(largeur_ecran))
+# print("hauteur_ecran : "+ str(hauteur_ecran))
+# print(dpi_ecran)
+# print(echelle_ecran)
+# print(largeur_ecran_mm)
+# print(hauteur_ecran_mm)
+if largeur_ecran <= 1281 :
+    largeur_fenetre_principale = 1155
+    hauteur_fenetre_principale = 750
+    largeur_canevas_spectres = largeur_canevas_spectres_reference = 1000
+    hauteur_canevas_spectres = hauteur_canevas_spectres_reference = 200
+    default_font = font.nametofont("TkDefaultFont")
+    default_font.configure(size=10)
+elif largeur_ecran <= 1921:
+    largeur_fenetre_principale = 1500
+    hauteur_fenetre_principale = 900
+    largeur_canevas_spectres = largeur_canevas_spectres_reference = 1000
+    hauteur_canevas_spectres = hauteur_canevas_spectres_reference = 200
+    default_font = font.nametofont("TkDefaultFont")
+    default_font.configure(size=11)
+else :
+    largeur_fenetre_principale = 1900
+    hauteur_fenetre_principale = 1000
+    largeur_canevas_spectres = largeur_canevas_spectres_reference = 1050
+    hauteur_canevas_spectres = hauteur_canevas_spectres_reference = 195
+    default_font = font.nametofont("TkDefaultFont")
+    default_font.configure(size=11)
+
+# print("taille de la police : " + str(default_font.cget('size')))
+
 style_LIBStick = ttk.Style()
+style_LIBStick.configure('TButton', justify = "center", anchor = "center")
 if flag_style_LIBStick_ini == str(True) :
     # Create style used by default for all Frames
     style_LIBStick.configure('TFrame', background = COULEUR_INTERFACE)
@@ -5086,8 +5162,7 @@ if flag_style_LIBStick_ini == str(True) :
 bg_couleur = fenetre_principale._get_bg_color()
 # print(fenetre_principale.get_themes())
 fenetre_principale.title("LIBStick v3.0")
-fenetre_principale.geometry("1155x750+100+50")
-
+fenetre_principale.geometry(str(largeur_fenetre_principale) + "x" + str(hauteur_fenetre_principale) + "+100+50")
 # vscrollbar = AutoScrollbar(fenetre_principale, orient=tk.VERTICAL)
 # vscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
 # hscrollbar = AutoScrollbar(fenetre_principale, orient=tk.HORIZONTAL)
@@ -5097,8 +5172,10 @@ vscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
 hscrollbar = AutoScrollbar(fenetre_principale, orient=tk.HORIZONTAL)
 hscrollbar.grid(row=1, column=0, sticky=tk.E+tk.W)
 
-canevas_scroll = tk.Canvas(fenetre_principale, yscrollcommand=vscrollbar.set,
-                                xscrollcommand=hscrollbar.set, bg = bg_couleur)
+canevas_scroll = tk.Canvas(fenetre_principale,
+                           yscrollcommand=vscrollbar.set,
+                           xscrollcommand=hscrollbar.set,
+                           bg = bg_couleur)
 canevas_scroll.grid(row=0, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
 
 vscrollbar.config(command=canevas_scroll.yview)
@@ -5107,20 +5184,24 @@ hscrollbar.config(command=canevas_scroll.xview)
 fenetre_principale.grid_rowconfigure(0, weight=1)
 fenetre_principale.grid_columnconfigure(0, weight=1)
 
-frame_scroll = ttk.Frame(canevas_scroll)
-# frame_scroll.rowconfigure(1, weight=1)
-# frame_scroll.columnconfigure(1, weight=1)
+frame_scroll = tk.Frame(canevas_scroll,
+                        height=canevas_scroll.winfo_height(),
+                        width=canevas_scroll.winfo_width())
+frame_scroll.rowconfigure(0, weight=1)
+frame_scroll.columnconfigure(0, weight=1)
 
 onglets = ttk.Notebook(frame_scroll)
-onglets.pack()
+onglets.pack(expand=True, fill=tk.BOTH)
+onglets.rowconfigure(0, weight=1)
+onglets.columnconfigure(0, weight=1)
 onglet1 = ttk.Frame(onglets)
 onglet2 = ttk.Frame(onglets)
 onglet3 = ttk.Frame(onglets)
 onglet4 = ttk.Frame(onglets)
-onglet1.pack()
-onglet2.pack()
-onglet3.pack()
-onglet4.pack()
+onglet1.pack(expand=True, fill=tk.BOTH)
+onglet2.pack(expand=True, fill=tk.BOTH)
+onglet3.pack(expand=True, fill=tk.BOTH)
+onglet4.pack(expand=True, fill=tk.BOTH)
 
 onglets.add(onglet1, text=_("LIBStick pré-traitements"))
 onglets.add(onglet2, text=_("LIBStick extraction"))
@@ -5326,7 +5407,7 @@ frame2_L_trait.grid(row=20, column=10, sticky="nsew")
 ###################################################################################################
 canevas0_L_trait = tk.Canvas(frame1_L_trait, width=largeur_canevas_spectres,
                              height=(hauteur_canevas_spectres+170), bg="white")
-canevas0_L_trait.grid(row=1, column=1, columnspan=6)
+canevas0_L_trait.grid(row=1, column=1, columnspan=6, sticky="nsew")
 
 ligne_position_0_x_L_trait = canevas0_L_trait.create_line(0, 0, 0, hauteur_canevas_spectres+170, fill="white")
 ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
@@ -5404,7 +5485,7 @@ frame1_1_L_trait = ttk.Frame(frame1_L_trait)
 frame1_1_L_trait.grid(row=1, column=7, rowspan=4, sticky=tk.N+tk.S)
 
 text_zoom_L_trait = ttk.Label(frame1_1_L_trait, text="Zoom : ", width=8)
-text_zoom_L_trait.grid(row=1, column=1, sticky=tk.N)
+text_zoom_L_trait.grid(row=1, column=1, sticky=tk.N+tk.W)
 variable_zoom_inf_L_trait = tk.DoubleVar(value=198)
 variable_zoom_sup_L_trait = tk.DoubleVar(value=1013)
 entree_zoom_inf_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
@@ -5413,19 +5494,19 @@ entree_zoom_inf_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, incr
 entree_zoom_sup_L_trait = ttk.Spinbox(frame1_1_L_trait, from_=198, to=1013, increment=5,
                                       textvariable=variable_zoom_sup_L_trait,
                                       command=change_zoom_sup_L_trait, width=8, foreground="black")
-entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tk.N)
-entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tk.N)
+entree_zoom_inf_L_trait.grid(row=2, column=1, sticky=tk.N+tk.W)
+entree_zoom_sup_L_trait.grid(row=3, column=1, sticky=tk.N+tk.W)
 type_fichier_L_trait = tk.StringVar(value=".asc")
-bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
-                                command=choix_fichier_L_trait, width=10)
-bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisation"),
-                                          command=visualisation_L_trait, state="disable", width=10)
+bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"), style = 'TButton',
+                                command=choix_fichier_L_trait, width=8)
+bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visu"),
+                                          command=visualisation_L_trait, state="disable", width=8)
 # bouton_rep_L_trait = ttk.Button(frame1_1_L_trait, text=_("Fichier"),
 #                                 command=choix_fichier_L_trait, width=8)
 # bouton_visualisation_L_trait = ttk.Button(frame1_1_L_trait, text=_("Visualisation"),
 #                                           command=visualisation_L_trait, state="disable", width=8)
-bouton_rep_L_trait.grid(row=4, column=1, sticky=tk.N)
-bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tk.N)
+bouton_rep_L_trait.grid(row=4, column=1, sticky=tk.N+tk.W)
+bouton_visualisation_L_trait.grid(row=5, column=1, sticky=tk.N+tk.W)
 
 image_classification = tk.PhotoImage(file=rep_LIBStick+"/LIBStick_datas/icons/Classification.png")
 
@@ -5439,7 +5520,7 @@ bouton_classification_L_trait.grid(row=8, column=1, sticky=tk.S)
 ###################################################################################################
 canevas1_L_trait = tk.Canvas(frame2_L_trait, width=largeur_canevas_spectres,
                              height=hauteur_canevas_spectres, bg="white")
-canevas1_L_trait.grid(row=1, column=1, columnspan=2)
+canevas1_L_trait.grid(row=1, column=1, columnspan=2, sticky="nsew")
 
 ligne_position_1_x_L_trait = canevas1_L_trait.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_1_y_L_trait = canevas0_L_trait.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
@@ -5460,15 +5541,15 @@ coche_sauve_fond_L_trait = ttk.Checkbutton(frame2_1_L_trait, text=_("Sauvegarde 
 coche_sauve_fond_L_trait.grid(row=2, column=1)
 
 bouton_execute_L_trait = ttk.Button(frame2_1_L_trait, text=_("Executer"), state="disable",
-                                    command=execute_L_trait, width=10)
-bouton_execute_L_trait.grid(row=3, column=1)
+                                    command=execute_L_trait, width=8)
+bouton_execute_L_trait.grid(row=3, column=1, sticky=tk.W)
 
 text_spectre_L_trait = ttk.Label(frame2_1_L_trait, text=_("Spectre : "))
-text_spectre_L_trait.grid(row=4, column=1, sticky=tk.N)
+text_spectre_L_trait.grid(row=4, column=1, sticky=tk.W)
 numero_spectre_L_trait = tk.IntVar(value=1)
 entree_spectre_L_trait = ttk.Spinbox(frame2_1_L_trait, from_=1, to=50, textvariable=numero_spectre_L_trait,
                                      command=lit_affiche_spectre_numero_L_trait, width=8, foreground="black")
-entree_spectre_L_trait.grid(row=5, column=1, sticky=tk.N)
+entree_spectre_L_trait.grid(row=5, column=1, sticky=tk.W)
 
 
 ###################################################################################################
@@ -5552,7 +5633,7 @@ frame3_L_ext.grid(row=30, column=10, sticky="nsew")
 ###################################################################################################
 canevas0_L_ext = tk.Canvas(frame1_L_ext, width=largeur_canevas_spectres,
                            height=hauteur_canevas_spectres, bg="white")
-canevas0_L_ext.grid(row=1, column=1, columnspan=6)
+canevas0_L_ext.grid(row=1, column=1, columnspan=6, sticky="nsew")
 
 ligne_position_x_L_ext = canevas0_L_ext.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_ext = canevas0_L_ext.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
@@ -5561,10 +5642,10 @@ lambda_texte_L_ext = ttk.Label(frame1_L_ext,
                                text="Lambda = " + str(format(lambda_texte_spectre_L_ext, "4.2f") + " nm"))
 lambda_texte_L_ext.grid(row=2, column=5)
 
-text1_L_ext = ttk.Label(frame1_L_ext, text=_("Première borne inf (nm)"))
-text2_L_ext = ttk.Label(frame1_L_ext, text=_("Première borne sup (nm)"))
-text3_L_ext = ttk.Label(frame1_L_ext, text=_("Seconde borne inf (nm)"))
-text4_L_ext = ttk.Label(frame1_L_ext, text=_("Seconde borne sup (nm)"))
+text1_L_ext = ttk.Label(frame1_L_ext, text=_("1ere borne inf (nm)"))
+text2_L_ext = ttk.Label(frame1_L_ext, text=_("1ere borne sup (nm)"))
+text3_L_ext = ttk.Label(frame1_L_ext, text=_("2de borne inf (nm)"))
+text4_L_ext = ttk.Label(frame1_L_ext, text=_("2de borne sup (nm)"))
 text1_L_ext.grid(row=2, column=1, sticky=tk.E)
 text2_L_ext.grid(row=2, column=3, sticky=tk.E)
 text3_L_ext.grid(row=3, column=1, sticky=tk.E)
@@ -5588,16 +5669,16 @@ entree3_L_ext.grid(row=3, column=2, sticky=tk.W)
 entree4_L_ext.grid(row=3, column=4, sticky=tk.W)
 
 flag_zone2_L_ext = tk.IntVar(value=flag_zone2_init_L_ext)
-coche_zone2_L_ext = ttk.Checkbutton(frame1_L_ext, text=_("Seconde extraction"),
-                                        variable=flag_zone2_L_ext, command=change_flag_zone2_L_ext)
+coche_zone2_L_ext = ttk.Checkbutton(frame1_L_ext, text=_("2de extraction"),
+                                    variable=flag_zone2_L_ext, command=change_flag_zone2_L_ext)
 coche_zone2_L_ext.grid(row=3, column=5)
 
 bouton_reset_L_ext = ttk.Button(frame1_L_ext, text=_("Reset"),
-                                    command=reset_tableau_L_ext, width=10)
+                                command=reset_tableau_L_ext, width=7)
 bouton_reset_L_ext.grid(row=2, column=6, rowspan=2)
 
 frame1_1_L_ext = ttk.Frame(frame1_L_ext)
-frame1_1_L_ext.grid(row=1, column=7, rowspan=3, sticky=tk.N)
+frame1_1_L_ext.grid(row=1, column=7, rowspan=3, sticky=tk.N+tk.W)
 
 text_zoom_L_ext = ttk.Label(frame1_1_L_ext, text="Zoom : ", width=8)
 text_zoom_L_ext.grid(row=1, column=1)
@@ -5609,15 +5690,15 @@ entree_zoom_inf_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, incremen
 entree_zoom_sup_L_ext = ttk.Spinbox(frame1_1_L_ext, from_=198, to=1013, increment=5,
                                     textvariable=variable_zoom_sup_L_ext,
                                     command=change_zoom_sup_L_ext, width=8, foreground="black")
-entree_zoom_inf_L_ext.grid(row=2, column=1)
-entree_zoom_sup_L_ext.grid(row=3, column=1)
+entree_zoom_inf_L_ext.grid(row=2, column=1, sticky=tk.N)
+entree_zoom_sup_L_ext.grid(row=3, column=1, sticky=tk.N)
 
 type_fichier_L_ext = tk.StringVar(value=".asc")
 # bouton_rep_L_ext=ttk.Button(frame1_1_L_ext, text="Repertoire\nde travail" ,command=choix_rep_L_ext, width=8)
 bouton_rep_L_ext = ttk.Button(frame1_1_L_ext, text=_("Fichier"),
-                                  command=choix_fichier_L_ext, width=10)
-bouton_execute_L_ext = ttk.Button(
-    frame1_1_L_ext, text=_("Exécute"), command=execute_scripts_L_ext, state="disable", width=10)
+                                  command=choix_fichier_L_ext, width=8)
+bouton_execute_L_ext = ttk.Button(frame1_1_L_ext, text=_("Exécute"),
+                                  command=execute_scripts_L_ext, state="disable", width=8)
 bouton_rep_L_ext.grid(row=4, column=1)
 bouton_execute_L_ext.grid(row=5, column=1)
 
@@ -5646,15 +5727,13 @@ canevas1_L_ext = tk.Canvas(frame2_L_ext, width=largeur_canevas_spectres/2,
                            height=hauteur_canevas_spectres, bg="white")
 canevas2_L_ext = tk.Canvas(frame2_L_ext, width=largeur_canevas_spectres/2,
                            height=hauteur_canevas_spectres, bg="white")
-canevas1_L_ext.grid(row=1, column=1, columnspan=4)
-canevas2_L_ext.grid(row=1, column=5, columnspan=4)
+canevas1_L_ext.grid(row=1, column=1, columnspan=4, sticky="nsew")
+canevas2_L_ext.grid(row=1, column=5, columnspan=4, sticky="nsew")
 
-text5_L_ext = ttk.Label(frame2_L_ext, text=_("Position x (nm) : "))
-text6_L_ext = ttk.Label(
-    frame2_L_ext, text=_("Position y (n° de spectre) : "))
-text7_L_ext = ttk.Label(frame2_L_ext, text=_("Position x (nm) : "))
-text8_L_ext = ttk.Label(
-    frame2_L_ext, text=_("Position y (n° de spectre) : "))
+text5_L_ext = ttk.Label(frame2_L_ext, text=_("x (nm) : "))
+text6_L_ext = ttk.Label(frame2_L_ext, text=_("y (n° de spectre) : "))
+text7_L_ext = ttk.Label(frame2_L_ext, text=_("x (nm) : "))
+text8_L_ext = ttk.Label(frame2_L_ext, text=_("y (n° de spectre) : "))
 text5_L_ext.grid(row=2, column=1, sticky=tk.E)
 text6_L_ext.grid(row=2, column=3, sticky=tk.E)
 text7_L_ext.grid(row=2, column=5, sticky=tk.E)
@@ -5686,7 +5765,7 @@ coche_image_brute_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("Image brute\ns
 coche_image_brute_L_ext.grid(row=1, column=1)
 
 flag_spectre_inclus_moyenne_L_ext = tk.BooleanVar(value=True)
-coche_spectre_inclus_moyenne_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("Spectre inclus\ndans spectre\nmoyen"),
+coche_spectre_inclus_moyenne_L_ext = ttk.Checkbutton(frame2_1_L_ext, text=_("\n Spectre inclus\ndans spectre\nmoyen"),
                                                      variable=flag_spectre_inclus_moyenne_L_ext,
                                                      command=change_bool_spectre_L_ext)
 coche_spectre_inclus_moyenne_L_ext.grid(row=2, column=1)
@@ -5706,16 +5785,16 @@ canevas3_L_ext = tk.Canvas(frame3_L_ext, width=largeur_canevas_spectres/2,
                            height=200, bg="white")
 canevas4_L_ext = tk.Canvas(frame3_L_ext, width=largeur_canevas_spectres/2,
                            height=200, bg="white")
-canevas3_L_ext.grid(row=3, column=1, columnspan=2)
-canevas4_L_ext.grid(row=3, column=3, columnspan=2)
+canevas3_L_ext.grid(row=3, column=1, columnspan=2, sticky="nsew")
+canevas4_L_ext.grid(row=3, column=3, columnspan=2, sticky="nsew")
 
 frame3_1_L_ext = ttk.Frame(frame3_L_ext)
 frame3_1_L_ext.grid(row=1, column=5, rowspan=4, sticky=tk.N)
 
 text9_L_ext = ttk.Label(frame3_1_L_ext, text=_("Du spectre n° :"))
 text10_L_ext = ttk.Label(frame3_1_L_ext, text=_("Au spectre n° :"))
-text9_L_ext.grid(row=1, column=1)
-text10_L_ext.grid(row=3, column=1)
+text9_L_ext.grid(row=1, column=1, sticky=tk.W)
+text10_L_ext.grid(row=3, column=1, sticky=tk.W)
 
 variable_9_L_ext = tk.IntVar(value=0)
 variable_9_avant_L_ext = tk.IntVar(value=1)
@@ -5725,18 +5804,18 @@ entree9_L_ext = ttk.Spinbox(frame3_1_L_ext, from_=1, to=hauteur_canevas_spectres
                             command=retro_action_entree10_L_ext, width=5, foreground="black")
 entree10_L_ext = ttk.Spinbox(frame3_1_L_ext, from_=1, to=hauteur_canevas_spectres,textvariable=variable_10_L_ext,
                              command=retro_action_entree9_L_ext, width=5, foreground="black")
-entree9_L_ext.grid(row=2, column=1)
-entree10_L_ext.grid(row=4, column=1)
+entree9_L_ext.grid(row=2, column=1, sticky=tk.W)
+entree10_L_ext.grid(row=4, column=1, sticky=tk.W)
 
 bouton_extraction_L_ext = ttk.Button(frame3_1_L_ext, text=_("Extraction"),
                                      state="disable",
-                                     command=creation_spectre_moyen_L_ext, width=10)
-bouton_extraction_L_ext.grid(row=5, column=1)
+                                     command=creation_spectre_moyen_L_ext, width=9)
+bouton_extraction_L_ext.grid(row=5, column=1, sticky=tk.W)
 
 flag_spectres_normalises_moyenne_L_ext = tk.BooleanVar(value=True)
 coche_spectres_normalises_moyenne_L_ext = ttk.Checkbutton(frame3_1_L_ext, text=_("Moyenne des\nspectres \nnormalisés"),
                                                          variable=flag_spectres_normalises_moyenne_L_ext)
-coche_spectres_normalises_moyenne_L_ext.grid(row=6, column=1)
+coche_spectres_normalises_moyenne_L_ext.grid(row=6, column=1, sticky=tk.W)
 
 
 ###################################################################################################
@@ -5833,7 +5912,7 @@ frame3_L_comp.grid(row=30, column=10, sticky="nsew")
 ###################################################################################################
 canevas0_L_comp = tk.Canvas(frame1_L_comp, width=largeur_canevas_spectres,
                             height=hauteur_canevas_spectres, bg="white")
-canevas0_L_comp.grid(row=1, column=1, columnspan=6)
+canevas0_L_comp.grid(row=1, column=1, columnspan=6, sticky="nsew")
 
 ligne_position_x_L_comp = canevas0_L_comp.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_comp = canevas0_L_comp.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
@@ -5842,10 +5921,10 @@ lambda_texte_L_comp = ttk.Label(frame1_L_comp,
                                 text="Lambda = " + str(format(lambda_texte_spectre_L_comp, "4.2f") + " nm"))
 lambda_texte_L_comp.grid(row=2, column=5)
 
-text1_L_comp = ttk.Label(frame1_L_comp, text=_("Numérateur borne inf (nm)"))
-text2_L_comp = ttk.Label(frame1_L_comp, text=_("Numérateur borne sup (nm)"))
-text3_L_comp = ttk.Label(frame1_L_comp, text=_("Dénominateur borne inf (nm)"))
-text4_L_comp = ttk.Label(frame1_L_comp, text=_("Dénominateur borne sup( nm)"))
+text1_L_comp = ttk.Label(frame1_L_comp, text=_("Num. borne inf (nm)"))
+text2_L_comp = ttk.Label(frame1_L_comp, text=_("Num. borne sup (nm)"))
+text3_L_comp = ttk.Label(frame1_L_comp, text=_("Dénom. borne inf (nm)"))
+text4_L_comp = ttk.Label(frame1_L_comp, text=_("Dénom. borne sup( nm)"))
 text1_L_comp.grid(row=2, column=1, sticky=tk.E)
 text2_L_comp.grid(row=2, column=3, sticky=tk.E)
 text3_L_comp.grid(row=3, column=1, sticky=tk.E)
@@ -5876,7 +5955,7 @@ coche_denominateur_L_comp.grid(row=3, column=5)
 
 bouton_reset_L_comp = ttk.Button(frame1_L_comp, text=_("Reset"),
                                      command=reset_tableau_L_comp,
-                                     width=10)
+                                     width=7)
 bouton_reset_L_comp.grid(row=2, column=6, rowspan=2)
 
 frame1_1_L_comp = ttk.Frame(frame1_L_comp)
@@ -5899,10 +5978,10 @@ type_fichier_L_comp = tk.StringVar(value=".mean")
 # bouton_rep_L_comp=ttk.Button(frame1_1_L_comp, text="Repertoire\nde travail" ,
 #                                  command=choix_rep_L_comp, width=8)
 bouton_rep_L_comp = ttk.Button(frame1_1_L_comp, text=_("Fichier"),
-                                   command=choix_fichier_L_comp, width=10)
+                                   command=choix_fichier_L_comp, width=8)
 bouton_execute_L_comp = ttk.Button(frame1_1_L_comp, text=_("Exécute"),
                                    command=execute_scripts_L_comp,
-                                   state="disable", width=10)
+                                   state="disable", width=8)
 bouton_rep_L_comp.grid(row=4, column=1)
 bouton_execute_L_comp.grid(row=5, column=1)
 
@@ -5931,7 +6010,7 @@ bouton_classification_L_comp.grid(row=8, column=1, sticky=tk.S)
 ###################################################################################################
 canevas1_L_comp = tk.Canvas(frame2_L_comp, width=largeur_canevas_spectres,
                             height=hauteur_canevas_spectres, bg="white")
-canevas1_L_comp.grid(row=1, column=1, columnspan=4)
+canevas1_L_comp.grid(row=1, column=1, columnspan=4, sticky="nsew")
 
 # text5_L_comp = ttk.Label(frame2_L_comp, text="Position x (nm) : ")
 # text6_L_comp = ttk.Label(frame2_L_comp, text="Position y (n° de spectre) : ")
@@ -5957,7 +6036,7 @@ flag_traitement_L_comp = tk.IntVar(value=flag_traitement_init_L_comp)
 coche_traitement_L_comp = ttk.Checkbutton(frame2_1_L_comp,
                                           text=_("Normalisation\ndes spectres"),
                                           variable=flag_traitement_L_comp)
-coche_traitement_L_comp.grid(row=1, column=1)
+coche_traitement_L_comp.grid(row=1, column=1, sticky=tk.W)
 
 # type_traitement_L_comp=tk.StringVar(value="Echantillons différents")
 # type_traitement_combobox_L_comp=ttk.Combobox(frame2_1_L_comp, textvariable=type_traitement_L_comp,
@@ -5971,15 +6050,15 @@ flag_stat_L_comp = tk.IntVar(value=flag_stat_init_L_comp)
 coche_stat_L_comp = ttk.Checkbutton(frame2_1_L_comp,
                                     text=_("Statistiques"),
                                     variable=flag_stat_L_comp)
-coche_stat_L_comp.grid(row=2, column=1)
+coche_stat_L_comp.grid(row=2, column=1, sticky=tk.W)
 
 ligne1_vert_L_comp = canevas1_L_comp.create_line(x1_L_comp, 0, x1_L_comp, hauteur_canevas_spectres, fill="white")
 ligne1_hori_L_comp = canevas1_L_comp.create_line(0, y1_L_comp, largeur_canevas_spectres/2, y1_L_comp, fill="white")
 
 text5_L_comp = ttk.Label(frame2_1_L_comp, text=_("\nPosition x (nm) : "))
 text6_L_comp = ttk.Label(frame2_1_L_comp, text=_("Position y \n(n° de spectre) : "))
-text5_L_comp.grid(row=4, column=1)
-text6_L_comp.grid(row=6, column=1)
+text5_L_comp.grid(row=4, column=1, sticky=tk.W)
+text6_L_comp.grid(row=6, column=1, sticky=tk.W)
 
 variable_5_L_comp = tk.DoubleVar(value=0)
 variable_6_L_comp = tk.IntVar(value=0)
@@ -5987,8 +6066,8 @@ entree5_L_comp = ttk.Spinbox(frame2_1_L_comp, from_=198, to=1013,textvariable=va
                              command=vars_5_6_to_coord1_L_comp, increment=0.5, width=5, foreground="black")
 entree6_L_comp = ttk.Spinbox(frame2_1_L_comp, from_=1, to=100, textvariable=variable_6_L_comp,
                              command=vars_5_6_to_coord1_L_comp, width=5, foreground="black")
-entree5_L_comp.grid(row=5, column=1)
-entree6_L_comp.grid(row=7, column=1)
+entree5_L_comp.grid(row=5, column=1, sticky=tk.W)
+entree6_L_comp.grid(row=7, column=1, sticky=tk.W)
 
 affiche_lignes_spectre_L_comp()
 
@@ -5996,17 +6075,17 @@ affiche_lignes_spectre_L_comp()
 ###################################################################################################
 # Interface graphique frame3_L_comp : affichage des résultats sous forme de TreeView
 ###################################################################################################
-tree_resultats_L_comp = ttk.Treeview(
-    frame3_L_comp, columns=(1, 2, 3), height=10, show="headings")
-tree_resultats_L_comp.column(1, width=hauteur_canevas_spectres)
-tree_resultats_L_comp.column(2, width=600)
-tree_resultats_L_comp.column(3, width=hauteur_canevas_spectres)
+tree_resultats_L_comp = ttk.Treeview(frame3_L_comp, columns=(1, 2, 3),
+                                     height=10, show="headings")
+tree_resultats_L_comp.column(1, width=100)
+tree_resultats_L_comp.column(2, width=650)
+tree_resultats_L_comp.column(3, width=250)
 tree_resultats_L_comp.heading(1, text=_("n°"))
 tree_resultats_L_comp.heading(2, text=_("Nom du spectre"))
 tree_resultats_L_comp.heading(3, text=_("Rapport zone1/zone2"))
 tree_resultats_L_comp.grid(row=1, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
-scroll_tree_resultat_L_comp = ttk.Scrollbar(
-    frame3_L_comp, orient=tk.VERTICAL, command=tree_resultats_L_comp.yview)
+scroll_tree_resultat_L_comp = ttk.Scrollbar(frame3_L_comp, orient=tk.VERTICAL,
+                                            command=tree_resultats_L_comp.yview)
 scroll_tree_resultat_L_comp.grid(row=1, column=2, sticky=tk.N+tk.S)
 tree_resultats_L_comp.configure(yscrollcommand=scroll_tree_resultat_L_comp.set)
 
@@ -6095,7 +6174,7 @@ frame3_L_ACP.grid(row=30, column=10, sticky="nsew")
 ###################################################################################################
 canevas0_L_ACP = tk.Canvas(frame1_L_ACP, width=largeur_canevas_spectres,
                            height=hauteur_canevas_spectres, bg="white")
-canevas0_L_ACP.grid(row=1, column=1, columnspan=6)
+canevas0_L_ACP.grid(row=1, column=1, columnspan=6, sticky="nsew")
 
 ligne_position_x_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
@@ -6137,7 +6216,7 @@ entree_zoom_sup_L_ACP.grid(row=3, column=1, sticky=tk.N)
 
 type_fichier_L_ACP = tk.StringVar(value=".mean")
 bouton_rep_L_ACP = ttk.Button(frame1_1_L_ACP, text=_("Fichier"),
-                                  command=choix_fichier_L_ACP, width=10)
+                                  command=choix_fichier_L_ACP, width=8)
 bouton_rep_L_ACP.grid(row=4, column=1, sticky=tk.N)
 
 bouton_classification_L_ACP = tk.Button(frame1_1_L_ACP, image=image_classification,
@@ -6158,16 +6237,16 @@ if style_interface_LIBStick == "black" :
 else :
     tree_L_ACP.tag_configure("select", foreground="black")
 tree_L_ACP.column(1, width=50)
-tree_L_ACP.column(2, width=600)
-tree_L_ACP.column(3, width=hauteur_canevas_spectres)
-tree_L_ACP.column(4, width=80)
+tree_L_ACP.column(2, width=650)
+tree_L_ACP.column(3, width=200)
+tree_L_ACP.column(4, width=100)
 tree_L_ACP.heading(1, text=_("n°"))
 tree_L_ACP.heading(2, text=_("Nom du spectre"))
 tree_L_ACP.heading(3, text=_("Utlisé pour l'ACP :"))
 tree_L_ACP.heading(4, text=_("Label :"))
 tree_L_ACP.grid(row=1, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
-scroll_tree_L_ACP = ttk.Scrollbar(
-    frame2_L_ACP, orient=tk.VERTICAL, command=tree_L_ACP.yview)
+scroll_tree_L_ACP = ttk.Scrollbar(frame2_L_ACP, orient=tk.VERTICAL,
+                                  command=tree_L_ACP.yview)
 scroll_tree_L_ACP.grid(row=1, column=2, sticky=tk.N+tk.S)
 tree_L_ACP.configure(yscrollcommand=scroll_tree_L_ACP.set)
 
@@ -6239,13 +6318,13 @@ coche_eboulis_L_ACP.grid(row=9, column=1, sticky=tk.W, columnspan=2)
 ###################################################################################################
 canevas1_L_ACP = tk.Canvas(frame3_L_ACP, width=largeur_canevas_spectres,
                            height=hauteur_canevas_spectres, bg="white")
-canevas1_L_ACP.grid(row=1, column=1, columnspan=6)
+canevas1_L_ACP.grid(row=1, column=1, columnspan=6, sticky="nsew")
 
 frame3_1_L_ACP = ttk.Frame(frame3_L_ACP)
 frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tk.N)
 
 flag_plotly_L_ACP = tk.BooleanVar(value=True)
-coche_plotly_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("Diag. plotly"), variable=flag_plotly_L_ACP)
+coche_plotly_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("\n Diag. plotly\n"), variable=flag_plotly_L_ACP)
 coche_plotly_L_ACP.grid(row=1, column=1)
 
 bouton_enregistre_L_ACP = ttk.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"),
@@ -6334,7 +6413,8 @@ def __________IHM_interface_principale__________():
 #  Interface graphique : gestion du redimentionnement de la fenêtre principale
 ###################################################################################################
 canevas_scroll.create_window(0, 0, anchor='nw', window=frame_scroll)
-frame_scroll.update_idletasks()
+# frame_scroll.update_idletasks()
+fenetre_principale.update_idletasks()
 canevas_scroll.config(scrollregion=canevas_scroll.bbox("all"))
 
 fenetre_principale.bind("<Configure>", change_taille_fenetre)
@@ -6342,5 +6422,14 @@ fenetre_principale.bind("<Configure>", change_taille_fenetre)
 # fenetre_principale.bind("<Visibility>", applique_change_taille_fenetre_event)
 # fenetre_principale.bind("<Property>", applique_change_taille_fenetre_event)
 
+onglet1.columnconfigure(10, weight=1)
+onglet2.columnconfigure(10, weight=1)
+onglet3.columnconfigure(10, weight=1)
+onglet4.columnconfigure(10, weight=1)
+
+onglet1.rowconfigure(10, weight=1)
+onglet2.rowconfigure(30, weight=1)
+onglet3.rowconfigure(30, weight=1)
+onglet4.rowconfigure(20, weight=1)
 
 fenetre_principale.mainloop()

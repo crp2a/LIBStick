@@ -1,5 +1,5 @@
 #!/bin/sh
 #
 
-
-python3 /home/yannick/Bureau/LIBS/LIBStick/LIBStick.py
+cd /home/yannick/Bureau/LIBS/LIBStick
+python3 ./LIBStick.py -w
