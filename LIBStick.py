@@ -3596,6 +3596,17 @@ def change_flag_traitement_L_ACP():
     Change l'état du bouton +ind supp lorsqu'on change une des cases à cocher Spectres normalisés ou Centré réduit
     """
     bouton_applique_ind_sup_L_ACP.configure(state="disable")
+    
+    
+def change_flag_binning_L_ACP():
+    """
+    Change l'état du spinbox si on change la case à cosser "Binning :"
+    """
+    if flag_binning_L_ACP.get() == True :
+        entree_binning_L_ACP.configure(state="enable")
+    else :
+        entree_binning_L_ACP.configure(state="disable")
+    change_flag_traitement_L_ACP
 
 
 def execute_ACP_L_ACP():
@@ -3617,12 +3628,20 @@ def execute_ACP_L_ACP():
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
     treeview_dataframe = dataframe_treeview_L_ACP()
+    
+    #test binning
+    if flag_binning_L_ACP.get() == True :
+        taille_binning = binning_L_ACP.get()
+        print("Binning " + str(taille_binning))
+        dataframe = LIBStick_outils.binning_dataframe(dataframe, taille_binning)
+    
     dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe,
                                                                                                                        treeview_dataframe,
                                                                                                                        tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
     if flag_normalise_L_ACP.get() is True:
         dataframe = LIBStick_outils.normalise_dataframe_aire(dataframe)
-
+        
+        
     # flag_ACP = True
     # if flag_ACP is True :   # cas normal, ACP et non pas test de l'ICA. Dancs ce cas penser à indenter le bloc suivant
 
@@ -3689,6 +3708,13 @@ def applique_ACP_ind_sup_L_ACP():
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
     dataframe = DataFrame_complet_L_ACP.copy(deep=True)
     treeview_dataframe = dataframe_treeview_L_ACP()
+    
+    #test binning
+    if flag_binning_L_ACP.get() == True :
+        taille_binning = binning_L_ACP.get()
+        print("Binning " + str(taille_binning))
+        dataframe = LIBStick_outils.binning_dataframe(dataframe, taille_binning)
+    
     dataframe, treeview_dataframe, dataframe_individus_supp, treeview_dataframe_individus_supp = coupe_dataframe_L_ACP(dataframe,
                                                                                                                        treeview_dataframe,
                                                                                                                        tableau_bornes)  # suprime les lignes non incluses dans le calcul de l'ACP
@@ -6265,48 +6291,58 @@ coche_centre_reduit_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Centré redu
                                             command=change_flag_traitement_L_ACP)
 coche_centre_reduit_L_ACP.grid(row=2, column=1, sticky=tk.W, columnspan=2)
 
+flag_binning_L_ACP = tk.BooleanVar(value=False)
+coche_binning_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Binning :"),
+                                            variable=flag_binning_L_ACP,
+                                            command=change_flag_binning_L_ACP)
+coche_binning_L_ACP.grid(row=3, column=1, sticky=tk.W, columnspan=2)
+binning_L_ACP = tk.IntVar(value=2)
+entree_binning_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=20, increment=1, textvariable=binning_L_ACP,
+                                   state="disable", width=5)
+entree_binning_L_ACP.grid(row=4, column=1, sticky=tk.W)
+
 bouton_execute_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("ACP"),
                                   command=execute_ACP_L_ACP, state="disable", width=6)
-bouton_execute_L_ACP.grid(row=3, column=1, sticky=tk.W)
+bouton_execute_L_ACP.grid(row=5, column=1, sticky=tk.W)
 
 bouton_applique_ind_sup_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("+ ind. supp."),
                                    command=applique_ACP_ind_sup_L_ACP, state="disable", width=6)
-bouton_applique_ind_sup_L_ACP.grid(row=3, column=2, sticky=tk.W)
+bouton_applique_ind_sup_L_ACP.grid(row=5, column=2, sticky=tk.W)
 
 bouton_ouvre_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("Ouvre"),
                                 command=ouvre_ACP_L_ACP, state="disable", width=6)
-bouton_ouvre_L_ACP.grid(row=4, column=1, sticky=tk.W)
+bouton_ouvre_L_ACP.grid(row=6, column=1, sticky=tk.W)
 
 bouton_sauve_L_ACP = ttk.Button(frame2_1_L_ACP, text=_("Sauve"),
                                 command=enregistre_ACP_L_ACP, state="disable", width=6)
-bouton_sauve_L_ACP.grid(row=4, column=2, sticky=tk.W)
+bouton_sauve_L_ACP.grid(row=6, column=2, sticky=tk.W)
 
-text_dim_L_ACP = ttk.Label(frame2_1_L_ACP, text=_("Dimensions : "))
-text_dim_L_ACP.grid(row=5, column=1, sticky=tk.W, columnspan=2)
-dim_1_L_ACP = tk.IntVar(value=1)
-entree_dim1_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_1_L_ACP,
-                                width=5, foreground="red", command=affiche_spectres_var_ACP_L_ACP)
-dim_2_L_ACP = tk.IntVar(value=2)
-entree_dim2_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_2_L_ACP,
-                                width=5, foreground="blue", command=affiche_spectres_var_ACP_L_ACP)
-dim_3_L_ACP = tk.IntVar(value=3)
-entree_dim3_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_3_L_ACP, state="disable",
-                                width=5, foreground="green", command=affiche_spectres_var_ACP_L_ACP)
-entree_dim1_L_ACP.grid(row=6, column=1, sticky=tk.W)
-entree_dim2_L_ACP.grid(row=6, column=2, sticky=tk.W)
-entree_dim3_L_ACP.grid(row=7, column=1, sticky=tk.W)
+# text_dim_L_ACP = ttk.Label(frame2_1_L_ACP, text=_("Dimensions : "))
+# text_dim_L_ACP.grid(row=5, column=1, sticky=tk.W, columnspan=2)
+# dim_1_L_ACP = tk.IntVar(value=1)
+# entree_dim1_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_1_L_ACP,
+#                                 width=5, foreground="red", command=affiche_spectres_var_ACP_L_ACP)
+# dim_2_L_ACP = tk.IntVar(value=2)
+# entree_dim2_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_2_L_ACP,
+#                                 width=5, foreground="blue", command=affiche_spectres_var_ACP_L_ACP)
+# dim_3_L_ACP = tk.IntVar(value=3)
+# entree_dim3_L_ACP = ttk.Spinbox(frame2_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_3_L_ACP, state="disable",
+#                                 width=5, foreground="green", command=affiche_spectres_var_ACP_L_ACP)
+# entree_dim1_L_ACP.grid(row=6, column=1, sticky=tk.W)
+# entree_dim2_L_ACP.grid(row=6, column=2, sticky=tk.W)
+# entree_dim3_L_ACP.grid(row=7, column=1, sticky=tk.W)
 
-flag_3D_L_ACP = tk.BooleanVar(value=False)
-coche_3D_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text="3D", variable=flag_3D_L_ACP, command=change_flag_3D_L_ACP)
-coche_3D_L_ACP.grid(row=7, column=2, sticky=tk.W)
+# flag_3D_L_ACP = tk.BooleanVar(value=False)
+# coche_3D_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text="3D", variable=flag_3D_L_ACP, command=change_flag_3D_L_ACP)
+# coche_3D_L_ACP.grid(row=7, column=2, sticky=tk.W)
 
-flag_echelle_L_ACP = tk.BooleanVar(value=True)
-coche_echelle_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Même echelle x et y"), variable=flag_echelle_L_ACP)
-coche_echelle_L_ACP.grid(row=8, column=1, sticky=tk.W, columnspan=2)
+# flag_echelle_L_ACP = tk.BooleanVar(value=True)
+# coche_echelle_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Même echelle x et y"), variable=flag_echelle_L_ACP)
+# coche_echelle_L_ACP.grid(row=8, column=1, sticky=tk.W, columnspan=2)
 
-flag_eboulis_L_ACP = tk.BooleanVar(value=True)
-coche_eboulis_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Diag. éboulis"), variable=flag_eboulis_L_ACP)
-coche_eboulis_L_ACP.grid(row=9, column=1, sticky=tk.W, columnspan=2)
+# flag_eboulis_L_ACP = tk.BooleanVar(value=True)
+# coche_eboulis_L_ACP = ttk.Checkbutton(frame2_1_L_ACP, text=_("Diag. éboulis"), variable=flag_eboulis_L_ACP)
+# coche_eboulis_L_ACP.grid(row=9, column=1, sticky=tk.W, columnspan=2)
 
 # flag_calcul_L_ACP=tk.BooleanVar(value=False)
 # coche_calcul_L_ACP=ttk.Checkbutton(frame2_1_L_ACP, text="fanalysis ?", variable=flag_calcul_L_ACP)
@@ -6323,14 +6359,41 @@ canevas1_L_ACP.grid(row=1, column=1, columnspan=6, sticky="nsew")
 frame3_1_L_ACP = ttk.Frame(frame3_L_ACP)
 frame3_1_L_ACP.grid(row=1, column=7, rowspan=3, sticky=tk.N)
 
+text_dim_L_ACP = ttk.Label(frame3_1_L_ACP, text=_("Dimensions : "))
+text_dim_L_ACP.grid(row=1, column=1, sticky=tk.W, columnspan=2)
+dim_1_L_ACP = tk.IntVar(value=1)
+entree_dim1_L_ACP = ttk.Spinbox(frame3_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_1_L_ACP,
+                                width=5, foreground="red", command=affiche_spectres_var_ACP_L_ACP)
+dim_2_L_ACP = tk.IntVar(value=2)
+entree_dim2_L_ACP = ttk.Spinbox(frame3_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_2_L_ACP,
+                                width=5, foreground="blue", command=affiche_spectres_var_ACP_L_ACP)
+dim_3_L_ACP = tk.IntVar(value=3)
+entree_dim3_L_ACP = ttk.Spinbox(frame3_1_L_ACP, from_=1, to=10, increment=1, textvariable=dim_3_L_ACP, state="disable",
+                                width=5, foreground="green", command=affiche_spectres_var_ACP_L_ACP)
+entree_dim1_L_ACP.grid(row=2, column=1, sticky=tk.W)
+entree_dim2_L_ACP.grid(row=2, column=2, sticky=tk.W)
+entree_dim3_L_ACP.grid(row=3, column=1, sticky=tk.W)
+
+flag_3D_L_ACP = tk.BooleanVar(value=False)
+coche_3D_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text="3D", variable=flag_3D_L_ACP, command=change_flag_3D_L_ACP)
+coche_3D_L_ACP.grid(row=3, column=2, sticky=tk.W)
+
+flag_echelle_L_ACP = tk.BooleanVar(value=True)
+coche_echelle_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("Même echelle\n x et y"), variable=flag_echelle_L_ACP)
+coche_echelle_L_ACP.grid(row=4, column=1, sticky=tk.W, columnspan=2)
+
+flag_eboulis_L_ACP = tk.BooleanVar(value=True)
+coche_eboulis_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("Diag. éboulis"), variable=flag_eboulis_L_ACP)
+coche_eboulis_L_ACP.grid(row=5, column=1, sticky=tk.W, columnspan=2)
+
 flag_plotly_L_ACP = tk.BooleanVar(value=True)
-coche_plotly_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("\n Diag. plotly\n"), variable=flag_plotly_L_ACP)
-coche_plotly_L_ACP.grid(row=1, column=1)
+coche_plotly_L_ACP = ttk.Checkbutton(frame3_1_L_ACP, text=_("Diag. plotly"), variable=flag_plotly_L_ACP)
+coche_plotly_L_ACP.grid(row=6, column=1,  sticky=tk.W, columnspan=2)
 
 bouton_enregistre_L_ACP = ttk.Button(frame3_1_L_ACP, text=_("Enregistrer \nfacteurs \nde l'ACP"),
                                      command=enregistre_facteurs_ACP_L_ACP,
                                      state="disable", width=10)
-bouton_enregistre_L_ACP.grid(row=2, column=1)
+bouton_enregistre_L_ACP.grid(row=7, column=1, sticky=tk.W, columnspan=2)
 
 ligne_position_1_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 

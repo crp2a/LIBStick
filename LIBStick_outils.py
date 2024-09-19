@@ -293,3 +293,63 @@ def normalise_dataframe_aire(dataframe):  # données lignes
         tableau[ligne, :] = (tableau[ligne, :] / aire)
     dataframe = pd.DataFrame(tableau, index=dataframe.index, columns=dataframe.columns)
     return dataframe
+
+
+###################################################################################################
+# Binning des spectres d'un tableau, données en colonnes, abscisses dans la première colonne
+###################################################################################################
+def binning_spectre (spectre, taille_bin=2):
+    """
+    Effectue un binning par moyenne sur un spectre.
+    Args:
+        spectre: Le spectre d'entrée sous forme de tableau NumPy.
+        taille_bin: La taille de chaque bin.
+    Returns:
+        Le spectre binné.
+    """
+    # Vérification de la taille du spectre par rapport à la taille du bin
+    # et supprime les derniers pixels du spectres
+    if len(spectre) % taille_bin != 0:
+        supprime = (len(spectre) % taille_bin)
+        spectre = spectre[: -supprime]
+    # Reshape le spectre en une matrice où chaque ligne correspond à un bin
+    spectre_reshape = spectre.reshape(-1, taille_bin)
+    # Calcul de la moyenne de chaque ligne (chaque bin)
+    spectre_binne = np.mean(spectre_reshape, axis=1)
+    # print("-----------------------")
+    # print(spectre.shape)    
+    # print(spectre_reshape)
+    # print(spectre_reshape.shape)
+    # print(spectre_binne.shape)
+    return spectre_binne
+
+
+def binning_dataframe(dataframe, taille_bin=2):
+    """
+    Effectue un binning par moyenne sur tous les spectres d'un Dataframe (un spectre par ligne)
+    Parameters
+    ----------
+    dataframe : TYPE
+        DESCRIPTION.
+    taille_bin : TYPE, optional
+        DESCRIPTION. The default is 2.
+    Returns
+    -------
+    None.
+    """
+    tableau = dataframe.values    
+    tableau_binne = np.zeros((tableau.shape[0], tableau.shape[1]//taille_bin))
+    for ligne in range(tableau.shape[0]):
+        spectre = tableau[ligne, :]
+        spectre_binne = binning_spectre(spectre, taille_bin)
+        tableau_binne[ligne, :] = spectre_binne
+              
+    colonnes = dataframe.columns.values
+    colonnes_binne = binning_spectre(colonnes, taille_bin)
+    dataframe_binne = pd.DataFrame(tableau_binne, index=dataframe.index)
+    dataframe_binne.columns = colonnes_binne
+    # print(dataframe)
+    # print("------------------------")
+    # print(dataframe_binne)
+    return dataframe_binne
+
