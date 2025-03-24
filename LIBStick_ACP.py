@@ -258,11 +258,11 @@ def affiche_ACP_ind_supp(treeview_dataframe_individus_supp, treeview_dataframe,
         ax.set_xlabel("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)")
         ax.set_ylabel("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")
         n = tableau_ACP.shape[0]
-        print(n)
+        # print(n)
         for i in range(n):
             ax.text(tableau_ACP[i, dim1-1], tableau_ACP[i, dim2-1], treeview_dataframe.index[i])
         m = tableau_ACP_individus_supp.shape[0]
-        print(m)
+        # print(m)
         for j in range(m):
             ax.text(tableau_ACP_individus_supp[j, dim1-1], tableau_ACP_individus_supp[j, dim2-1],
                     treeview_dataframe_individus_supp.index[j])
