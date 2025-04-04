@@ -81,23 +81,15 @@ def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, repertoire, re
     return texte, resultat_df
 
 
-
-# long_onde = 236.03
-# delta = 0.5
-# seuil = 5
-# rep_LIBStick = "/home/yannick/Bureau/LIBS/LIBStick"
-# recherche_elements(long_onde, delta,seuil, rep_LIBStick)
-
-
 ###################################################################################################
 # Recherche de correspondance longueur d'onde -> éléments en automatique
 ###################################################################################################
-def recherche_elements_auto(long_onde, delta, seuil, repertoire, rep_NIST):
-    texte_neutres, resultat_df_neutres = recherche_elements_neutres_ions_auto(long_onde, delta,seuil, False, repertoire, rep_NIST)
-    texte_ions, resultat_df_ions = recherche_elements_neutres_ions_auto(long_onde, delta,seuil, True, repertoire, rep_NIST)
-    # print(texte_neutres)
-    # print(texte_ions)
-    return texte_neutres, texte_ions, resultat_df_neutres, resultat_df_ions
+# def recherche_elements_auto(long_onde, delta, seuil, repertoire, rep_NIST):
+#     texte_neutres, resultat_df_neutres = recherche_elements_neutres_ions_auto(long_onde, delta,seuil, False, repertoire, rep_NIST)
+#     texte_ions, resultat_df_ions = recherche_elements_neutres_ions_auto(long_onde, delta,seuil, True, repertoire, rep_NIST)
+#     # print(texte_neutres)
+#     # print(texte_ions)
+#     return texte_neutres, texte_ions, resultat_df_neutres, resultat_df_ions
 
 
 def recherche_elements_neutres_ions_auto(long_onde, delta,seuil, ions, repertoire, rep_NIST):

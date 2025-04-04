@@ -360,16 +360,20 @@ def change_taille_fenetre(event):
             hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 750)/2)            
             hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
     else :
-        if fenetre_principale.winfo_width() < 1250 :
-            largeur_canevas_spectres = largeur_canevas_spectres_reference
-        else :
-            largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1250
+        largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1250
+        hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 770)/2)
+        hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
+        
+        # if fenetre_principale.winfo_width() < 1250 :
+        #     largeur_canevas_spectres = largeur_canevas_spectres_reference
+        # else :
+        #     largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1250
 
-        if fenetre_principale.winfo_height() < 770 :
-            hauteur_canevas_spectres = hauteur_canevas_spectres_reference
-        else :
-            hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 770)/2)
-            hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
+        # if fenetre_principale.winfo_height() < 770 :
+        #     hauteur_canevas_spectres = hauteur_canevas_spectres_reference
+        # else :
+        #     hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 770)/2)
+        #     hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
 
     applique_change_taille_fenetre()
 
@@ -1562,11 +1566,12 @@ def lit_affiche_spectre_L_det():
     """
     global spectre_entier_L_det
     global limites_spectre_x_L_det, limites_spectre_y_L_det
-    global maximum_spectre_actuel_L_det
+    global minimum_spectre_actuel_L_det, maximum_spectre_actuel_L_det
     os.chdir(rep_travail_L_det)
     spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul_L_det,
                                                        type_fichier_L_det.get())
     limites_spectre_x_L_det, limites_spectre_y_L_det = lit_limites_L_det(spectre_entier_L_det)
+    minimum_spectre_actuel_L_det = limites_spectre_y_L_det[0]
     maximum_spectre_actuel_L_det = limites_spectre_y_L_det[1]
     affiche_spectre_L_det()
 
@@ -1603,7 +1608,6 @@ def detecte_elements_L_det():
     Détecte les éléments possibles pour chaque pic détecté, remplit dataframe_elem_detect_IDlabels_L_det
     puis lance le remplissage du tableau Treeview
     """
-    global dataframe_neutres_L_det, dataframe_ions_L_det
     global dataframe_elem_detect_IDlabels_L_det
     global texte_elem_L_det
     minimum = spectre_entier_L_det[:,1].min()
@@ -1616,44 +1620,57 @@ def detecte_elements_L_det():
     texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
     texte_elem_L_det = texte_elem_L_det + longueurs_onde_trie_decroissant_df_L_det.to_markdown() + "\n\n" "---------------------------" + "\n"
 
-    dataframe_neutres_L_det = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
+    dataframe_neutres = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
                                                     "Element","Longueur d'onde","I relative", 
                                                     _("Type"), _("Validé"),"ID"])
-    dataframe_ions_L_det = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
+    dataframe_ions = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
                                                  "Element","Longueur d'onde","I relative",
                                                  _("Type"), _("Validé"),"ID"])
     for lambda_recherche_elements, intensite_recherche_elements in longueurs_onde_trie_decroissant_df_L_det.values :
-        neutres, ions, df_neutre, df_ions = LIBStick_recherche_elements.recherche_elements_auto(lambda_recherche_elements,
-                                                                                                delta_recherche_elements_L_det.get(),
-                                                                                                seuil_recherche_elements_L_det.get(),
-                                                                                                rep_LIBStick, 
-                                                                                                rep_NIST)
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
+            neutres, df_neutre = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
+                                                                                                  delta_recherche_elements_L_det.get(), 
+                                                                                                  seuil_recherche_elements_L_det.get(),
+                                                                                                  False, 
+                                                                                                  rep_LIBStick,
+                                                                                                  rep_NIST)     
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
+            ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
+                                                                                                  delta_recherche_elements_L_det.get(), 
+                                                                                                  seuil_recherche_elements_L_det.get(),
+                                                                                                  True, 
+                                                                                                  rep_LIBStick,
+                                                                                                  rep_NIST)
+                
         intensite_recherche_elements_norm = (intensite_recherche_elements-minimum)*100/(maximum-minimum)
         texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
         texte_elem_L_det = texte_elem_L_det +f"Longueur d'onde : {lambda_recherche_elements:.3f} nm" + "\n"
         texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
         texte_elem_L_det = texte_elem_L_det + f"**intensité normalisée : {intensite_recherche_elements_norm:.3f}**" + "\n\n"
-        texte_elem_L_det = texte_elem_L_det + neutres + "\n\n"
-        texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
-        texte_elem_L_det = texte_elem_L_det + ions + "\n\n"
-        texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
+            texte_elem_L_det = texte_elem_L_det + neutres + "\n\n"
+            texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
+            texte_elem_L_det = texte_elem_L_det + ions + "\n\n"
+            texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
         
-        indice = dataframe_neutres_L_det.shape[0]
-        dataframe_neutres_L_det = pd.concat([dataframe_neutres_L_det, df_neutre], ignore_index=True)
-        dataframe_neutres_L_det.iloc[indice: , 1]= lambda_recherche_elements
-        dataframe_neutres_L_det.iloc[indice: , 2]= intensite_recherche_elements
-        dataframe_neutres_L_det.iloc[indice: , 6]= _("Neutre")
-        dataframe_neutres_L_det.iloc[indice: , 7]= _("Non")
-        
-        indice = dataframe_ions_L_det.shape[0]
-        dataframe_ions_L_det = pd.concat([dataframe_ions_L_det, df_ions] , ignore_index=True)
-        dataframe_ions_L_det.iloc[indice: , 1]= lambda_recherche_elements
-        dataframe_ions_L_det.iloc[indice: , 2]= intensite_recherche_elements
-        dataframe_ions_L_det.iloc[indice: , 6]= _("Ion")
-        dataframe_ions_L_det.iloc[indice: , 7]= _("Non")
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
+            indice = dataframe_neutres.shape[0]
+            dataframe_neutres = pd.concat([dataframe_neutres, df_neutre], ignore_index=True)
+            dataframe_neutres.iloc[indice: , 1]= lambda_recherche_elements
+            dataframe_neutres.iloc[indice: , 2]= intensite_recherche_elements
+            dataframe_neutres.iloc[indice: , 6]= _("Neutre")
+            dataframe_neutres.iloc[indice: , 7]= _("Non")
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
+            indice = dataframe_ions.shape[0]
+            dataframe_ions = pd.concat([dataframe_ions, df_ions] , ignore_index=True)
+            dataframe_ions.iloc[indice: , 1]= lambda_recherche_elements
+            dataframe_ions.iloc[indice: , 2]= intensite_recherche_elements
+            dataframe_ions.iloc[indice: , 6]= _("Ion")
+            dataframe_ions.iloc[indice: , 7]= _("Non")
         
     # Concatène les deux DF neutres et ions :
-    dataframe_elem_detect_IDlabels_L_det = pd.concat([dataframe_neutres_L_det,dataframe_ions_L_det], 
+    dataframe_elem_detect_IDlabels_L_det = pd.concat([dataframe_neutres,dataframe_ions], 
                                                      axis=0, ignore_index=True)
     for i in range(dataframe_elem_detect_IDlabels_L_det.shape[0]) :
         dataframe_elem_detect_IDlabels_L_det.iloc[i, 0] = i
@@ -1760,7 +1777,7 @@ def affiche_spectre_L_det():
     """
     global limites_affichage_spectre_L_det
     global delta_limites_L_det
-    global maximum_spectre_actuel_L_det
+    global minimum_spectre_actuel_L_det, maximum_spectre_actuel_L_det
     global minimum_spectre_lineaire_L_det
     global flag_echelle_log_L_det
     limites_affichage_spectre_L_det[0] = variable_zoom_inf_L_det.get()
@@ -1823,10 +1840,12 @@ def affiche_spectre_L_det():
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_det = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
-        minimum = spectre[:, 1].min()
+        minimum_spectre_actuel_L_det = minimum = spectre[:, 1].min()
         maximum_spectre_actuel_L_det = maximum = spectre[:, 1].max()
 
     # dessin du spectre
+    if minimum < 0 :
+        minimum =0
     spectre[:, 1] = (hauteur_canevas_spectres_L_det-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres_L_det)/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     for i in range(len(spectre) - 1):
@@ -1966,24 +1985,31 @@ def affiche_lignes1_spectre_L_det():
     """
     global ligne1_1_L_det
     global ligne1_2_L_det
-    correction_zoom_affichage = 1 - ((limites_spectre_y_L_det[1] - maximum_spectre_actuel_L_det) / limites_spectre_y_L_det[1])
-    # minimum = spectre_entier_L_det[:,1].min()
-    # maximum = spectre_entier_L_det[:,1].max()
-    # print ("minimum du spectre : " + str(minimum))
-    # print ("maximum du spectre : " + str(maximum))
-    # print(limites_spectre_y_L_det[1])
-    # print(maximum_spectre_actuel_L_det)
-    # print(correction_zoom_affichage)
-    # - hauteur_canevas_spectres_L_det*correction_zoom_affichage
-    decalage_proportionel_1 = hauteur_canevas_spectres_L_det*(1-correction_zoom_affichage)*variable_3_L_det.get()/100
-    decalage_proportionel_2 = hauteur_canevas_spectres_L_det*(1-correction_zoom_affichage)*variable_4_L_det.get()/100
-    y_ligne1_1 = hauteur_canevas_spectres_L_det*(1-variable_3_L_det.get()/100) - decalage_proportionel_1
-    y_ligne1_2 = hauteur_canevas_spectres_L_det*(1-variable_4_L_det.get()/100) - decalage_proportionel_2
+    
+    minimum_spectre = limites_spectre_y_L_det[0]
+    maximum_spectre = limites_spectre_y_L_det[1]    
+    if minimum_spectre < 0 :
+        minimum_spectre = 0
+    delta_spectre = maximum_spectre - minimum_spectre
+    
+    minimum_actuel = minimum_spectre_actuel_L_det
+    maximum_actuel = maximum_spectre_actuel_L_det
+    if minimum_actuel < 0 :
+        minimum_spectre = 0
+    delta_actuel = maximum_actuel - minimum_actuel
+
+        
+    y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
+    y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
+    
+    y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
+    y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
+    
     ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1, 
                                                 fill="red", width=LARGEUR_LIGNES)
     ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2, 
                                                 fill="red", width=LARGEUR_LIGNES)
-
+    
 
 def deplace_lignes1_L_det():
     """
@@ -1992,29 +2018,40 @@ def deplace_lignes1_L_det():
     """
     deplace_ligne1_1_L_det()
     deplace_ligne1_2_L_det()
-
-
+ 
+    
 def deplace_ligne1_1_L_det():
     """
     Déplace la ligne rouge de la limite limites "Int rel mini" 
     de detection des pics sur le canevas 0
     """
     global ligne1_1_L_det, flag_nouvelle_detection_L_det
+    
     canevas0_L_det.delete(ligne1_1_L_det)
-    correction_zoom_affichage = 1 - ((limites_spectre_y_L_det[1] - maximum_spectre_actuel_L_det) / limites_spectre_y_L_det[1])
-    # print(limites_spectre_y_L_det[1])
-    # print(maximum_spectre_actuel_L_det)
-    # print(correction_zoom_affichage)
-    decalage_proportionel_1 = hauteur_canevas_spectres_L_det*(1-correction_zoom_affichage)*variable_3_L_det.get()/100
-    y_ligne1_1 = hauteur_canevas_spectres_L_det*(1-variable_3_L_det.get()/100) - decalage_proportionel_1
+    
+    minimum_spectre = limites_spectre_y_L_det[0]
+    maximum_spectre = limites_spectre_y_L_det[1]    
+    if minimum_spectre < 0 :
+        minimum_spectre = 0
+    delta_spectre = maximum_spectre - minimum_spectre
+    
+    minimum_actuel = minimum_spectre_actuel_L_det
+    maximum_actuel = maximum_spectre_actuel_L_det
+    if minimum_actuel < 0 :
+        minimum_spectre = 0
+    delta_actuel = maximum_actuel - minimum_actuel
+        
+    y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
+    y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
     ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1, 
                                                 fill="red", width=LARGEUR_LIGNES)
+    
     if variable_3_L_det.get() >= variable_4_L_det.get():
         variable_4_L_det.set(variable_3_L_det.get())
         deplace_ligne1_2_L_det()
     flag_nouvelle_detection_L_det = True
     bouton_recherche_L_det.configure(state="disable")
-
+    
 
 def deplace_ligne1_2_L_det():
     """
@@ -2022,22 +2059,33 @@ def deplace_ligne1_2_L_det():
     de detection des pics sur le canevas 0
     """
     global ligne1_2_L_det, flag_nouvelle_detection_L_det
+    
     canevas0_L_det.delete(ligne1_2_L_det)
-    correction_zoom_affichage = 1 - ((limites_spectre_y_L_det[1] - maximum_spectre_actuel_L_det) / limites_spectre_y_L_det[1])
-    # print(limites_spectre_y_L_det[1])
-    # print(maximum_spectre_actuel_L_det)
-    # print(correction_zoom_affichage)
-    decalage_proportionel_2 = hauteur_canevas_spectres_L_det*(1-correction_zoom_affichage)*variable_4_L_det.get()/100
-    y_ligne1_2 = hauteur_canevas_spectres_L_det*(1-variable_4_L_det.get()/100) - decalage_proportionel_2
+    
+    minimum_spectre = limites_spectre_y_L_det[0]
+    maximum_spectre = limites_spectre_y_L_det[1]    
+    if minimum_spectre < 0 :
+        minimum_spectre = 0
+    delta_spectre = maximum_spectre - minimum_spectre
+    
+    minimum_actuel = minimum_spectre_actuel_L_det
+    maximum_actuel = maximum_spectre_actuel_L_det
+    if minimum_actuel < 0 :
+        minimum_spectre = 0
+    delta_actuel = maximum_actuel - minimum_actuel
+    
+    y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
+    y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
     ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2, 
                                                 fill="red", width=LARGEUR_LIGNES)
+    
     if variable_4_L_det.get() <= variable_3_L_det.get():
         variable_3_L_det.set(variable_4_L_det.get())
         deplace_ligne1_1_L_det()
     flag_nouvelle_detection_L_det = True
     bouton_recherche_L_det.configure(state="disable")
-
-
+    
+    
 def deplace_ligne1_1_return_L_det(event):
     """
     Déclenche le déplacement de la ligne rouge de la limite "Int rel mini"  sur le canevas 0
@@ -2138,7 +2186,7 @@ def efface_pic_label_L_det(numero) :
     global dataframe_elem_detect_IDlabels_L_det
     pic_element_ID = dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"]
     # print("efface le pic label :" + str(numero) + " identifiant : " +str(pic_element_ID))
-    canevas0_L_det.delete(pic_element_ID)
+    canevas0_L_det.delete(int(pic_element_ID))
     dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = np.nan
 
 
@@ -2152,7 +2200,7 @@ def efface_pics_labels_L_det() :
                                           dataframe_elem_detect_IDlabels_L_det.iloc[:,8]) :
             if not(pd.isna(pic_element_ID)) :
                 # print("efface label n° : "+ str(numero)+ " ID n° : " + str(pic_element_ID))
-                canevas0_L_det.delete(pic_element_ID)
+                canevas0_L_det.delete(int(pic_element_ID))
                 dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = np.nan
         
         
@@ -6333,16 +6381,19 @@ hauteur_ecran = fenetre_principale.winfo_screenheight()
 
 default_font = font.nametofont("TkDefaultFont")
 default_font.configure(size=11)
-# print(default_font.measure("abcdef"))
 facteur_echelle_ecran = (default_font.measure("abcdef")) / 46
 
-if largeur_ecran <= 1281 :
+# if largeur_ecran <= 1281 :
+if largeur_ecran <= 1370 :
     largeur_fenetre_principale = 1155
     hauteur_fenetre_principale = 750
     largeur_canevas_spectres = largeur_canevas_spectres_reference = 1000
-    hauteur_canevas_spectres = hauteur_canevas_spectres_L_det = hauteur_canevas_spectres_reference = 200
-    taille_police = math.ceil(11/facteur_echelle_ecran)
-    TAILLE_FONT_CLASSIFICATION = math.ceil(8/facteur_echelle_ecran)
+    hauteur_canevas_spectres =  hauteur_canevas_spectres_reference = 200
+    hauteur_canevas_spectres_L_det = 290
+    # taille_police = math.ceil(11/facteur_echelle_ecran)
+    # TAILLE_FONT_CLASSIFICATION = math.ceil(8/facteur_echelle_ecran)
+    taille_police = math.ceil(10/facteur_echelle_ecran)
+    TAILLE_FONT_CLASSIFICATION = math.ceil(10/facteur_echelle_ecran)
     default_font.configure(size=taille_police)
 elif largeur_ecran <= 1921:
     largeur_fenetre_principale = 1500
@@ -6965,7 +7016,10 @@ bouton_classification_L_det.grid(row=8, column=1, sticky=tk.S)
 ###################################################################################################
 # Interface graphique frame2_L_det : affichage des résultats sous forme de TreeView
 ###################################################################################################
-tree_L_det = ttk.Treeview(frame2_L_det, columns=(1, 2, 3, 4, 5, 6, 7,8), height=20, show="headings")
+if hauteur_ecran <= 780 :
+    tree_L_det = ttk.Treeview(frame2_L_det, columns=(1, 2, 3, 4, 5, 6, 7,8), height=15, show="headings")
+else :
+    tree_L_det = ttk.Treeview(frame2_L_det, columns=(1, 2, 3, 4, 5, 6, 7,8), height=20, show="headings")
 bg_color_treeview = style_LIBStick.lookup("Treeview", "background")
 tree_L_det.tag_configure("default", background = bg_color_treeview )
 tree_L_det.tag_configure("neutres_select", background = bg_color_treeview, foreground="orange" )
@@ -7021,7 +7075,7 @@ text7_L_det = ttk.Label(frame2_1_L_det, text=_("Seuil (> I rela.) :"))
 text6_L_det.grid(row=6, column=1)
 text7_L_det.grid(row=7, column=1)
 
-delta_recherche_elements_L_det = tk.DoubleVar(value=0.5)
+delta_recherche_elements_L_det = tk.DoubleVar(value=0.2)
 seuil_recherche_elements_L_det = tk.IntVar(value=1)
 entree_delta_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=5, increment=0.1, width=5,
                                   textvariable=delta_recherche_elements_L_det, foreground="black")
