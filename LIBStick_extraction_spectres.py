@@ -40,10 +40,12 @@ def lit_fichier_entre_bornes(fichier, bas, haut, type_fichier):
     """
     document = LIBStick_outils.lit_spectre(fichier, type_fichier)
     document_tronc = np.zeros((0, 2))
-    for ligne in document:
-        if (ligne[0] >= bas and ligne[0] <= haut):
-            document_tronc = np.row_stack((document_tronc, ligne))
-            # document_tronc=np.vstack((document_tronc,ligne)) #idem ci-dessus
+    document_tronc = document[(document[:,0] >= bas) &
+                              (document[:,0] <= haut)]
+    # for ligne in document:
+    #     if (ligne[0] >= bas and ligne[0] <= haut):
+    #         document_tronc = np.row_stack((document_tronc, ligne))
+    #         # document_tronc=np.vstack((document_tronc,ligne)) #idem ci-dessus
     return document_tronc
 
 
@@ -285,7 +287,7 @@ def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):
     tableau_extrait = tableau_norm[:, 1:]
     for i in range(len(liste_bool), 0, -1):
         if liste_bool[i-1] is False:
-            print("supprime : " + str(i))
+            # print("supprime : " + str(i))
             tableau_extrait = np.delete(tableau_extrait, i-1, axis=1)
     spectre_moyen = tableau_extrait.sum(axis=1)
     spectre_moyen = spectre_moyen/tableau_extrait.shape[1]
@@ -321,10 +323,10 @@ def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool
     tableau = np.loadtxt("tableau_brut_points.txt", delimiter="\t",
                             dtype=float, encoding="Latin-1")
     if flag_spectres_normalises_moyenne is True:
-        print("moyenne des spectres normalisés")
+        # print("moyenne des spectres normalisés")
         tableau = LIBStick_outils.normalise_tableau_x_aire(tableau)
-    else:
-        print("moyenne des spectres bruts")
+    # else:
+    #     print("moyenne des spectres bruts")
 #    print(tableau)
 #    spectre_moyen=creation_spectre_moyen_avec_x(tableau_norm, bornes_moyenne_spectres)
     spectre_moyen = creation_spectre_moyen_avec_x_tableau_bool(tableau, liste_bool)
@@ -350,10 +352,12 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
     for i in range(len(liste_fichiers)):
         for bornes in tableau_bornes:
             os.chdir(rep_travail)
-            document = lit_fichier_entre_bornes(
-                liste_fichiers[i], bornes[0], bornes[1], type_fichier)
+            document = lit_fichier_entre_bornes(liste_fichiers[i], 
+                                                bornes[0], bornes[1], 
+                                                type_fichier)
             enregistre_spectre(document, rep_travail+"/" +
-                               str(bornes[0])+"_" + str(bornes[1]), liste_fichiers[i])
+                               str(bornes[0])+"_" + str(bornes[1]), 
+                               liste_fichiers[i])
     for bornes in tableau_bornes:
         os.chdir(rep_script)
         creation_tableau_norm(rep_travail+"/"+str(bornes[0])+"_" + str(bornes[1])+"/",

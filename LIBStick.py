@@ -41,6 +41,20 @@ import LIBStick_graduations
 
 
 ###################################################################################################
+# Utilitaires pour ecriture du code
+###################################################################################################
+def timer_decorator(function):
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = function(*args, **kwargs)
+        end = time.perf_counter()
+        print(f"La fonction {function.__name__} a été exécutée en : {end - start: .5f} secondes")
+        return result
+    return wrapper
+
+
+
+###################################################################################################
 # initialisations générales et définitions des variables globales
 ###################################################################################################
 NOM_OS = os.name
@@ -48,6 +62,8 @@ rep_LIBStick = os.getcwd()
 # print(rep_LIBStick)
 #rep_NIST = "NIST_atomic_spectra"
 rep_NIST = "NIST_LIBS"
+flag_df_elements_L_det = False
+flag_df_atomic_elements_L_rec = False
 
 # interface graphique
 flag_change_fenetre = False
@@ -604,6 +620,7 @@ def visualisation_L_trait():
     bouton_execute_L_trait.configure(state="normal")
 
 
+@timer_decorator
 def execute_L_trait():
     """
     Traitement et sauvegarde du/des spectre(s). Bouton Executer
@@ -1481,6 +1498,7 @@ limites_affichage_spectre_L_det = np.array([198.0, 1013.0])
 coord_zoom_L_det = np.array([198, 0, 1013, 0])
 delta_limites_L_det = limites_affichage_spectre_L_det[1]-limites_affichage_spectre_L_det[0]
 flag_premier_lamda_L_det = True
+# flag_df_elements_L_det = False
 spectre_entier_L_det = np.zeros((0, 2))
 spectre_corrige_L_det = np.zeros((0, 2))
 tableau_bornes_L_det=np.array([300.0, 608.0])
@@ -1603,6 +1621,7 @@ def lit_limites_L_det(spectre):
     return limites_spectre_x,limites_spectre_y
 
 
+@timer_decorator
 def detecte_elements_L_det():
     """
     Détecte les éléments possibles pour chaque pic détecté, remplit dataframe_elem_detect_IDlabels_L_det
@@ -1610,6 +1629,18 @@ def detecte_elements_L_det():
     """
     global dataframe_elem_detect_IDlabels_L_det
     global texte_elem_L_det
+    global df_neutres_L_det, df_ions_L_det, flag_df_elements_L_det
+    if flag_df_elements_L_det == False :
+        print("creation DF elements")
+        df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False, 
+                                                                 rep_LIBStick, 
+                                                                 rep_NIST)
+        df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True, 
+                                                                 rep_LIBStick, 
+                                                                 rep_NIST)
+        flag_df_elements_L_det = True
+    else :
+        print("zappe la creation DF elements")
     minimum = spectre_entier_L_det[:,1].min()
     maximum = spectre_entier_L_det[:,1].max()
     texte_elem_L_det = ""
@@ -1628,19 +1659,29 @@ def detecte_elements_L_det():
                                                  _("Type"), _("Validé"),"ID"])
     for lambda_recherche_elements, intensite_recherche_elements in longueurs_onde_trie_decroissant_df_L_det.values :
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
-            neutres, df_neutre = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-                                                                                                  delta_recherche_elements_L_det.get(), 
-                                                                                                  seuil_recherche_elements_L_det.get(),
-                                                                                                  False, 
-                                                                                                  rep_LIBStick,
-                                                                                                  rep_NIST)     
+            neutres, df_neutres = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
+                                                                                                   delta_recherche_elements_L_det.get(), 
+                                                                                                   seuil_recherche_elements_L_det.get(),
+                                                                                                   False, 
+                                                                                                   df_neutres_L_det) 
+            # neutres, df_neutre = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
+            #                                                                                       delta_recherche_elements_L_det.get(), 
+            #                                                                                       seuil_recherche_elements_L_det.get(),
+            #                                                                                       False, 
+            #                                                                                       rep_LIBStick,
+            #                                                                                       rep_NIST)     
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
             ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-                                                                                                  delta_recherche_elements_L_det.get(), 
-                                                                                                  seuil_recherche_elements_L_det.get(),
-                                                                                                  True, 
-                                                                                                  rep_LIBStick,
-                                                                                                  rep_NIST)
+                                                                                             delta_recherche_elements_L_det.get(), 
+                                                                                             seuil_recherche_elements_L_det.get(),
+                                                                                             True, 
+                                                                                             df_ions_L_det)    
+            # ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
+            #                                                                                       delta_recherche_elements_L_det.get(), 
+            #                                                                                       seuil_recherche_elements_L_det.get(),
+            #                                                                                       True, 
+            #                                                                                       rep_LIBStick,
+            #                                                                                       rep_NIST)
                 
         intensite_recherche_elements_norm = (intensite_recherche_elements-minimum)*100/(maximum-minimum)
         texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
@@ -1656,7 +1697,7 @@ def detecte_elements_L_det():
         
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
             indice = dataframe_neutres.shape[0]
-            dataframe_neutres = pd.concat([dataframe_neutres, df_neutre], ignore_index=True)
+            dataframe_neutres = pd.concat([dataframe_neutres, df_neutres], ignore_index=True)
             dataframe_neutres.iloc[indice: , 1]= lambda_recherche_elements
             dataframe_neutres.iloc[indice: , 2]= intensite_recherche_elements
             dataframe_neutres.iloc[indice: , 6]= _("Neutre")
@@ -1679,7 +1720,7 @@ def detecte_elements_L_det():
     remplit_treeview_L_det()
     bouton_exporte_L_det.configure(state="enable")
     
-
+    
 ###################################################################################################
 # fonctions graphiques du caneva du spectre (frame1_L_det)
 ###################################################################################################
@@ -5704,6 +5745,7 @@ def __________L_rec__________():
 # initialisations
 ###################################################################################################
 flag_fenetre_recherche_elements_ouvert_L_rec  = False
+flag_df_elements_L_rec = False
 
 
 ###################################################################################################
@@ -5778,14 +5820,42 @@ def ouvre_fenetre_recherche_elements_L_rec():
 def recherche_elements_L_rec() :
     global rep_NIST
     global texte_neutres_L_rec, texte_ions_L_rec
+    global df_neutres_L_det, df_ions_L_det, flag_df_elements_L_det
+    global df_neutres_atomic_L_rec, df_ions_atomic_L_rec, flag_df_atomic_elements_L_rec
     if flag_NIST_LIBS_L_ele.get() == 1 :
         rep_NIST = "NIST_LIBS"
+        if flag_df_elements_L_det == False :
+            # print("creation DF elements")
+            df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False, 
+                                                                     rep_LIBStick, 
+                                                                     rep_NIST)
+            df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True, 
+                                                                     rep_LIBStick, 
+                                                                     rep_NIST)
+            flag_df_elements_L_det = True
+        # else :
+        #     print("zappe la creation DF elements")
+        texte_neutres_L_rec, texte_ions_L_rec, _, _ = LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
+                                                                                   delta_recherche_elements_L_rec.get(),
+                                                                                   seuil_recherche_elements_L_rec.get(),
+                                                                                   df_neutres_L_det, df_ions_L_det)
     else :
         rep_NIST = "NIST_atomic_spectra"
-    texte_neutres_L_rec, texte_ions_L_rec, _, _ = LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
-                                                                               delta_recherche_elements_L_rec.get(),
-                                                                               seuil_recherche_elements_L_rec.get(),
-                                                                               rep_LIBStick, rep_NIST)
+        if flag_df_atomic_elements_L_rec == False :
+            print("creation DF elements")
+            df_neutres_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(False, 
+                                                                     rep_LIBStick, 
+                                                                     rep_NIST)
+            df_ions_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(True, 
+                                                                     rep_LIBStick, 
+                                                                     rep_NIST)
+            flag_df_atomic_elements_L_rec = True
+        else :
+            print("zappe la creation DF elements")
+        texte_neutres_L_rec, texte_ions_L_rec, _, _ = LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
+                                                                                   delta_recherche_elements_L_rec.get(),
+                                                                                   seuil_recherche_elements_L_rec.get(),
+                                                                                   df_neutres_atomic_L_rec, df_ions_atomic_L_rec)    
     zone_texte_L_rec.insert("1.0", "\n\n")
     zone_texte_L_rec.insert("1.0", texte_ions_L_rec)
     zone_texte_L_rec.insert("1.0", "\n")

@@ -67,9 +67,11 @@ def creation_spectre_bornes(spectre_entier, tableau_bornes):
     Extrait et retourne un spectre limité aux bornes définies par les Spinbox
     """
     spectre_limite_bornes = np.zeros((0, 2))
-    for ligne in spectre_entier:
-        if ligne[0] > tableau_bornes[0] and ligne[0] < tableau_bornes[1]:
-            spectre_limite_bornes = np.row_stack((spectre_limite_bornes, ligne))
+    # for ligne in spectre_entier:
+    #     if ligne[0] > tableau_bornes[0] and ligne[0] < tableau_bornes[1]:
+    #         spectre_limite_bornes = np.row_stack((spectre_limite_bornes, ligne))
+    spectre_limite_bornes = spectre_entier[(spectre_entier[:,0] > tableau_bornes[0]) &
+                                            (spectre_entier[:,0] < tableau_bornes[1])]
     return spectre_limite_bornes
 
 
@@ -390,9 +392,11 @@ def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, tail
         repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
     for nom_fichier in liste_fichiers:
         spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
-        spectre = creation_spectre_filtre(
-            spectre, tableau_bornes, type_filtre, taille_filtre, ordre, deriv)
-        fond_continu = creation_fond(spectre, type_fond, param1, param2, param3)
+        spectre = creation_spectre_filtre(spectre, tableau_bornes, 
+                                          type_filtre, taille_filtre, 
+                                          ordre, deriv)
+        fond_continu = creation_fond(spectre, type_fond, 
+                                     param1, param2, param3)
         spectre = creation_spectre_corrige(spectre, fond_continu)
         enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
         if flag_sauve_fond is True:
