@@ -5,6 +5,7 @@ Created on Wed Oct  7 09:34:25 2020
 Module outils pour l'ACP
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
 
 
 import pickle as pk
@@ -86,7 +87,7 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
         fig_px_matrice = px.scatter_matrix(tableau_ACP, dimensions=range(3),
                                             color=treeview_dataframe.values[:, -1],
                                             opacity=0.5,
-                                            hover_name=(treeview_dataframe["nom"]),
+                                            hover_name=(treeview_dataframe[_("nom")]),
                                             labels={"0":str("F1"+ "( %.2f" % inerties[0] + " %)"),
                                                     "1":str("F2"+ "( %.2f" % inerties[1] + " %)"),
                                                     "2":str("F3"+ "( %.2f" % inerties[2] + " %)")})
@@ -129,7 +130,7 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
                                 color=treeview_dataframe.values[:, -1],
                                 symbol=treeview_dataframe.values[:, -2],
                                 text=treeview_dataframe.index, opacity=0.5,
-                                hover_name=(treeview_dataframe["nom"]),
+                                hover_name=(treeview_dataframe[_("nom")]),
                                 labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
                                         "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)")})
             fig_px_scatter.update_traces(marker_size=20)
@@ -169,7 +170,7 @@ def affiche_ACP(treeview_dataframe, modele_ACP, tableau_ACP, dim,
                                       color=treeview_dataframe.values[:, -1],
                                       symbol=treeview_dataframe.values[:, -2],
                                       text=treeview_dataframe.index, opacity=0.5,
-                                      hover_name=(treeview_dataframe["nom"]),
+                                      hover_name=(treeview_dataframe[_("nom")]),
                                       labels={"0":str("F"+str(dim1) + "( %.2f" % inerties[dim1-1] + " %)"),
                                               "1":str("F"+str(dim2) + "( %.2f" % inerties[dim2-1] + " %)"),
                                               "2":str("F"+str(dim3) + "( %.2f" % inerties[dim3-1] + " %)")})

@@ -5,6 +5,8 @@ Created on Wed Jan 31 14:31:16 2024
 
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
+
 
 import numpy as np
 

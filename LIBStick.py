@@ -10,25 +10,27 @@ Programme principal et interface graphique de LIBStick
 # import tkinter, tkinter.filedialog, tkinter.ttk
 # from LIBStick_IHM_extraction import *
 
-import os, sys
+import os
+import sys
 import time
 import configparser
 import pathlib
 import gettext
 import math
+
+import tkinter as tk
+import tkinter.filedialog as fd
+import tkinter.font as font
+import tkinter.messagebox as messagebox
+import tkinter.ttk as ttk
+from ttkthemes import ThemedTk
+# import ttkwidgets
+
 import numpy as np
 import pandas as pd
 import PIL.Image
 import PIL.ImageTk
 from scipy.signal import find_peaks
-
-import tkinter as tk
-import tkinter.filedialog as fd
-import tkinter.ttk as ttk
-from ttkthemes import ThemedTk
-import tkinter.font as font
-import tkinter.messagebox as messagebox
-# import ttkwidgets
 
 import LIBStick_outils
 import LIBStick_traitements_spectres
@@ -109,7 +111,7 @@ lambda_texte_spectre_0_L_ACP = lambda_texte_spectre_1_L_ACP = 0
 
 # noms des fichiers et répertoires, listes des fichiers, nombre de fichiers
 nom_echantillon_L_ext = ""
-nom_fichier_seul_L_trait = nom_fichier_seul_L_det = nom_fichier_seul_L_ext = "" 
+nom_fichier_seul_L_trait = nom_fichier_seul_L_det = nom_fichier_seul_L_ext = ""
 nom_fichier_seul_L_comp = nom_fichier_seul_L_ACP = ""
 rep_travail_L_trait = rep_travail_L_det = rep_travail_L_ext = rep_travail_L_comp = rep_travail_L_ACP = ""
 liste_fichiers_L_trait = liste_fichiers_L_det = liste_fichiers_L_ext = liste_fichiers_L_comp = liste_fichiers_L_ACP = []
@@ -373,13 +375,13 @@ def change_taille_fenetre(event):
         if fenetre_principale.winfo_height() < 750 :
             hauteur_canevas_spectres = hauteur_canevas_spectres_reference
         else :
-            hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 750)/2)            
+            hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 750)/2)
             hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
     else :
         largeur_canevas_spectres = largeur_canevas_spectres_reference + fenetre_principale.winfo_width() - 1250
         hauteur_canevas_spectres = hauteur_canevas_spectres_reference + int((fenetre_principale.winfo_height() - 770)/2)
         hauteur_canevas_spectres_L_det = int((fenetre_principale.winfo_height())-600)
-        
+
         # if fenetre_principale.winfo_width() < 1250 :
         #     largeur_canevas_spectres = largeur_canevas_spectres_reference
         # else :
@@ -397,7 +399,7 @@ def change_taille_fenetre(event):
 def applique_change_taille_fenetre():
     global old_time
     canevas0_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres+170)
-    canevas1_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)    
+    canevas1_L_trait.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas0_L_det.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres_L_det)
     canevas0_L_ext.config(width=largeur_canevas_spectres, height=hauteur_canevas_spectres)
     canevas1_L_ext.config(width=largeur_canevas_spectres/2, height=hauteur_canevas_spectres)
@@ -576,7 +578,7 @@ def choix_fichier_L_trait():
     global nombre_fichiers_L_trait
     nom_fichier_L_trait = fd.askopenfilename(initialdir=rep_travail_L_trait,
                                              title=_('Choisissez un fichier spectre'),
-                                             filetypes=((_("tous"), "*.*"), 
+                                             filetypes=((_("tous"), "*.*"),
                                                         (_("fichiers LIBStick"), "*.tsv"),
                                                         (_("fichiers LIBStick moyen"), "*.mean"),
                                                         (_("fichiers IVEA"), "*.asc"),
@@ -588,7 +590,30 @@ def choix_fichier_L_trait():
                                                                      type_fichier_L_trait.get())
     nombre_fichiers_L_trait = len(liste_fichiers_L_trait)
     entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
-    lit_affiche_spectre_L_trait()
+
+    try :
+        lit_affiche_spectre_L_trait(nom_fichier_seul_L_trait)
+    except Exception as e1 :
+        print(f"Fichier {nom_fichier_seul_L_trait} : mauvais format ! Supprimé de la liste ! ({e1})")
+        liste_fichiers_L_trait.remove(nom_fichier_seul_L_trait)
+        nombre_fichiers_L_trait = len(liste_fichiers_L_trait)
+        entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
+        indices_a_supprimer = []
+        for numero in range(nombre_fichiers_L_trait) :
+            try :
+                nom_fichier_seul_L_trait = liste_fichiers_L_trait[numero]
+                lit_affiche_spectre_L_trait(nom_fichier_seul_L_trait)
+                break
+            except Exception as e2 :
+                print(f"Fichier {nom_fichier_seul_L_trait} : mauvais format ! Supprimé de la liste ! ({e2})")
+                indices_a_supprimer.append(numero)
+                continue
+        for indice in sorted(indices_a_supprimer, reverse=True):
+            if indice < len(liste_fichiers_L_trait):
+                liste_fichiers_L_trait.pop(indice)
+        nombre_fichiers_L_trait = len(liste_fichiers_L_trait)
+        entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
+    
     bouton_visualisation_L_trait.configure(state="normal")
     fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+nom_fichier_seul_L_trait)
 
@@ -625,6 +650,7 @@ def execute_L_trait():
     """
     Traitement et sauvegarde du/des spectre(s). Bouton Executer
     """
+    global liste_fichiers_L_trait
     flag_tous_fichiers = flag_tous_fichiers_L_trait.get()
     flag_sauve_fond = flag_sauve_fond_L_trait.get()
     if flag_tous_fichiers is False:
@@ -632,18 +658,25 @@ def execute_L_trait():
                                               fond_continu_L_trait, nom_fichier_seul_L_trait,
                                               flag_sauve_fond)
     if flag_tous_fichiers is True:
-        LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait, type_fichier_L_trait.get(),
-                                                      tableau_bornes_L_trait, type_filtre_L_trait.get(),
-                                                      taille_filtre_L_trait.get(), ordre_filtre_L_trait.get(),
-                                                      derivee_filtre_L_trait.get(), type_fond_L_trait.get(),
-                                                      param1_fond_L_trait.get(), param2_fond_L_trait.get(),
-                                                      param3_fond_L_trait.get(), flag_sauve_fond)
+        liste_fichiers_L_trait =  LIBStick_traitements_spectres.execute_en_bloc(rep_travail_L_trait,
+                                                                                type_fichier_L_trait.get(),
+                                                                                liste_fichiers_L_trait,
+                                                                                tableau_bornes_L_trait, 
+                                                                                type_filtre_L_trait.get(),
+                                                                                taille_filtre_L_trait.get(),
+                                                                                ordre_filtre_L_trait.get(),
+                                                                                derivee_filtre_L_trait.get(), 
+                                                                                type_fond_L_trait.get(),
+                                                                                param1_fond_L_trait.get(), 
+                                                                                param2_fond_L_trait.get(),
+                                                                                param3_fond_L_trait.get(), 
+                                                                                flag_sauve_fond)
 
 
 ###################################################################################################
 # fonctions graphiques du caneva du spectre (frame1_L_trait)
 ###################################################################################################
-def lit_affiche_spectre_L_trait():
+def lit_affiche_spectre_L_trait(nom_fichier_seul):
     """
     Lecture d'un fichier spectre et affichage du spectre brut.
     """
@@ -652,7 +685,7 @@ def lit_affiche_spectre_L_trait():
     global maximum_spectre_L_trait, maximum_spectre_corrige_L_trait
     global fond_continu_L_trait
     os.chdir(rep_travail_L_trait)
-    spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait,
+    spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                          type_fichier_L_trait.get())
     limites_spectre_x_L_trait, limites_spectre_y_L_trait = lit_limites_L_trait(spectre_entier_L_trait)
     maximum_spectre_L_trait = maximum_spectre_corrige_L_trait = limites_spectre_y_L_trait[1]
@@ -799,7 +832,7 @@ def affiche_spectre_L_trait():
                 spectre = np.row_stack((spectre, ligne))
         minimum_spectre_L_trait = spectre[:, 1].min()
         coord_y_min = min(coord_zoom_L_trait[1],coord_zoom_L_trait[3])
-        coord_y_min = (coord_y_min*(hauteur_canevas_spectres+170)/hauteur_canevas_spectres)
+        coord_y_min = coord_y_min*(hauteur_canevas_spectres+170)/hauteur_canevas_spectres
         # print("coord_y0_min = " + str(coord_y_min))
         ratio_y_0_max = (hauteur_canevas_spectres+170-coord_y_min)/(hauteur_canevas_spectres+170)
         if  flag_change_fenetre is False :
@@ -815,7 +848,7 @@ def affiche_spectre_L_trait():
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_trait.get() == True :
+        if flag_echelle_log_L_trait.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -830,7 +863,7 @@ def affiche_spectre_L_trait():
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_trait.get() == True :
+        if flag_echelle_log_L_trait.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -844,7 +877,7 @@ def affiche_spectre_L_trait():
         for ligne in spectre_entier_L_trait:
             if (ligne[0] >= limites_affichage_spectre_L_trait[0] and ligne[0] <= limites_affichage_spectre_L_trait[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_trait.get() == True :
+        if flag_echelle_log_L_trait.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_trait = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -876,7 +909,7 @@ def affiche_fond_L_trait():
             spectre = np.row_stack((spectre, ligne))
     minimum = minimum_spectre_L_trait
     maximum = maximum_spectre_L_trait
-    if flag_echelle_log_L_trait.get() == True :
+    if flag_echelle_log_L_trait.get() is True :
         spectre[:,1] = np.log(spectre[:,1]-minimum_spectre_lineaire_L_trait)
     spectre[:, 1] = (hauteur_canevas_spectres+170-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres+170)/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
@@ -905,14 +938,14 @@ def affiche_graduation_L_trait():
     liste_0_lignes_grad_L_trait=[]
     # liste_0_textes_grad_L_trait=[]
     for x in liste_graduations_en_pixels :
-       liste_0_lignes_grad_L_trait.append(canevas0_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
+        liste_0_lignes_grad_L_trait.append(canevas0_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
                                                                        fill="blue", dash=(1,2)))
 
     for texte in liste_0_textes_grad_L_trait :
         canevas0_L_trait.delete(texte)
         liste_0_textes_grad_L_trait=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_0_textes_grad_L_trait.append(canevas0_L_trait.create_text(liste_graduations_en_pixels[i], 10,
+        liste_0_textes_grad_L_trait.append(canevas0_L_trait.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
 
@@ -922,14 +955,14 @@ def affiche_graduation_L_trait():
     liste_1_lignes_grad_L_trait=[]
     # liste_1_textes_grad_L_trait=[]
     for x in liste_graduations_en_pixels :
-       liste_1_lignes_grad_L_trait.append(canevas1_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
+        liste_1_lignes_grad_L_trait.append(canevas1_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
                                                                        fill="blue", dash=(1,2)))
 
     for texte in liste_1_textes_grad_L_trait :
         canevas1_L_trait.delete(texte)
         liste_1_textes_grad_L_trait=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_1_textes_grad_L_trait.append(canevas1_L_trait.create_text(liste_graduations_en_pixels[i], 10,
+        liste_1_textes_grad_L_trait.append(canevas1_L_trait.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
 
@@ -1072,6 +1105,7 @@ def lit_affiche_spectre_numero_L_trait():
     """
     global spectre_entier_L_trait
     global nom_fichier_seul_L_trait
+    global liste_fichiers_L_trait, nombre_fichiers_L_trait
     sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
     flag_zoom_auto_y.set(True)
     numero = numero_spectre_L_trait.get()-1
@@ -1080,7 +1114,14 @@ def lit_affiche_spectre_numero_L_trait():
     spectre_entier_L_trait = LIBStick_outils.lit_spectre(nom_fichier_seul_L_trait,
                                                          type_fichier_L_trait.get())
     #affiche_spectre_L_trait()
-    visualisation_L_trait()
+    try :
+        visualisation_L_trait()
+    except Exception as e :
+        print(f"Fichier {nom_fichier_seul_L_trait} : mauvais format ! Supprimé de la liste ! ({e})")
+        liste_fichiers_L_trait.pop(numero)
+        nombre_fichiers_L_trait = len(liste_fichiers_L_trait)
+        entree_spectre_L_trait.configure(to=nombre_fichiers_L_trait)
+    
     fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+nom_fichier_seul_L_trait)
     flag_zoom_auto_y.set(sauve_flag_zoom_auto_y)
 
@@ -1144,7 +1185,7 @@ def affiche_spectre_corrige_L_trait():
         maximum_spectre_corrige_L_trait = maximum = spectre[:, 1].max()
 
     # dessin du spectre
-    spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
+    spectre[:, 1] = hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
@@ -1167,13 +1208,13 @@ def affiche_position_souris_1_L_trait(event):
     global ligne_position_1_y_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, 
-                                                              hauteur_canevas_spectres+170, 
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres+170,
                                                               fill="green")
     if flag_zoom_auto_y.get() is False:
         ratio_y1 = event.y/(hauteur_canevas_spectres)
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
-                                                                  largeur_canevas_spectres, 
+                                                                  largeur_canevas_spectres,
                                                                   ratio_y1*(hauteur_canevas_spectres+170),
                                                                   fill="green")
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
@@ -1201,19 +1242,19 @@ def affiche_position_souris_motion_1_L_trait(event):
     global flag_premier_lamda_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, 
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
                                                               hauteur_canevas_spectres+170,
                                                               fill="green")
     if flag_zoom_auto_y.get() is False:
         ratio_y1 = event.y/(hauteur_canevas_spectres)
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
-                                                                  largeur_canevas_spectres, 
+                                                                  largeur_canevas_spectres,
                                                                   ratio_y1*(hauteur_canevas_spectres+170),
                                                                   fill="green")
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, 
-                                                              hauteur_canevas_spectres, 
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x,
+                                                              hauteur_canevas_spectres,
                                                               fill="green")
     if flag_zoom_auto_y.get() is False:
         ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
@@ -1542,10 +1583,11 @@ def choix_fichier_L_det():
     global rep_travail_L_det
     global nombre_fichiers_L_det
     global liste_fichiers_L_det
-    global longueurs_onde_df_L_det, DataFrame_complet_L_det, dataframe_elem_detect_IDlabels_L_det
-    nom_fichier_L_det = fd.askopenfilename(title='Choisissez un fichier spectre', 
-                                           initialdir=rep_travail_L_det, 
-                                           filetypes=((_("tous"), "*.*"), 
+    global longueurs_onde_df_L_det, dataframe_elem_detect_IDlabels_L_det
+    global DataFrame_complet_L_det
+    nom_fichier_L_det = fd.askopenfilename(title='Choisissez un fichier spectre',
+                                           initialdir=rep_travail_L_det,
+                                           filetypes=((_("tous"), "*.*"),
                                                       (_("fichiers LIBStick"), "*.tsv"),
                                                       (_("fichiers LIBStick moyen"), "*.mean"),
                                                       (_("fichiers IVEA"), "*.asc"),
@@ -1556,13 +1598,31 @@ def choix_fichier_L_det():
     liste_fichiers_L_det = LIBStick_outils.creation_liste_fichiers(rep_travail_L_det,
                                                                    type_fichier_L_det.get())
     nombre_fichiers_L_det = len(liste_fichiers_L_det)
-#    entree6_L_det.configure(from_=1, to=nombre_fichiers_L_det)
-    tableau_spectres_L_det = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_det,
-                                                                           type_fichier_L_det.get())
-    DataFrame_complet_L_det = LIBStick_outils.creer_dataframe_x_tableau_en_colonnes(tableau_spectres_L_det,
-                                                                                    liste_fichiers_L_det)
+    entree_spectre_L_det.configure(to=nombre_fichiers_L_det)
     
-    lit_affiche_spectre_L_det()
+    try :
+        lit_affiche_spectre_L_det(nom_fichier_seul_L_det)
+    except Exception as e1 :
+        print(f"Fichier {nom_fichier_seul_L_det} : mauvais format ! Supprimé de la liste ! ({e1})")
+        liste_fichiers_L_det.remove(nom_fichier_seul_L_det)
+        nombre_fichiers_L_det = len(liste_fichiers_L_det)
+        entree_spectre_L_det.configure(to=nombre_fichiers_L_det)
+        indices_a_supprimer = []
+        for numero in range(nombre_fichiers_L_det) :
+            try :
+                nom_fichier_seul_L_det = liste_fichiers_L_det[numero]
+                lit_affiche_spectre_L_det(nom_fichier_seul_L_det)
+                break
+            except Exception as e2 :
+                print(f"Fichier {nom_fichier_seul_L_det} : mauvais format ! Supprimé de la liste ! ({e2})")
+                indices_a_supprimer.append(numero)
+                continue
+        for indice in sorted(indices_a_supprimer, reverse=True):
+            if indice < len(liste_fichiers_L_det):
+                liste_fichiers_L_det.pop(indice)
+        nombre_fichiers_L_det = len(liste_fichiers_L_det)
+        entree_spectre_L_det.configure(to=nombre_fichiers_L_det)
+
     # Efface les pics et les labels :
     efface_pics_L_det()
     efface_pics_labels_L_det()
@@ -1572,13 +1632,14 @@ def choix_fichier_L_det():
     dataframe_elem_detect_IDlabels_L_det = pd.DataFrame(columns=treeview_columns)
     # Efface le tableau Treeview :
     efface_treeview_L_det()
-    
+
     fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+ nom_fichier_seul_L_det)
     bouton_recherche_L_det.configure(state="disable")
+    bouton_efface_L_det.configure(state="disable")
     bouton_exporte_L_det.configure(state="disable")
 
 
-def lit_affiche_spectre_L_det():
+def lit_affiche_spectre_L_det(nom_fichier_seul):
     """
     Lecture d'un fichier spectre et affichage du spectre
     """
@@ -1586,7 +1647,7 @@ def lit_affiche_spectre_L_det():
     global limites_spectre_x_L_det, limites_spectre_y_L_det
     global minimum_spectre_actuel_L_det, maximum_spectre_actuel_L_det
     os.chdir(rep_travail_L_det)
-    spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul_L_det,
+    spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                        type_fichier_L_det.get())
     limites_spectre_x_L_det, limites_spectre_y_L_det = lit_limites_L_det(spectre_entier_L_det)
     minimum_spectre_actuel_L_det = limites_spectre_y_L_det[0]
@@ -1617,7 +1678,7 @@ def lit_limites_L_det(spectre):
     variable_2_L_det.set(limites_spectre_x[1]-5)
     entree1_L_det.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
     entree2_L_det.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    
+
     return limites_spectre_x,limites_spectre_y
 
 
@@ -1630,13 +1691,13 @@ def detecte_elements_L_det():
     global dataframe_elem_detect_IDlabels_L_det
     global texte_elem_L_det
     global df_neutres_L_det, df_ions_L_det, flag_df_elements_L_det
-    if flag_df_elements_L_det == False :
+    if flag_df_elements_L_det is False :
         print("creation DF elements")
-        df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False, 
-                                                                 rep_LIBStick, 
+        df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False,
+                                                                 rep_LIBStick,
                                                                  rep_NIST)
-        df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True, 
-                                                                 rep_LIBStick, 
+        df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True,
+                                                                 rep_LIBStick,
                                                                  rep_NIST)
         flag_df_elements_L_det = True
     else :
@@ -1651,38 +1712,38 @@ def detecte_elements_L_det():
     texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
     texte_elem_L_det = texte_elem_L_det + longueurs_onde_trie_decroissant_df_L_det.to_markdown() + "\n\n" "---------------------------" + "\n"
 
-    dataframe_neutres = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
-                                                    "Element","Longueur d'onde","I relative", 
+    dataframe_neutres = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"),
+                                                    "Element","Longueur d'onde","I relative",
                                                     _("Type"), _("Validé"),"ID"])
-    dataframe_ions = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"), 
+    dataframe_ions = pd.DataFrame(columns=[_("n°"),_("Pic (nm)"), _("I du pic"),
                                                  "Element","Longueur d'onde","I relative",
                                                  _("Type"), _("Validé"),"ID"])
     for lambda_recherche_elements, intensite_recherche_elements in longueurs_onde_trie_decroissant_df_L_det.values :
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
-            neutres, df_neutres = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-                                                                                                   delta_recherche_elements_L_det.get(), 
+            neutres, df_neutres = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements,
+                                                                                                   delta_recherche_elements_L_det.get(),
                                                                                                    seuil_recherche_elements_L_det.get(),
-                                                                                                   False, 
-                                                                                                   df_neutres_L_det) 
-            # neutres, df_neutre = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-            #                                                                                       delta_recherche_elements_L_det.get(), 
+                                                                                                   False,
+                                                                                                   df_neutres_L_det)
+            # neutres, df_neutre = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements,
+            #                                                                                       delta_recherche_elements_L_det.get(),
             #                                                                                       seuil_recherche_elements_L_det.get(),
-            #                                                                                       False, 
-            #                                                                                       rep_LIBStick,
-            #                                                                                       rep_NIST)     
-        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
-            ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-                                                                                             delta_recherche_elements_L_det.get(), 
-                                                                                             seuil_recherche_elements_L_det.get(),
-                                                                                             True, 
-                                                                                             df_ions_L_det)    
-            # ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements, 
-            #                                                                                       delta_recherche_elements_L_det.get(), 
-            #                                                                                       seuil_recherche_elements_L_det.get(),
-            #                                                                                       True, 
+            #                                                                                       False,
             #                                                                                       rep_LIBStick,
             #                                                                                       rep_NIST)
-                
+        if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
+            ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements,
+                                                                                             delta_recherche_elements_L_det.get(),
+                                                                                             seuil_recherche_elements_L_det.get(),
+                                                                                             True,
+                                                                                             df_ions_L_det)
+            # ions, df_ions = LIBStick_recherche_elements.recherche_elements_neutres_ions_auto(lambda_recherche_elements,
+            #                                                                                       delta_recherche_elements_L_det.get(),
+            #                                                                                       seuil_recherche_elements_L_det.get(),
+            #                                                                                       True,
+            #                                                                                       rep_LIBStick,
+            #                                                                                       rep_NIST)
+
         intensite_recherche_elements_norm = (intensite_recherche_elements-minimum)*100/(maximum-minimum)
         texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
         texte_elem_L_det = texte_elem_L_det +f"Longueur d'onde : {lambda_recherche_elements:.3f} nm" + "\n"
@@ -1694,7 +1755,7 @@ def detecte_elements_L_det():
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "I":
             texte_elem_L_det = texte_elem_L_det + ions + "\n\n"
             texte_elem_L_det = texte_elem_L_det + "---------------------------" + "\n"
-        
+
         if texte_n_i_L_det.get() == "N&I" or texte_n_i_L_det.get() == "N":
             indice = dataframe_neutres.shape[0]
             dataframe_neutres = pd.concat([dataframe_neutres, df_neutres], ignore_index=True)
@@ -1709,18 +1770,18 @@ def detecte_elements_L_det():
             dataframe_ions.iloc[indice: , 2]= intensite_recherche_elements
             dataframe_ions.iloc[indice: , 6]= _("Ion")
             dataframe_ions.iloc[indice: , 7]= _("Non")
-        
+
     # Concatène les deux DF neutres et ions :
-    dataframe_elem_detect_IDlabels_L_det = pd.concat([dataframe_neutres,dataframe_ions], 
+    dataframe_elem_detect_IDlabels_L_det = pd.concat([dataframe_neutres,dataframe_ions],
                                                      axis=0, ignore_index=True)
     for i in range(dataframe_elem_detect_IDlabels_L_det.shape[0]) :
         dataframe_elem_detect_IDlabels_L_det.iloc[i, 0] = i
     dataframe_elem_detect_IDlabels_L_det["ID"] = pd.Series(np.nan)
-    
+
     remplit_treeview_L_det()
     bouton_exporte_L_det.configure(state="enable")
-    
-    
+
+
 ###################################################################################################
 # fonctions graphiques du caneva du spectre (frame1_L_det)
 ###################################################################################################
@@ -1736,8 +1797,8 @@ def affiche_lambda_L_det(event):
         canevas0_L_det.delete(lambda_texte_spectre_0_L_det)
     l = event.x*delta_limites_L_det/largeur_canevas_spectres+limites_affichage_spectre_L_det[0]
     lambda_recherche_elements_L_rec.set(l)
-    lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y, 
-                                                              text=str(format(l, "4.1f")), 
+    lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y,
+                                                              text=str(format(l, "4.1f")),
                                                               fill="blue")
     lambda_texte_L_det.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_det = False
@@ -1776,17 +1837,17 @@ def affiche_position_souris_motion_L_det(event):
     global flag_premier_lamda_L_det
     canevas0_L_det.delete(ligne_position_x_L_det)
     canevas0_L_det.delete(ligne_position_y_L_det)
-    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det, 
+    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det,
                                                         fill="green")
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y,
                                                             fill="green")
     if flag_premier_lamda_L_det is False:
         canevas0_L_det.delete(lambda_texte_spectre_0_L_det)
     l = event.x*delta_limites_L_det/largeur_canevas_spectres+limites_affichage_spectre_L_det[0]
     lambda_recherche_elements_L_rec.set(l)
-    lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y, 
-                                                              text=str(format(l, "4.1f")), 
+    lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y,
+                                                              text=str(format(l, "4.1f")),
                                                               fill="blue")
     lambda_texte_L_det.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_det = False
@@ -1798,7 +1859,7 @@ def change_flag_spectre_L_det() :
         efface les lignes rouges verticales
         grise les bormes de limite inf et sup
     """
-    if flag_spectre_entier_L_det.get() == True :
+    if flag_spectre_entier_L_det.get() is True :
         text1_L_det.configure(state="disable")
         text2_L_det.configure(state="disable")
         entree1_L_det.configure(state="disable")
@@ -1810,7 +1871,7 @@ def change_flag_spectre_L_det() :
         entree1_L_det.configure(state="enable")
         entree2_L_det.configure(state="enable")
         affiche_lignes0_spectre_L_det()
-    
+
 
 def affiche_spectre_L_det():
     """
@@ -1848,7 +1909,7 @@ def affiche_spectre_L_det():
         for ligne in spectre_entier_L_det:
             if (ligne[0] >= limites_affichage_spectre_L_det[0] and ligne[0] <= limites_affichage_spectre_L_det[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_det.get() == True :
+        if flag_echelle_log_L_det.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_det = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -1863,7 +1924,7 @@ def affiche_spectre_L_det():
         for ligne in spectre_entier_L_det:
             if (ligne[0] >= limites_affichage_spectre_L_det[0] and ligne[0] <= limites_affichage_spectre_L_det[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_det.get() == True :
+        if flag_echelle_log_L_det.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_det = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -1877,7 +1938,7 @@ def affiche_spectre_L_det():
         for ligne in spectre_entier_L_det:
             if (ligne[0] >= limites_affichage_spectre_L_det[0] and ligne[0] <= limites_affichage_spectre_L_det[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_det.get() == True :
+        if flag_echelle_log_L_det.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_det = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -1893,7 +1954,7 @@ def affiche_spectre_L_det():
         canevas0_L_det.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
 
     # ajout des graduations etc..
-    if flag_spectre_entier_L_det.get() == False :
+    if flag_spectre_entier_L_det.get() is False :
         affiche_lignes0_spectre_L_det()
     else :
         efface_lignes0_spectre_L_det()
@@ -1927,14 +1988,14 @@ def affiche_graduation_L_det():
     liste_0_lignes_grad_L_det=[]
     # liste_0_textes_grad_L_det=[]
     for x in liste_graduations_en_pixels :
-       liste_0_lignes_grad_L_det.append(canevas0_L_det.create_line(x, 0, x, hauteur_canevas_spectres_L_det,
+        liste_0_lignes_grad_L_det.append(canevas0_L_det.create_line(x, 0, x, hauteur_canevas_spectres_L_det,
                                                                        fill="blue", dash=(1,2)))
 
     for texte in liste_0_textes_grad_L_det :
         canevas0_L_det.delete(texte)
         liste_0_textes_grad_L_det=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_0_textes_grad_L_det.append(canevas0_L_det.create_text(liste_graduations_en_pixels[i], 10,
+        liste_0_textes_grad_L_det.append(canevas0_L_det.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
 
@@ -1942,7 +2003,7 @@ def affiche_graduation_L_det():
 def efface_lignes0_spectre_L_det() :
     canevas0_L_det.delete(ligne0_1_L_det)
     canevas0_L_det.delete(ligne0_2_L_det)
-    
+
 
 def affiche_lignes0_spectre_L_det():
     """
@@ -1952,11 +2013,11 @@ def affiche_lignes0_spectre_L_det():
     global ligne0_1_L_det
     global ligne0_2_L_det
     # efface_lignes0_spectre_L_det()
-    x_ligne0_1 = ((variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-    x_ligne0_2 = ((variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-    ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det, 
+    x_ligne0_1 = (variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+    x_ligne0_2 = (variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+    ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det,
                                                 fill="red", width=LARGEUR_LIGNES)
-    ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det, 
+    ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det,
                                                 fill="red", width=LARGEUR_LIGNES)
 
 
@@ -1975,8 +2036,8 @@ def deplace_ligne0_1_L_det():
     """
     global ligne0_1_L_det, flag_nouvelle_detection_L_det
     canevas0_L_det.delete(ligne0_1_L_det)
-    x_ligne0_1 = ((variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-    ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det, 
+    x_ligne0_1 = (variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+    ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det,
                                                 fill="red", width=LARGEUR_LIGNES)
     if variable_1_L_det.get() >= variable_2_L_det.get():
         variable_2_L_det.set(variable_1_L_det.get())
@@ -1991,8 +2052,8 @@ def deplace_ligne0_2_L_det():
     """
     global ligne0_2_L_det, flag_nouvelle_detection_L_det
     canevas0_L_det.delete(ligne0_2_L_det)
-    x_ligne0_2 = ((variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-    ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det, 
+    x_ligne0_2 = (variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+    ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det,
                                                 fill="red", width=LARGEUR_LIGNES)
     if variable_2_L_det.get() <= variable_1_L_det.get():
         variable_1_L_det.set(variable_2_L_det.get())
@@ -2017,7 +2078,7 @@ def deplace_ligne0_2_return_L_det(event):
     aprés saisie d'une valeur dans la spinbox borne sup.
     """
     deplace_ligne0_2_L_det()
-    
+
 
 def affiche_lignes1_spectre_L_det():
     """
@@ -2026,112 +2087,115 @@ def affiche_lignes1_spectre_L_det():
     """
     global ligne1_1_L_det
     global ligne1_2_L_det
-    
+
     minimum_spectre = limites_spectre_y_L_det[0]
-    maximum_spectre = limites_spectre_y_L_det[1]    
-    if minimum_spectre < 0 :
-        minimum_spectre = 0
+    maximum_spectre = limites_spectre_y_L_det[1]
+    minimum_spectre = max(minimum_spectre,0)
+    # if minimum_spectre < 0 :
+    #     minimum_spectre = 0
     delta_spectre = maximum_spectre - minimum_spectre
-    
+
     minimum_actuel = minimum_spectre_actuel_L_det
     maximum_actuel = maximum_spectre_actuel_L_det
     if minimum_actuel < 0 :
         minimum_spectre = 0
     delta_actuel = maximum_actuel - minimum_actuel
 
-        
+
     y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
     y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
-    
+
     y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
     y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
-    
-    ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1, 
+
+    ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1,
                                                 fill="red", width=LARGEUR_LIGNES)
-    ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2, 
+    ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2,
                                                 fill="red", width=LARGEUR_LIGNES)
-    
+
 
 def deplace_lignes1_L_det():
     """
-    Déplace les lignes rouges des limites de detection des pics 
+    Déplace les lignes rouges des limites de detection des pics
     de "Int rel mini" et "Int rel maxi" sur le canevas 0
     """
     deplace_ligne1_1_L_det()
     deplace_ligne1_2_L_det()
- 
-    
+
+
 def deplace_ligne1_1_L_det():
     """
-    Déplace la ligne rouge de la limite limites "Int rel mini" 
+    Déplace la ligne rouge de la limite limites "Int rel mini"
     de detection des pics sur le canevas 0
     """
     global ligne1_1_L_det, flag_nouvelle_detection_L_det
-    
+
     canevas0_L_det.delete(ligne1_1_L_det)
-    
+
     minimum_spectre = limites_spectre_y_L_det[0]
-    maximum_spectre = limites_spectre_y_L_det[1]    
-    if minimum_spectre < 0 :
-        minimum_spectre = 0
+    maximum_spectre = limites_spectre_y_L_det[1]
+    minimum_spectre = max(minimum_spectre,0)
+    # if minimum_spectre < 0 :
+    #     minimum_spectre = 0
     delta_spectre = maximum_spectre - minimum_spectre
-    
+
     minimum_actuel = minimum_spectre_actuel_L_det
     maximum_actuel = maximum_spectre_actuel_L_det
     if minimum_actuel < 0 :
         minimum_spectre = 0
     delta_actuel = maximum_actuel - minimum_actuel
-        
+
     y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
     y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
-    ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1, 
+    ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1,
                                                 fill="red", width=LARGEUR_LIGNES)
-    
+
     if variable_3_L_det.get() >= variable_4_L_det.get():
         variable_4_L_det.set(variable_3_L_det.get())
         deplace_ligne1_2_L_det()
     flag_nouvelle_detection_L_det = True
     bouton_recherche_L_det.configure(state="disable")
-    
+
 
 def deplace_ligne1_2_L_det():
     """
-    Déplace la ligne rouge de la limite limites "Int rel max" 
+    Déplace la ligne rouge de la limite limites "Int rel max"
     de detection des pics sur le canevas 0
     """
     global ligne1_2_L_det, flag_nouvelle_detection_L_det
-    
+
     canevas0_L_det.delete(ligne1_2_L_det)
-    
+
     minimum_spectre = limites_spectre_y_L_det[0]
-    maximum_spectre = limites_spectre_y_L_det[1]    
-    if minimum_spectre < 0 :
-        minimum_spectre = 0
+    maximum_spectre = limites_spectre_y_L_det[1]
+    minimum_spectre = max(minimum_spectre,0)
+    # if minimum_spectre < 0 :
+    #     minimum_spectre = 0
     delta_spectre = maximum_spectre - minimum_spectre
-    
+
     minimum_actuel = minimum_spectre_actuel_L_det
     maximum_actuel = maximum_spectre_actuel_L_det
     if minimum_actuel < 0 :
         minimum_spectre = 0
     delta_actuel = maximum_actuel - minimum_actuel
-    
+
     y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
     y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
-    ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2, 
+    ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2,
                                                 fill="red", width=LARGEUR_LIGNES)
-    
+
     if variable_4_L_det.get() <= variable_3_L_det.get():
         variable_3_L_det.set(variable_4_L_det.get())
         deplace_ligne1_1_L_det()
     flag_nouvelle_detection_L_det = True
     bouton_recherche_L_det.configure(state="disable")
-    
-    
+
+
 def deplace_ligne1_1_return_L_det(event):
     """
     Déclenche le déplacement de la ligne rouge de la limite "Int rel mini"  sur le canevas 0
     lors d'un appuie sur ENTER, TAB ou ENTER du pavé numérique
-    aprés saisie d'une valeur dans la spinbox "Int rel mini" 
+    aprés saisie d'une valeur dans la spinbox "Int rel mini"
     """
     deplace_ligne1_1_L_det()
 
@@ -2145,7 +2209,7 @@ def deplace_ligne1_2_return_L_det(event):
     deplace_ligne1_2_L_det()
 
 
-def visualisation_pics_L_det():
+def detection_pics_L_det():
     """
     Afiche les pics détectés
     """
@@ -2157,11 +2221,11 @@ def visualisation_pics_L_det():
     hauteur_max = (maximum-minimum)*variable_4_L_det.get()/100 + minimum
     S_sur_B = (maximum-minimum)*variable_5_L_det.get()/100
     largeur_max=variable_6_L_det.get()
-    if flag_spectre_entier_L_det.get() == True :
+    if flag_spectre_entier_L_det.get() is True :
         pics_L_det, pics_int_L_det = find_peaks(spectre_entier_L_det[:,1],
                                         height=(hauteur_min,hauteur_max),
                                         prominence=S_sur_B,
-                                        width=largeur_max)   
+                                        width=largeur_max)
         longueurs_onde = np.zeros((len(pics_L_det), 2))
         compteur = 0
         for i in pics_L_det :
@@ -2179,18 +2243,19 @@ def visualisation_pics_L_det():
         for i in pics_L_det :
             longueurs_onde[compteur,:] = spectre_coupe[i,:]
             compteur = compteur +1
-        
-    longueurs_onde_df_L_det = pd.DataFrame(longueurs_onde, 
+
+    longueurs_onde_df_L_det = pd.DataFrame(longueurs_onde,
                                            columns=["Longueur d'onde","I mesure"])
-    
+
     longueurs_onde_trie_decroissant = longueurs_onde[np.argsort(-longueurs_onde[:,1])]
-    longueurs_onde_trie_decroissant_df_L_det = pd.DataFrame(longueurs_onde_trie_decroissant, 
+    longueurs_onde_trie_decroissant_df_L_det = pd.DataFrame(longueurs_onde_trie_decroissant,
                                                             columns=["Longueur d'onde","I mesure"])
-    
+
     bouton_recherche_L_det.configure(state="enable")
+    bouton_efface_L_det.configure(state="enable")
     affiche_pics_L_det()
-    
-    
+
+
 def efface_pics_L_det() :
     """
     Efface les positions des pics détectés
@@ -2213,9 +2278,9 @@ def affiche_pics_L_det():
             delta_limites = limites_affichage_spectre_L_det[1]-limites_affichage_spectre_L_det[0]
             long_onde = ligne_tableau[1]
             # intensite = ligne_tableau[2]
-            x = ((long_onde-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites)
+            x = (long_onde-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites
             y = hauteur_canevas_spectres_L_det - 10
-            liste_pics_L_det.append(canevas0_L_det.create_text(x, y, 
+            liste_pics_L_det.append(canevas0_L_det.create_text(x, y,
                                                                text="X",
                                                                fill="orange" ))
 
@@ -2237,19 +2302,19 @@ def efface_pics_labels_L_det() :
     """
     global dataframe_elem_detect_IDlabels_L_det
     if dataframe_elem_detect_IDlabels_L_det.size != 0 :
-        for numero, pic_element_ID in zip(dataframe_elem_detect_IDlabels_L_det.iloc[:,0], 
+        for numero, pic_element_ID in zip(dataframe_elem_detect_IDlabels_L_det.iloc[:,0],
                                           dataframe_elem_detect_IDlabels_L_det.iloc[:,8]) :
-            if not(pd.isna(pic_element_ID)) :
+            if not pd.isna(pic_element_ID) :
                 # print("efface label n° : "+ str(numero)+ " ID n° : " + str(pic_element_ID))
                 canevas0_L_det.delete(int(pic_element_ID))
                 dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = np.nan
-        
-        
+
+
 def affiche_pics_labels_L_det():
     global dataframe_elem_detect_IDlabels_L_det
     efface_pics_labels_L_det()
     # limites_affichage_spectre = limites_affichage_spectre_L_det
-    if not(dataframe_elem_detect_IDlabels_L_det.empty) :
+    if not dataframe_elem_detect_IDlabels_L_det.empty :
         for numero, selection in zip(dataframe_elem_detect_IDlabels_L_det.iloc[:,0],
                                      dataframe_elem_detect_IDlabels_L_det.iloc[:,7]) :
             # if not(pd.isna(pic_element_ID)) :
@@ -2260,11 +2325,11 @@ def affiche_pics_labels_L_det():
                     label = ligne_tableau.iloc[3]
                     long_onde = float(ligne_tableau.iloc[4])
                     intensite = float(ligne_tableau.iloc[2])
-                    x = ((long_onde-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites)
+                    x = (long_onde-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites
                     y = hauteur_canevas_spectres_L_det*(1 - (intensite/maximum_spectre_actuel_L_det)) +10
                     # y = hauteur_canevas_spectres_L_det - 20
-                    dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = canevas0_L_det.create_text(x, y, 
-                                                                                                      text=label, 
+                    dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = canevas0_L_det.create_text(x, y,
+                                                                                                      text=label,
                                                                                                       fill="orange" )
 
 
@@ -2370,7 +2435,7 @@ def zoom_drag_and_drop_L_det(event):
             canevas0_L_det.delete(lambda_texte_spectre_0_L_det)
         l = event.x*delta_limites_L_det/largeur_canevas_spectres+limites_affichage_spectre_L_det[0]
         lambda_recherche_elements_L_rec.set(l)
-        lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y, 
+        lambda_texte_spectre_0_L_det = canevas0_L_det.create_text(event.x, event.y,
                                                                   text=str(format(l, "4.1f")),
                                                                   fill="blue")
         lambda_texte_L_det.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
@@ -2404,6 +2469,60 @@ def zoom_clic_release_canevas1_L_det(event):
 ###################################################################################################
 # fonctions graphiques du tableau de résultats (frame2_L_det)
 ###################################################################################################
+def lit_affiche_spectre_numero_L_det():
+    """
+    Mets à jour le spectre à afficher et le fond continu dans le canevas 0,
+    ainsi que le nom du spectre affiché dans la barre de titre
+    lorsqu'on change de spectre à l'aide la spinbox Spectre
+    """
+    global spectre_entier_L_det
+    global nom_fichier_seul_L_det
+    global liste_fichiers_L_det, nombre_fichiers_L_det
+    sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
+    flag_zoom_auto_y.set(True)
+    numero = numero_spectre_L_det.get()-1
+    nom_fichier_seul_L_det = liste_fichiers_L_det[numero]
+    os.chdir(rep_travail_L_det)
+    spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul_L_det,
+                                                         type_fichier_L_det.get())
+    #affiche_spectre_L_det()
+    try :
+        affiche_spectre_L_det()
+    except Exception as e :
+        print(f"Fichier {nom_fichier_seul_L_det} : mauvais format ! Supprimé de la liste ! ({e})")
+        liste_fichiers_L_det.pop(numero)
+        nombre_fichiers_L_det = len(liste_fichiers_L_det)
+        entree_spectre_L_det.configure(to=nombre_fichiers_L_det)
+    
+    fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+nom_fichier_seul_L_det)
+    flag_zoom_auto_y.set(sauve_flag_zoom_auto_y)
+
+
+def lit_affiche_spectre_numero_event_L_det(event):
+    """
+    Déclenche la mise à jour des affichages (spectre, fond, spectre corrigé et nom)
+    lors d'un appuie sur ENTER, TAB ou ENTER du pavé numérique
+    aprés saisie d'une valeur dans la spinbox Spectre
+    """
+    lit_affiche_spectre_numero_L_det()
+    
+    
+def efface_elements_L_det() :
+    global longueurs_onde_df_L_det, dataframe_elem_detect_IDlabels_L_det, longueurs_onde_trie_decroissant_df_L_det
+    # Efface les pics et les labels :
+    efface_pics_L_det()
+    efface_pics_labels_L_det()
+    # Efface le le DF contenant les identifiants des pics et le DF contenant les éléments et les identifiants des labels :
+    longueurs_onde_df_L_det = pd.DataFrame()
+    treeview_columns = [_("n°"),_("Pic (nm)"), _("I du pic"), "Element","Longueur d'onde","I relative", _("Type"), _("Validé"), "ID"]
+    dataframe_elem_detect_IDlabels_L_det = pd.DataFrame(columns=treeview_columns)
+    longueurs_onde_trie_decroissant_df_L_det = pd.DataFrame()
+    # Efface le tableau Treeview :
+    efface_treeview_L_det()
+    bouton_recherche_L_det.configure(state="disable")
+    bouton_efface_L_det.configure(state="disable")
+
+
 def remplit_treeview_L_det():
     """
     Remplit le tableau de l'interface (TreeView)
@@ -2411,7 +2530,7 @@ def remplit_treeview_L_det():
     efface_treeview_L_det()
     for ligne_tableau in dataframe_elem_detect_IDlabels_L_det.values :
         if ligne_tableau[6] == _("Neutre") and ligne_tableau[7] == _("Oui") :
-            tree_L_det.insert("", "end", 
+            tree_L_det.insert("", "end",
                               tags="neutres_select",
                               values=(ligne_tableau[0],
                                       f"{ligne_tableau[1]:.2f}",
@@ -2422,7 +2541,7 @@ def remplit_treeview_L_det():
                                       ligne_tableau[6],
                                       ligne_tableau[7]))
         if ligne_tableau[6] == _("Neutre") and ligne_tableau[7] == _("Non") :
-            tree_L_det.insert("", "end", 
+            tree_L_det.insert("", "end",
                               tags="neutres_deselect",
                               values=(ligne_tableau[0],
                                       f"{ligne_tableau[1]:.2f}",
@@ -2433,7 +2552,7 @@ def remplit_treeview_L_det():
                                       ligne_tableau[6],
                                       ligne_tableau[7]))
         if ligne_tableau[6] == _("Ion") and ligne_tableau[7] == _("Oui") :
-            tree_L_det.insert("", "end", 
+            tree_L_det.insert("", "end",
                               tags="ions_select",
                               values=(ligne_tableau[0],
                                       f"{ligne_tableau[1]:.2f}",
@@ -2444,7 +2563,7 @@ def remplit_treeview_L_det():
                                       ligne_tableau[6],
                                       ligne_tableau[7]))
         if ligne_tableau[6] == _("Ion") and ligne_tableau[7] == _("Non") :
-            tree_L_det.insert("", "end", 
+            tree_L_det.insert("", "end",
                               tags="ions_deselect",
                               values=(ligne_tableau[0],
                                       f"{ligne_tableau[1]:.2f}",
@@ -2487,7 +2606,7 @@ def trie_treeview_L_det(colonne):
     """
     global dataframe_elem_detect_IDlabels_L_det
     global flag_ordre_trie_L_det
-    if flag_ordre_trie_L_det == True :
+    if flag_ordre_trie_L_det is True :
         flag_ordre_trie_L_det = False
     else :
         flag_ordre_trie_L_det = True
@@ -2507,10 +2626,10 @@ def selectionne_element_L_det(event) :
         item = tree_L_det.item(selection_i)["values"]
         x_element_pic = item[4]
         if float(x_element_pic) > limites_affichage_spectre_L_det[0] and float(x_element_pic) < limites_affichage_spectre_L_det[1]:
-            x_ligne = ((float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-            ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det, 
-                                                       fill="orange", 
-                                                       dash=(4, 1), 
+            x_ligne = (float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+            ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
+                                                       fill="orange",
+                                                       dash=(4, 1),
                                                        width=LARGEUR_LIGNES)
             ligne_element_L_det.append(ligne_element)
 
@@ -2525,13 +2644,13 @@ def selectionne_element_up_L_det(event) :
     item = tree_L_det.item(selection)["values"]
     x_element_pic = item[4]
     if float(x_element_pic) > limites_affichage_spectre_L_det[0] and float(x_element_pic) < limites_affichage_spectre_L_det[1]:
-        x_ligne = ((float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-        ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det, 
-                                                   fill="orange", 
-                                                   dash=(4, 1), 
+        x_ligne = (float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+        ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
+                                                   fill="orange",
+                                                   dash=(4, 1),
                                                    width=LARGEUR_LIGNES)
         ligne_element_L_det.append(ligne_element)
-            
+
 
 def selectionne_element_down_L_det(event) :
     """
@@ -2543,13 +2662,13 @@ def selectionne_element_down_L_det(event) :
     item = tree_L_det.item(selection)["values"]
     x_element_pic = item[4]
     if float(x_element_pic) > limites_affichage_spectre_L_det[0] and float(x_element_pic) < limites_affichage_spectre_L_det[1]:
-        x_ligne = ((float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det)
-        ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det, 
-                                                   fill="orange", 
-                                                   dash=(4, 1), 
+        x_ligne = (float(x_element_pic)-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
+        ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
+                                                   fill="orange",
+                                                   dash=(4, 1),
                                                    width=LARGEUR_LIGNES)
         ligne_element_L_det.append(ligne_element)
-    
+
 
 def efface_ligne_element_L_det() :
     """
@@ -2574,32 +2693,32 @@ def change_tree_selection_L_det(event):
     for selection_i in selection :
         item = tree_L_det.item(selection_i)["values"]
         if item[7] == _("Non") and item[6] == _("Neutre"):
-            tree_L_det.item(selection_i, values=(item[0], item[1], item[2], 
+            tree_L_det.item(selection_i, values=(item[0], item[1], item[2],
                                                  item[3], item[4], item[5],
                                                  item[6],_("Oui")), tags="neutres_select")
             dataframe_elem_detect_IDlabels_L_det.loc[item[0], _("Validé")] = _("Oui")
             affiche_pics_labels_L_det()
         if item[7] == _("Oui") and item[6] == _("Neutre"):
-            tree_L_det.item(selection_i, values=(item[0], item[1], item[2], 
+            tree_L_det.item(selection_i, values=(item[0], item[1], item[2],
                                                  item[3], item[4], item[5],
                                                  item[6], _("Non")), tags="neutres_deselect")
             dataframe_elem_detect_IDlabels_L_det.loc[item[0], _("Validé")] = _("Non")
             efface_pic_label_L_det(item[0])
             affiche_pics_labels_L_det()
         if item[7] == _("Non") and item[6] == _("Ion"):
-            tree_L_det.item(selection_i, values=(item[0], item[1], item[2], 
+            tree_L_det.item(selection_i, values=(item[0], item[1], item[2],
                                                  item[3], item[4], item[5],
                                                  item[6],_("Oui")), tags="ions_select")
             dataframe_elem_detect_IDlabels_L_det.loc[item[0], _("Validé")] = _("Oui")
             affiche_pics_labels_L_det()
         if item[7] == _("Oui") and item[6] == _("Ion"):
-            tree_L_det.item(selection_i, values=(item[0], item[1], item[2], 
+            tree_L_det.item(selection_i, values=(item[0], item[1], item[2],
                                                  item[3], item[4], item[5],
                                                  item[6], _("Non")), tags="ions_deselect")
             dataframe_elem_detect_IDlabels_L_det.loc[item[0], _("Validé")] = _("Non")
             efface_pic_label_L_det(item[0])
-            affiche_pics_labels_L_det()   
-            
+            affiche_pics_labels_L_det()
+
 
 def exporte_resultats_L_det() :
     """
@@ -2609,13 +2728,13 @@ def exporte_resultats_L_det() :
         - Un fichier *.xlsx contenant le tableau Treeview
     """
     dataframe_elem_detect_IDlabels_L_det = remplit_dataframe_from_treeview_L_det()
-    nom_fichiers_export_L_det = fd.asksaveasfilename(title=_("Choisissez une localistion et un nom de fichier, sans extension"), 
-                                                     confirmoverwrite = True, 
+    nom_fichiers_export_L_det = fd.asksaveasfilename(title=_("Choisissez une localistion et un nom de fichier, sans extension"),
+                                                     confirmoverwrite = True,
                                                      initialdir=rep_travail_L_det)
     with open(nom_fichiers_export_L_det + ".md", 'w', encoding='utf-8') as f_out :
         f_out.write(texte_elem_L_det)
     dataframe_elem_detect_IDlabels_L_det.to_excel(nom_fichiers_export_L_det + ".xlsx", index=False)
-    
+
 
 ###################################################################################################
 ###################################################################################################
@@ -2721,7 +2840,7 @@ def choix_fichier_L_ext():
     global liste_bool_existe_L_ext
     nom_fichier_L_ext = fd.askopenfilename(initialdir=rep_travail_L_ext,
                                                            title='Choisissez un fichier spectre',
-                                                                 filetypes=((_("tous"), "*.*"), 
+                                                                 filetypes=((_("tous"), "*.*"),
                                                                             (_("fichiers LIBStick"), "*.tsv"),
                                                                             (_("fichiers LIBStick moyen"), "*.mean"),
                                                                             (_("fichiers IVEA"), "*.asc"),
@@ -2729,16 +2848,36 @@ def choix_fichier_L_ext():
     nom_fichier_seul_L_ext = os.path.basename(nom_fichier_L_ext)
     type_fichier_L_ext.set(pathlib.Path(nom_fichier_seul_L_ext).suffix)
     rep_travail_L_ext = os.path.dirname(nom_fichier_L_ext)
-    liste_fichiers_L_ext = LIBStick_outils.creation_liste_fichiers(rep_travail_L_ext,
-                                                                   type_fichier_L_ext.get())
+    liste_fichiers_L_ext = LIBStick_outils.creation_liste_fichiers(rep_travail_L_ext, type_fichier_L_ext.get())
     nombre_fichiers_L_ext = len(liste_fichiers_L_ext)
+    
+    indices_a_supprimer = []
+    for numero, nom_fichier in enumerate(liste_fichiers_L_ext) :
+        try :
+            lit_affiche_spectre_L_ext(nom_fichier)
+        except Exception as e1 :
+            print(f"Fichier {nom_fichier} : mauvais format ! Supprimé de la liste ! ({e1})")
+            indices_a_supprimer.append(numero)
+            continue
+    for indice in sorted(indices_a_supprimer, reverse=True):
+        if indice < len(liste_fichiers_L_ext):
+            liste_fichiers_L_ext.pop(indice)
+    nombre_fichiers_L_ext = len(liste_fichiers_L_ext)
+    
+    try :
+        lit_affiche_spectre_L_ext(nom_fichier_seul_L_ext)
+    except Exception as e2 :
+        print(f"Fichier {nom_fichier_seul_L_ext} : mauvais format ! Supprimé de la liste ! ({e2})")
+        print("Affiche le premier fichier valide de la liste.")
+        lit_affiche_spectre_L_ext(liste_fichiers_L_ext[0])
+    
     variable_10_L_ext.set(nombre_fichiers_L_ext)
     variable_10_avant_L_ext.set(nombre_fichiers_L_ext)
     if liste_bool_existe_L_ext is False or nombre_fichiers_L_ext != nombre_fichiers_avant_L_ext:
         liste_bool_L_ext = [True]*nombre_fichiers_L_ext
         liste_bool_existe_L_ext = True
         nombre_fichiers_avant_L_ext = nombre_fichiers_L_ext
-    lit_affiche_spectre_L_ext(nom_fichier_seul_L_ext)
+        
     bouton_execute_L_ext.configure(state="normal")
     bouton_extraction_L_ext.configure(state="disable")
     entree6_L_ext.configure(to=nombre_fichiers_L_ext)
@@ -2761,7 +2900,8 @@ def execute_scripts_L_ext():
         canevas2_L_ext.delete("all")
     nom_echantillon_L_ext = LIBStick_extraction_spectres.main(rep_travail_L_ext, tableau_bornes,
                                                               type_fichier_L_ext.get(), liste_fichiers_L_ext,
-                                                              flag_zone2_L_ext.get(), flag_2D_L_ext.get(), flag_3D_L_ext.get())
+                                                              flag_zone2_L_ext.get(), flag_2D_L_ext.get(),
+                                                              flag_3D_L_ext.get())
     ouvre_image_L_ext()
     affiche_image_L_ext()
     bouton_extraction_L_ext.configure(state="normal")
@@ -2828,7 +2968,7 @@ def affiche_spectre_moyen2_L_ext():
 ###################################################################################################
 # fonctions graphiques du caneva du spectre (frame1_L_ext)
 ###################################################################################################
-def lit_affiche_spectre_L_ext(nom_fichier):
+def lit_affiche_spectre_L_ext(nom_fichier_seul):
     """
     Lecture d'un fichier spectre et affichage du spectre
     """
@@ -2836,7 +2976,7 @@ def lit_affiche_spectre_L_ext(nom_fichier):
     global limites_spectre_x_L_ext, limites_spectre_y_L_ext
     global maximum_spectre_L_ext
     os.chdir(rep_travail_L_ext)
-    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier,
+    spectre_entier_L_ext = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                        type_fichier_L_ext.get())
     limites_spectre_x_L_ext, limites_spectre_y_L_ext = lit_limites_L_ext(spectre_entier_L_ext)
     maximum_spectre_L_ext = limites_spectre_y_L_ext[1]
@@ -2931,7 +3071,7 @@ def affiche_position_souris_L_ext(event):
         ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
     l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
     lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
-    
+
 
 def affiche_position_souris_motion_L_ext(event):
     """
@@ -2994,7 +3134,7 @@ def affiche_spectre_L_ext():
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ext.get() == True :
+        if flag_echelle_log_L_ext.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -3009,7 +3149,7 @@ def affiche_spectre_L_ext():
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ext.get() == True :
+        if flag_echelle_log_L_ext.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -3023,7 +3163,7 @@ def affiche_spectre_L_ext():
         for ligne in spectre_entier_L_ext:
             if (ligne[0] >= limites_affichage_spectre_L_ext[0] and ligne[0] <= limites_affichage_spectre_L_ext[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ext.get() == True :
+        if flag_echelle_log_L_ext.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ext = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -3056,14 +3196,14 @@ def affiche_graduation_L_ext():
         canevas0_L_ext.delete(ligne)
     liste_0_lignes_grad_L_ext=[]
     for x in liste_graduations_en_pixels :
-       liste_0_lignes_grad_L_ext.append(canevas0_L_ext.create_line(x, 0, x, hauteur_canevas_spectres,
+        liste_0_lignes_grad_L_ext.append(canevas0_L_ext.create_line(x, 0, x, hauteur_canevas_spectres,
                                                                    fill="blue", dash=(1,2)))
 
     for texte in liste_0_textes_grad_L_ext :
         canevas0_L_ext.delete(texte)
         liste_0_textes_grad_L_ext=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_0_textes_grad_L_ext.append(canevas0_L_ext.create_text(liste_graduations_en_pixels[i], 10,
+        liste_0_textes_grad_L_ext.append(canevas0_L_ext.create_text(liste_graduations_en_pixels[i], 10,
                                                                    text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                    fill="blue"))
 
@@ -3801,7 +3941,7 @@ def choix_fichier_L_comp():
     global liste_fichiers_L_comp
     nom_fichier_L_comp = fd.askopenfilename(title='Choisissez un fichier spectre',
                                                             initialdir=rep_travail_L_comp,
-                                                            filetypes=((_("tous"), "*.*"), 
+                                                            filetypes=((_("tous"), "*.*"),
                                                                        (_("fichiers LIBStick"), "*.tsv"),
                                                                        (_("fichiers LIBStick moyen"), "*.mean"),
                                                                        (_("fichiers IVEA"), "*.asc"),
@@ -3812,13 +3952,33 @@ def choix_fichier_L_comp():
     liste_fichiers_L_comp = LIBStick_outils.creation_liste_fichiers(rep_travail_L_comp,
                                                                     type_fichier_L_comp.get())
     nombre_fichiers_L_comp = len(liste_fichiers_L_comp)
-    lit_affiche_spectre_L_comp()
+        
+    indices_a_supprimer = []
+    for numero, nom_fichier in enumerate(liste_fichiers_L_comp) :
+        try :
+            lit_affiche_spectre_L_comp(nom_fichier)
+        except Exception as e1 :
+            print(f"Fichier {nom_fichier} : mauvais format ! Supprimé de la liste ! ({e1})")
+            indices_a_supprimer.append(numero)
+            continue
+    for indice in sorted(indices_a_supprimer, reverse=True):
+        if indice < len(liste_fichiers_L_comp):
+            liste_fichiers_L_comp.pop(indice)
+    nombre_fichiers_L_comp = len(liste_fichiers_L_comp)
+    
+    try :
+        lit_affiche_spectre_L_comp(nom_fichier_seul_L_comp)
+    except Exception as e2 :
+        print(f"Fichier {nom_fichier_seul_L_comp} : mauvais format ! Supprimé de la liste ! ({e2})")
+        print("Affiche le premier fichier valide de la liste.")
+        lit_affiche_spectre_L_comp(liste_fichiers_L_comp[0])
+    
     bouton_execute_L_comp.configure(state="normal")
     entree6_L_comp.configure(from_=1, to=nombre_fichiers_L_comp)
     fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+nom_fichier_seul_L_comp)
 
 
-def lit_affiche_spectre_L_comp():
+def lit_affiche_spectre_L_comp(nom_fichier_seul):
     """
     Lecture d'un fichier spectre et affichage du spectre
     """
@@ -3826,7 +3986,7 @@ def lit_affiche_spectre_L_comp():
     global limites_spectre_x_L_comp, limites_spectre_y_L_comp
     global maximum_spectre_L_comp
     os.chdir(rep_travail_L_comp)
-    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul_L_comp,
+    spectre_entier_L_comp = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                         type_fichier_L_comp.get())
     limites_spectre_x_L_comp, limites_spectre_y_L_comp = lit_limites_L_comp(spectre_entier_L_comp)
     maximum_spectre_L_comp = limites_spectre_y_L_comp[1]
@@ -3848,12 +4008,12 @@ def lit_limites_L_comp(spectre):
     variable_zoom_inf_L_comp.set(limites_spectre_x[0])
     variable_zoom_sup_L_comp.set(limites_spectre_x[1])
     # fixe les valeurs limites pour le zoom et la zone de selection
-    entree_zoom_inf_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    entree_zoom_sup_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    entree1_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    entree2_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    entree3_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
-    entree4_L_ext.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_inf_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree_zoom_sup_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree1_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree2_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree3_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
+    entree4_L_comp.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
     return limites_spectre_x,limites_spectre_y
 
 
@@ -4021,7 +4181,7 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_comp.get() == True :
+        if flag_echelle_log_L_comp.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -4036,7 +4196,7 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_comp.get() == True :
+        if flag_echelle_log_L_comp.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -4051,7 +4211,7 @@ def affiche_spectre_L_comp():
         for ligne in spectre_entier_L_comp:
             if (ligne[0] >= limites_affichage_spectre_L_comp[0] and ligne[0] <= limites_affichage_spectre_L_comp[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_comp.get() == True :
+        if flag_echelle_log_L_comp.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_comp = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -4084,14 +4244,14 @@ def affiche_graduation_L_comp():
         canevas0_L_comp.delete(ligne)
     liste_0_lignes_grad_L_comp=[]
     for x in liste_graduations_en_pixels :
-       liste_0_lignes_grad_L_comp.append(canevas0_L_comp.create_line(x, 0, x, hauteur_canevas_spectres,
+        liste_0_lignes_grad_L_comp.append(canevas0_L_comp.create_line(x, 0, x, hauteur_canevas_spectres,
                                                                    fill="blue", dash=(1,2)))
 
     for texte in liste_0_textes_grad_L_comp :
         canevas0_L_comp.delete(texte)
         liste_0_textes_grad_L_comp=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_0_textes_grad_L_comp.append(canevas0_L_comp.create_text(liste_graduations_en_pixels[i], 10,
+        liste_0_textes_grad_L_comp.append(canevas0_L_comp.create_text(liste_graduations_en_pixels[i], 10,
                                                                    text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                    fill="blue"))
 
@@ -4691,7 +4851,7 @@ def choix_fichier_L_ACP():
     global DataFrame_complet_L_ACP
     nom_fichier_L_ACP = fd.askopenfilename(title='Choisissez un fichier spectre',
                                                            initialdir=rep_travail_L_ACP,
-                                                           filetypes=((_("tous"), "*.*"), 
+                                                           filetypes=((_("tous"), "*.*"),
                                                                       (_("fichiers LIBStick"), "*.tsv"),
                                                                       (_("fichiers LIBStick moyen"), "*.mean"),
                                                                       (_("fichiers IVEA"), "*.asc"),
@@ -4699,22 +4859,52 @@ def choix_fichier_L_ACP():
     nom_fichier_seul_L_ACP = os.path.basename(nom_fichier_L_ACP)
     type_fichier_L_ACP.set(pathlib.Path(nom_fichier_seul_L_ACP).suffix)
     rep_travail_L_ACP = os.path.dirname(nom_fichier_L_ACP)
-    liste_fichiers_L_ACP = LIBStick_outils.creation_liste_fichiers(rep_travail_L_ACP,
-                                                                   type_fichier_L_ACP.get())
-    nombre_fichiers_L_ACP = len(liste_fichiers_L_ACP)
-#    entree6_L_ACP.configure(from_=1, to=nombre_fichiers_L_ACP)
-    tableau_spectres_L_ACP = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP,
-                                                                           type_fichier_L_ACP.get())
+    liste_fichiers_L_ACP = LIBStick_outils.creation_liste_fichiers(rep_travail_L_ACP, type_fichier_L_ACP.get())
+        
+    try :
+        lit_affiche_spectre_L_ACP(nom_fichier_seul_L_ACP)
+    except Exception as e1 :
+        print(f"Fichier {nom_fichier_seul_L_ACP} : mauvais format ! Supprimé de la liste ! ({e1})")
+        liste_fichiers_L_ACP.remove(nom_fichier_seul_L_ACP)
+        nombre_fichiers_L_ACP = len(liste_fichiers_L_ACP)
+        indices_a_supprimer = []
+        for numero in range(nombre_fichiers_L_ACP) :
+            try :
+                nom_fichier_seul_L_ACP = liste_fichiers_L_ACP[numero]
+                lit_affiche_spectre_L_ACP(nom_fichier_seul_L_ACP)
+                break
+            except Exception as e2 :
+                print(f"Fichier {nom_fichier_seul_L_ACP} : mauvais format ! Supprimé de la liste ! ({e2})")
+                indices_a_supprimer.append(numero)
+                continue
+        for indice in sorted(indices_a_supprimer, reverse=True):
+            if indice < len(liste_fichiers_L_ACP):
+                liste_fichiers_L_ACP.pop(indice)
+                
+    nombre_fichiers_L_ACP = len(liste_fichiers_L_ACP)     
+    tableau_spectres_L_ACP,liste_fichiers_L_ACP = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers_L_ACP,
+                                                                                                type_fichier_L_ACP.get())
     DataFrame_complet_L_ACP = LIBStick_outils.creer_dataframe_x_tableau_en_colonnes(tableau_spectres_L_ACP,
                                                                                     liste_fichiers_L_ACP)
-    lit_affiche_spectre_L_ACP()
-    fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+nom_fichier_seul_L_ACP)
+    nombre_fichiers_L_ACP = len(liste_fichiers_L_ACP)   
+    fenetre_principale.title("LIBStick v4.0"+"\t spectre : "+ nom_fichier_seul_L_ACP)
     bouton_execute_L_ACP.configure(state="normal")
     bouton_applique_ind_sup_L_ACP.configure(state="disable")
-    # bouton_ouvre_L_ACP.configure(state="normal")
+    # bouton_ouvre_L_ACP.configure(state="normal")    
+    affiche_tableau_L_ACP()
+    efface_resultats_ACP_L_ACP()    
+    
+
+def efface_resultats_ACP_L_ACP():
+    """
+    Efface les données des facteurs de l'ACP et l'affichage
+    """
+    global dataframe_facteurs_ACP_L_ACP, spectre_dim1_L_ACP,spectre_dim2_L_ACP,spectre_dim3_L_ACP
+    dataframe_facteurs_ACP_L_ACP = spectre_dim1_L_ACP = spectre_dim2_L_ACP = spectre_dim3_L_ACP = pd.DataFrame()
+    canevas1_L_ACP.delete("all")
 
 
-def lit_affiche_spectre_L_ACP():
+def lit_affiche_spectre_L_ACP(nom_fichier_seul):
     """
     Lecture d'un fichier spectre et affichage du spectre
     """
@@ -4722,12 +4912,11 @@ def lit_affiche_spectre_L_ACP():
     global limites_spectre_x_L_ACP, limites_spectre_y_L_ACP
     global maximum_spectre_L_ACP
     os.chdir(rep_travail_L_ACP)
-    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(nom_fichier_seul_L_ACP,
+    spectre_entier_L_ACP = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                        type_fichier_L_ACP.get())
     limites_spectre_x_L_ACP, limites_spectre_y_L_ACP = lit_limites_L_ACP(spectre_entier_L_ACP)
     maximum_spectre_L_ACP = limites_spectre_y_L_ACP[1]
     affiche_spectre_L_ACP()
-    affiche_tableau_L_ACP()
 
 
 def lit_limites_L_ACP(spectre):
@@ -4756,7 +4945,7 @@ def dataframe_treeview_L_ACP():
     """
     Remplit un DataFrame à partir du tableau (TreeView) de l'interface
     """
-    treeview_columns = ["numero", "nom", "calcul ACP", "label"]  # list of names here
+    treeview_columns = [_("numero"), _("nom"), _("calcul ACP"), _("label")]  # list of names here
     treeview_df = pd.DataFrame(columns=treeview_columns)
     # print (tree_L_ACP)
     for ligne in tree_L_ACP.get_children():
@@ -4786,7 +4975,7 @@ def coupe_dataframe_L_ACP(dataframe, treeview_dataframe, tableau_bornes):
     treeview_dataframe_coupe = treeview_dataframe.copy(deep=True)
     treeview_dataframe_individus_supp = treeview_dataframe.copy(deep=True)
     i = 1
-    for selection in treeview_dataframe["calcul ACP"]:
+    for selection in treeview_dataframe[_("calcul ACP")]:
         if selection == "Non":
             # print("supprime la ligne n° " + str(i))
             dataframe_coupe = dataframe_coupe.drop(index=i)
@@ -4827,19 +5016,19 @@ def change_flag_traitement_L_ACP():
     bouton_applique_ind_sup_L_ACP.configure(state="disable")
     # print("change flag traitement")
     flag_nouvelle_ACP_L_ACP = True
-    
-    
+
+
 def change_flag_binning_L_ACP():
     """
     Change l'état du spinbox si on change la case à cosser "Binning :"
     """
     global flag_nouvelle_ACP_L_ACP
-    if flag_binning_L_ACP.get() == True :
+    if flag_binning_L_ACP.get() is True :
         entree_binning_L_ACP.configure(state="enable")
     else :
         entree_binning_L_ACP.configure(state="disable")
     # bouton_applique_ind_sup_L_ACP.configure(state="disable")
-    change_flag_traitement_L_ACP()  
+    change_flag_traitement_L_ACP()
     # flag_nouvelle_ACP_L_ACP = True
 
 
@@ -4860,12 +5049,12 @@ def execute_ACP_L_ACP():
     global dataframe_facteurs_ACP_L_ACP, flag_nouvelle_ACP_L_ACP
     tableau_bornes = creation_tab_bornes_L_ACP()
     # copie indispensable car la suite modifierait DataFrame_complet_L_ACP !
-    if flag_nouvelle_ACP_L_ACP == True :
+    if flag_nouvelle_ACP_L_ACP is True :
         dataframe_L_ACP = DataFrame_complet_L_ACP.copy(deep=True)
         treeview_dataframe_L_ACP = dataframe_treeview_L_ACP()
         # print(flag_nouvelle_ACP_L_ACP)
         #test binning
-        if flag_binning_L_ACP.get() == True :
+        if flag_binning_L_ACP.get() is True :
             taille_binning = binning_L_ACP.get()
             # print("Binning " + str(taille_binning))
             dataframe_L_ACP = LIBStick_outils.binning_dataframe(dataframe_L_ACP, taille_binning)
@@ -4877,12 +5066,13 @@ def execute_ACP_L_ACP():
         #test normalisation
         if flag_normalise_L_ACP.get() is True:
             dataframe_L_ACP = LIBStick_outils.normalise_dataframe_aire(dataframe_L_ACP)
-            dataframe_individus_supp = LIBStick_outils.normalise_dataframe_aire(dataframe_individus_supp_L_ACP)
+            dataframe_individus_supp_L_ACP = LIBStick_outils.normalise_dataframe_aire(dataframe_individus_supp_L_ACP)
 
     if flag_3D_L_ACP.get():
         dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get(), dim_3_L_ACP.get()]
     else:
         dim_L_ACP = [dim_1_L_ACP.get(), dim_2_L_ACP.get()]
+        
     nbr_spectres = dataframe_L_ACP.shape[0]
     nbr_variables = dataframe_L_ACP.shape[1]
     if nbr_spectres >= 20:
@@ -4891,16 +5081,16 @@ def execute_ACP_L_ACP():
         nbr_composantes = nbr_spectres
 
     tableau = dataframe_L_ACP.values
-    if flag_nouvelle_ACP_L_ACP == True :
+    if flag_nouvelle_ACP_L_ACP is True :
         modele_ACP_L_ACP = LIBStick_ACP.calcul_ACP_sklearn(tableau, nbr_composantes,
                                                            flag_centre_reduit_L_ACP.get())
         tableau_ACP_L_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP, tableau)
         flag_nouvelle_ACP_L_ACP = False
-        
+
     # print(flag_nouvelle_ACP_L_ACP)
-    LIBStick_ACP.affiche_ACP(treeview_dataframe_L_ACP, 
-                             modele_ACP_L_ACP, 
-                             tableau_ACP_L_ACP, 
+    LIBStick_ACP.affiche_ACP(treeview_dataframe_L_ACP,
+                             modele_ACP_L_ACP,
+                             tableau_ACP_L_ACP,
                              dim_L_ACP,
                              flag_3D_L_ACP.get(),
                              flag_echelle_L_ACP.get(),
@@ -4965,20 +5155,20 @@ def applique_ACP_ind_sup_L_ACP():
         tableau_ACP_individus_supp_L_ACP = LIBStick_ACP.applique_ACP(modele_ACP_L_ACP,
                                                                tableau_individus_supp)
         LIBStick_ACP.affiche_ACP_ind_supp(treeview_dataframe_individus_supp_L_ACP,
-                                          treeview_dataframe_L_ACP, 
+                                          treeview_dataframe_L_ACP,
                                           modele_ACP_L_ACP,
-                                          tableau_ACP_L_ACP, 
+                                          tableau_ACP_L_ACP,
                                           tableau_ACP_individus_supp_L_ACP,
-                                          dim_L_ACP, 
+                                          dim_L_ACP,
                                           flag_3D_L_ACP.get(),
                                           flag_echelle_L_ACP.get(),
                                           flag_eboulis_L_ACP.get(),
                                           flag_plotly_L_ACP.get())
     else:
-        LIBStick_ACP.affiche_ACP(treeview_dataframe_L_ACP, 
+        LIBStick_ACP.affiche_ACP(treeview_dataframe_L_ACP,
                                  modele_ACP_L_ACP,
-                                 tableau_ACP_L_ACP, 
-                                 dim_L_ACP, 
+                                 tableau_ACP_L_ACP,
+                                 dim_L_ACP,
                                  flag_3D_L_ACP.get(),
                                  flag_echelle_L_ACP.get(),
                                  flag_eboulis_L_ACP.get(),
@@ -5155,7 +5345,7 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ACP.get() == True :
+        if flag_echelle_log_L_ACP.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -5170,7 +5360,7 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ACP.get() == True :
+        if flag_echelle_log_L_ACP.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -5184,7 +5374,7 @@ def affiche_spectre_L_ACP():
         for ligne in spectre_entier_L_ACP:
             if (ligne[0] >= limites_affichage_spectre_L_ACP[0] and ligne[0] <= limites_affichage_spectre_L_ACP[1]):
                 spectre = np.row_stack((spectre, ligne))
-        if flag_echelle_log_L_ACP.get() == True :
+        if flag_echelle_log_L_ACP.get() is True :
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_ACP = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
@@ -5221,14 +5411,14 @@ def affiche_graduation_L_ACP():
     liste_0_lignes_grad_L_ACP=[]
     # liste_0_textes_grad_L_ACP=[]
     for x in liste_graduations_en_pixels :
-       liste_0_lignes_grad_L_ACP.append(canevas0_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
+        liste_0_lignes_grad_L_ACP.append(canevas0_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
                                                                        fill="blue", dash=(1,2)))
 
     for texte in liste_0_textes_grad_L_ACP :
         canevas0_L_ACP.delete(texte)
         liste_0_textes_grad_L_ACP=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_0_textes_grad_L_ACP.append(canevas0_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
+        liste_0_textes_grad_L_ACP.append(canevas0_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
 
@@ -5238,14 +5428,14 @@ def affiche_graduation_L_ACP():
     liste_1_lignes_grad_L_ACP=[]
     # liste_1_textes_grad_L_ACP=[]
     for x in liste_graduations_en_pixels :
-       liste_1_lignes_grad_L_ACP.append(canevas1_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
+        liste_1_lignes_grad_L_ACP.append(canevas1_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
                                                                        fill="blue", dash=(1,2)))
 
     for texte in liste_1_textes_grad_L_ACP :
         canevas1_L_ACP.delete(texte)
         liste_1_textes_grad_L_ACP=[]
     for i in range(len(liste_graduations_en_pixels)) :
-       liste_1_textes_grad_L_ACP.append(canevas1_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
+        liste_1_textes_grad_L_ACP.append(canevas1_L_ACP.create_text(liste_graduations_en_pixels[i], 10,
                                                                        text=str(format(liste_graduations_en_nm[i], "4.1f")),
                                                                        fill="blue"))
 
@@ -5386,27 +5576,27 @@ def affiche_spectres_var_ACP_L_ACP():
         minimum = min(minimum, minimum3)
         maximum = max(maximum, maximum3)
 
-    spectre1[:, 1] = (hauteur_canevas_spectres-(spectre1[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
+    spectre1[:, 1] = hauteur_canevas_spectres-(spectre1[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
     spectre1[:, 0] = (spectre1[:, 0] - limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP
     for i in range(len(spectre1) - 1):
         canevas1_L_ACP.create_line(spectre1[i, 0], spectre1[i, 1],
                                    spectre1[i+1, 0], spectre1[i+1, 1], fill="red")
 
-    spectre2[:, 1] = (hauteur_canevas_spectres-(spectre2[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
+    spectre2[:, 1] = hauteur_canevas_spectres-(spectre2[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
     spectre2[:, 0] = (spectre2[:, 0] - limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP
     for i in range(len(spectre2) - 1):
         canevas1_L_ACP.create_line(spectre2[i, 0], spectre2[i, 1],
                                    spectre2[i+1, 0], spectre2[i+1, 1], fill="blue")
 
     if flag_3D_L_ACP.get() is True:
-        spectre3[:, 1] = (hauteur_canevas_spectres-(spectre3[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
+        spectre3[:, 1] = hauteur_canevas_spectres-(spectre3[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
         spectre3[:, 0] = (spectre3[:, 0] - limites_affichage_spectre_L_ACP[0]) * \
             largeur_canevas_spectres/delta_limites_L_ACP
         for i in range(len(spectre3) - 1):
             canevas1_L_ACP.create_line(
                 spectre3[i, 0], spectre3[i, 1], spectre3[i+1, 0], spectre3[i+1, 1], fill="green")
 
-    y = (hauteur_canevas_spectres-(0 - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001))
+    y = hauteur_canevas_spectres-(0 - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
     canevas1_L_ACP.create_line(0, y, largeur_canevas_spectres, y, fill="grey")
 
     # ajout des graduations
@@ -5669,7 +5859,7 @@ def change_tree_selection_L_ACP(event):
         if item[2] == "Oui":
             #        tree_L_ACP.item(selection, values=(item[0],item[1],"Non"))
             tree_L_ACP.item(selection_i, values=(item[0], item[1], "Non", item[3]), tags="deselect")
-    bouton_applique_ind_sup_L_ACP.configure(state="disable")    
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
     flag_nouvelle_ACP_L_ACP = True
 
 
@@ -5764,7 +5954,7 @@ def ouvre_fenetre_recherche_elements_L_rec():
     """
     global fenetre_recherche_elements_L_rec, zone_texte_L_rec
     global flag_fenetre_recherche_elements_ouvert_L_rec
-    if flag_fenetre_recherche_elements_ouvert_L_rec  == False :
+    if flag_fenetre_recherche_elements_ouvert_L_rec  is False :
         fenetre_recherche_elements_L_rec = tk.Toplevel(fenetre_principale)
         if largeur_ecran <= 1921 :
             fenetre_recherche_elements_L_rec.geometry("660x490")
@@ -5824,13 +6014,13 @@ def recherche_elements_L_rec() :
     global df_neutres_atomic_L_rec, df_ions_atomic_L_rec, flag_df_atomic_elements_L_rec
     if flag_NIST_LIBS_L_ele.get() == 1 :
         rep_NIST = "NIST_LIBS"
-        if flag_df_elements_L_det == False :
+        if flag_df_elements_L_det is False :
             # print("creation DF elements")
-            df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False, 
-                                                                     rep_LIBStick, 
+            df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False,
+                                                                     rep_LIBStick,
                                                                      rep_NIST)
-            df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True, 
-                                                                     rep_LIBStick, 
+            df_ions_L_det = LIBStick_recherche_elements.creation_df_elements(True,
+                                                                     rep_LIBStick,
                                                                      rep_NIST)
             flag_df_elements_L_det = True
         # else :
@@ -5841,13 +6031,13 @@ def recherche_elements_L_rec() :
                                                                                    df_neutres_L_det, df_ions_L_det)
     else :
         rep_NIST = "NIST_atomic_spectra"
-        if flag_df_atomic_elements_L_rec == False :
+        if flag_df_atomic_elements_L_rec is False :
             print("creation DF elements")
-            df_neutres_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(False, 
-                                                                     rep_LIBStick, 
+            df_neutres_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(False,
+                                                                     rep_LIBStick,
                                                                      rep_NIST)
-            df_ions_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(True, 
-                                                                     rep_LIBStick, 
+            df_ions_atomic_L_rec = LIBStick_recherche_elements.creation_df_elements(True,
+                                                                     rep_LIBStick,
                                                                      rep_NIST)
             flag_df_atomic_elements_L_rec = True
         else :
@@ -5855,7 +6045,7 @@ def recherche_elements_L_rec() :
         texte_neutres_L_rec, texte_ions_L_rec, _, _ = LIBStick_recherche_elements.recherche_elements(lambda_recherche_elements_L_rec.get(),
                                                                                    delta_recherche_elements_L_rec.get(),
                                                                                    seuil_recherche_elements_L_rec.get(),
-                                                                                   df_neutres_atomic_L_rec, df_ions_atomic_L_rec)    
+                                                                                   df_neutres_atomic_L_rec, df_ions_atomic_L_rec)
     zone_texte_L_rec.insert("1.0", "\n\n")
     zone_texte_L_rec.insert("1.0", texte_ions_L_rec)
     zone_texte_L_rec.insert("1.0", "\n")
@@ -5908,7 +6098,7 @@ def ouvre_fenetre_a_propos_L_aide():
     fichier_texte=open(nom_fichier_texte,"r")
     texte=fichier_texte.read()
 
-    if flag_fenetre_a_propos_L_aide  == False :
+    if flag_fenetre_a_propos_L_aide  is False :
         fenetre_a_propos_L_aide = tk.Toplevel(fenetre_principale)
         fenetre_a_propos_L_aide_largeur = math.ceil(700*facteur_echelle_ecran)
         fenetre_a_propos_L_aide_hauteur = math.ceil(500*facteur_echelle_ecran)
@@ -6149,7 +6339,7 @@ def affiche_lignes_element_L_ele():
             intensite_relative = ligne_tableau[5]
             if intensite_relative >= 10 and flag_sup10_L_ele.get() == 1:
                 # affiche_ligne_element(long_onde, canevas0_L_ext)
-                x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
+                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
                 if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
@@ -6177,7 +6367,7 @@ def affiche_lignes_element_L_ele():
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 1)))
             if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
-                x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
+                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
                 if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)/2,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
@@ -6205,7 +6395,7 @@ def affiche_lignes_element_L_ele():
                                                                                    x_ligne, hauteur_canevas_spectres,
                                                                                    fill=couleur_lignes, dash=(4, 1)))
             if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
-                x_ligne = ((long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites)
+                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
                 if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
                     liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*0.825,
                                                                                        x_ligne, hauteur_canevas_spectres+170,
@@ -6481,7 +6671,7 @@ else :
     taille_police = math.ceil(12/facteur_echelle_ecran)
     TAILLE_FONT_CLASSIFICATION = math.ceil(12/facteur_echelle_ecran)
     default_font.configure(size=taille_police)
-    
+
 # print("facteur d'echelle de l'ecran : " + str(facteur_echelle_ecran))
 # print("taille de la police : " + str(default_font.cget('size')))
 # print("largeur_fenetre_principale : " + str(largeur_fenetre_principale))
@@ -6996,22 +7186,22 @@ text2_L_det.grid(row=2, column=3, sticky=tk.E)
 
 variable_1_L_det = tk.DoubleVar(value=tableau_bornes_L_det[0])
 variable_2_L_det = tk.DoubleVar(value=tableau_bornes_L_det[1])
-entree1_L_det = ttk.Spinbox(frame1_L_det, from_=198, to=1013, increment=0.5, 
+entree1_L_det = ttk.Spinbox(frame1_L_det, from_=198, to=1013, increment=0.5,
                             textvariable=variable_1_L_det,
-                            command=deplace_ligne0_1_L_det, 
-                            width=5, foreground="black", 
+                            command=deplace_ligne0_1_L_det,
+                            width=5, foreground="black",
                             state = "disable")
-entree2_L_det = ttk.Spinbox(frame1_L_det, from_=198, to=1013, increment=0.5, 
+entree2_L_det = ttk.Spinbox(frame1_L_det, from_=198, to=1013, increment=0.5,
                             textvariable=variable_2_L_det,
-                            command=deplace_ligne0_2_L_det, 
-                            width=5, foreground="black", 
+                            command=deplace_ligne0_2_L_det,
+                            width=5, foreground="black",
                             state="disable")
 entree1_L_det.grid(row=2, column=2, sticky=tk.W)
 entree2_L_det.grid(row=2, column=4, sticky=tk.W)
 
 flag_spectre_entier_L_det = tk.BooleanVar(value=True)
-coche_spectre_entier_L_det = ttk.Checkbutton(frame1_L_det, text=_("Spectre entier"), 
-                                             variable=flag_spectre_entier_L_det, 
+coche_spectre_entier_L_det = ttk.Checkbutton(frame1_L_det, text=_("Spectre entier"),
+                                             variable=flag_spectre_entier_L_det,
                                              command=change_flag_spectre_L_det)
 coche_spectre_entier_L_det.grid(row=2, column=5)
 
@@ -7030,31 +7220,31 @@ entree3_L_det = ttk.Spinbox(frame1_L_det, from_=0, to=99, increment=1,
                             textvariable=variable_3_L_det,
                             command=deplace_ligne1_1_L_det,
                             width=5, foreground="black")
-entree4_L_det = ttk.Spinbox(frame1_L_det, from_=1, to=100, increment=1, 
+entree4_L_det = ttk.Spinbox(frame1_L_det, from_=1, to=100, increment=1,
                             textvariable=variable_4_L_det,
                             command=deplace_ligne1_2_L_det,
                             width=5, foreground="black")
 entree3_L_det.grid(row=3, column=2, sticky=tk.W)
 entree4_L_det.grid(row=3, column=4, sticky=tk.W)
 
-text3_L_det = ttk.Label(frame1_L_det, text=_("S/N mini :"))
-text4_L_det = ttk.Label(frame1_L_det, text=_("Largeur maxi :"))
-text3_L_det.grid(row=4, column=1, sticky=tk.E)
-text4_L_det.grid(row=4, column=3, sticky=tk.E)
+text5_L_det = ttk.Label(frame1_L_det, text=_("S/N mini :"))
+text6_L_det = ttk.Label(frame1_L_det, text=_("Largeur maxi :"))
+text5_L_det.grid(row=4, column=1, sticky=tk.E)
+text6_L_det.grid(row=4, column=3, sticky=tk.E)
 
 variable_5_L_det = tk.DoubleVar(value=5)
 variable_6_L_det = tk.DoubleVar(value=1)
-entree5_L_det = ttk.Spinbox(frame1_L_det, from_=0, to=99, increment=1, 
+entree5_L_det = ttk.Spinbox(frame1_L_det, from_=0, to=99, increment=1,
                             textvariable=variable_5_L_det,
                             width=5, foreground="black")
-entree6_L_det = ttk.Spinbox(frame1_L_det, from_=1, to=500, increment=1, 
+entree6_L_det = ttk.Spinbox(frame1_L_det, from_=1, to=500, increment=1,
                             textvariable=variable_6_L_det,
                             width=5, foreground="black")
 entree5_L_det.grid(row=4, column=2, sticky=tk.W)
 entree6_L_det.grid(row=4, column=4, sticky=tk.W)
 
 bouton_visu_L_det = ttk.Button(frame1_L_det, text=_("Détection"),
-                                  command=visualisation_pics_L_det, width=10)
+                                  command=detection_pics_L_det, width=10)
 bouton_visu_L_det.grid(row=4, column=5, sticky=tk.N)
 
 frame1_1_L_det = ttk.Frame(frame1_L_det)
@@ -7064,7 +7254,7 @@ text_zoom_L_det = ttk.Label(frame1_1_L_det, text="Zoom : ", width=8)
 text_zoom_L_det.grid(row=1, column=1, sticky=tk.N)
 variable_zoom_inf_L_det = tk.DoubleVar(value=198)
 variable_zoom_sup_L_det = tk.DoubleVar(value=1013)
-entree_zoom_inf_L_det = ttk.Spinbox(frame1_1_L_det, from_=198, to=1013, increment=1, 
+entree_zoom_inf_L_det = ttk.Spinbox(frame1_1_L_det, from_=198, to=1013, increment=1,
                                     textvariable=variable_zoom_inf_L_det,
                                     command=change_zoom_inf_L_det, width=8, foreground="black")
 entree_zoom_sup_L_det = ttk.Spinbox(frame1_1_L_det, from_=198, to=1013, increment=1,
@@ -7095,13 +7285,13 @@ tree_L_det.tag_configure("default", background = bg_color_treeview )
 tree_L_det.tag_configure("neutres_select", background = bg_color_treeview, foreground="orange" )
 tree_L_det.tag_configure("ions_select", background = "grey45", foreground="orange" )
 tree_L_det.tag_configure("neutres_deselect", background = bg_color_treeview)
-tree_L_det.tag_configure("ions_deselect", background = "grey45") 
+tree_L_det.tag_configure("ions_deselect", background = "grey45")
 # tree_L_det.tag_configure("select", foreground="orange")
 if style_interface_LIBStick == "black" :
     tree_L_det.tag_configure("deselect", foreground="white")
 else :
     tree_L_det.tag_configure("deselect", foreground="black")
-    
+
 tree_L_det.column(1, width=100, anchor="w")
 tree_L_det.column(2, width=150, anchor="w")
 tree_L_det.column(3, width=150, anchor="w")
@@ -7134,33 +7324,45 @@ radio_boutton_n_L_det = ttk.Radiobutton(frame2_1_L_det, text = _("Neutres"),
                                        value = "N", variable = texte_n_i_L_det)
 radio_boutton_i_L_det = ttk.Radiobutton(frame2_1_L_det, text = _("Ions"),
                                        value = "I", variable = texte_n_i_L_det)
-radio_boutton_n_et_i_L_det = ttk.Radiobutton(frame2_1_L_det, text = _("Les deux"), 
+radio_boutton_n_et_i_L_det = ttk.Radiobutton(frame2_1_L_det, text = _("Les deux"),
                                             value = "N&I", variable = texte_n_i_L_det)
 radio_boutton_n_L_det.grid(row=1, column=1, sticky=tk.W, columnspan=2)
 radio_boutton_i_L_det.grid(row=2, column=1, sticky=tk.W, columnspan=2)
 radio_boutton_n_et_i_L_det.grid(row=3, column=1, sticky=tk.W, columnspan=2)
 
-text6_L_det = ttk.Label(frame2_1_L_det, text=_("Delta (nm) :"))
-text7_L_det = ttk.Label(frame2_1_L_det, text=_("Seuil (> I rela.) :"))
-text6_L_det.grid(row=6, column=1)
-text7_L_det.grid(row=7, column=1)
+text7_L_det = ttk.Label(frame2_1_L_det, text=_("Delta (nm) :"))
+text8_L_det = ttk.Label(frame2_1_L_det, text=_("Seuil (> I rela.) :"))
+text7_L_det.grid(row=6, column=1)
+text8_L_det.grid(row=7, column=1)
 
 delta_recherche_elements_L_det = tk.DoubleVar(value=0.2)
 seuil_recherche_elements_L_det = tk.IntVar(value=1)
-entree_delta_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=5, increment=0.1, width=5,
-                                  textvariable=delta_recherche_elements_L_det, foreground="black")
-entree_seuil_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=100, increment=1, width=5,
-                                  textvariable=seuil_recherche_elements_L_det, foreground="black")
-entree_delta_L_det.grid(row=6, column=2)
-entree_seuil_L_det.grid(row=7, column=2)
+entree7_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=5, increment=0.1, width=5,
+                            textvariable=delta_recherche_elements_L_det, foreground="black")
+entree8_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=100, increment=1, width=5,
+                            textvariable=seuil_recherche_elements_L_det, foreground="black")
+entree7_L_det.grid(row=6, column=2)
+entree8_L_det.grid(row=7, column=2)
 
 bouton_recherche_L_det = ttk.Button(frame2_1_L_det, text=_("Recherche"), width=10,
                                     command = detecte_elements_L_det, state="disable")
 bouton_recherche_L_det.grid(row=9, column=1, sticky=tk.W)
 
+bouton_efface_L_det = ttk.Button(frame2_1_L_det, text=_("Efface tout"), width=10,
+                                 command = efface_elements_L_det, state="disable")
+bouton_efface_L_det.grid(row=10, column=1, sticky=tk.W)
+
+text_spectre_L_det = ttk.Label(frame2_1_L_det, text=_("Spectre : "))
+text_spectre_L_det.grid(row=12, column=1, sticky=tk.W)
+numero_spectre_L_det = tk.IntVar(value=1)
+entree_spectre_L_det = ttk.Spinbox(frame2_1_L_det, from_=1, to=50, width=5,
+                                   textvariable=numero_spectre_L_det,
+                                   command=lit_affiche_spectre_numero_L_det, foreground="black")
+entree_spectre_L_det.grid(row=12, column=2, sticky=tk.W)
+
 bouton_exporte_L_det = ttk.Button(frame2_1_L_det, text=_("Exporte"), width=10,
-                                command = exporte_resultats_L_det, state="disable")
-bouton_exporte_L_det.grid(row=10, column=1, sticky=tk.W)
+                                  command = exporte_resultats_L_det, state="disable")
+bouton_exporte_L_det.grid(row=13, column=1, sticky=tk.W)
 
 
 ###################################################################################################
@@ -7197,6 +7399,10 @@ entree3_L_det.bind("<KP_Enter>", deplace_ligne1_1_return_L_det)
 entree4_L_det.bind("<KP_Enter>", deplace_ligne1_2_return_L_det)
 entree3_L_det.bind("<Tab>", deplace_ligne1_1_return_L_det)
 entree4_L_det.bind("<Tab>", deplace_ligne1_2_return_L_det)
+
+entree_spectre_L_det.bind("<Return>", lit_affiche_spectre_numero_event_L_det)
+entree_spectre_L_det.bind("<Tab>", lit_affiche_spectre_numero_event_L_det)
+entree_spectre_L_det.bind("<KP_Enter>", lit_affiche_spectre_numero_event_L_det)
 
 tree_L_det.bind("<ButtonRelease-1>", selectionne_element_L_det)
 # tree_L_det.bind("<Button-1>", selectionne_element_L_det)

@@ -5,6 +5,8 @@ Created on Fri May 12 14:56:33 2023
 
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
+
 
 import pandas as pd
 import LIBStick_outils
@@ -32,18 +34,18 @@ def creation_df_elements(ions, repertoire, rep_NIST):
 
     """
     # Chemin vers les fichiers des éléments
-    if ions == False :
+    if ions is False :
         elements_path = repertoire + "/LIBStick_datas/" + rep_NIST + "/elements"
     else :
         elements_path = repertoire + "/LIBStick_datas/" + rep_NIST + "/ions"
     # Lister les fichiers
     # Retourne une liste de chemins
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(elements_path,".csv")
-    
+
     # Récupérer les noms des éléments/ions à partir du nom de fichier
     # Retourne un vecteur
     # Lire les fichiers
-    # Retourne une liste de tableaux (un tableau par fichier lu)  
+    # Retourne une liste de tableaux (un tableau par fichier lu)
     noms_elements = []
     resultat_df = pd.DataFrame(columns=["Element","Longueur d'onde","I relative"])
     for i, fichier in zip(range(len(liste_fichiers)), liste_fichiers) :
@@ -54,7 +56,7 @@ def creation_df_elements(ions, repertoire, rep_NIST):
                            "Longueur d'onde" : DataFrame_element["Longueur d'onde (nm)"],
                            "I relative" : DataFrame_element["Intensité normalisée"]})
         resultat_df = pd.concat([resultat_df, df], axis=0, ignore_index=True)
-    
+
     # noms_elements = []
     # liste_df_elements=[]
     # resultat_df = pd.DataFrame(columns=["Element","Longueur d'onde","I relative"])
@@ -62,16 +64,16 @@ def creation_df_elements(ions, repertoire, rep_NIST):
     #     noms_elements = noms_elements + [liste_fichiers[i][0:-4]]
     #     DataFrame_element = pd.read_table(elements_path+"/"+fichier)
     #     liste_df_elements = liste_df_elements + [DataFrame_element]
-    
+
     # for i in range(len(liste_df_elements)) : # Pour chaque ième tableau de la liste...
     #     wavelength = liste_df_elements[i]["Longueur d'onde (nm)"].values # ...extraire la longueur d'onde
     #     intensity = liste_df_elements[i]["Intensité normalisée"].values  # ...extraire l'intensité
     #     for j in range(len(wavelength )) :
     #         resultat_df.loc[len(resultat_df)] = [noms_elements[i],wavelength[j],intensity[j]]
-            
+
     return resultat_df
-    
-    
+
+
 ###################################################################################################
 # Recherche de correspondance longueur d'onde -> éléments en automatique
 ###################################################################################################
@@ -102,16 +104,16 @@ def recherche_elements_neutres_ions_auto(long_onde, delta, seuil, ions, df_eleme
     """
     borneinf = long_onde-delta
     bornesup = long_onde+delta
-    if ions == False :
+    if ions is False :
         texte =  "**Neutres** :" + "\n\n" + "---------------------------"
     else :
         texte =  "**Ions** :" + "\n\n" + "---------------------------"
     resultat_df = pd.DataFrame(columns=["Element","Longueur d'onde","I relative"])
 
-    resultat_df = df_elements[(df_elements["Longueur d'onde"] > borneinf) & 
-                              (df_elements["Longueur d'onde"] < bornesup) & 
+    resultat_df = df_elements[(df_elements["Longueur d'onde"] > borneinf) &
+                              (df_elements["Longueur d'onde"] < bornesup) &
                               (df_elements["I relative"] >= seuil)]
-    
+
     # liste_inf_wavelength = [borneinf] * df_elements.shape[0]
     # liste_sup_wavelength = [bornesup] * df_elements.shape[0]
     # liste_int_min = [seuil] * df_elements.shape[0]
@@ -121,7 +123,7 @@ def recherche_elements_neutres_ions_auto(long_onde, delta, seuil, ions, df_eleme
     #     intensity = df_elements["I relative"].iloc[i]
     #     if ((wavelength > borneinf) & (wavelength < bornesup) & (intensity >= seuil)) == True :
     #         resultat_df.loc[len(resultat_df)] = [noms_elements,wavelength,intensity]
-            
+
     resultat_df.sort_values(by="I relative",ascending=(False), inplace = True)
     texte = texte + "\n" + resultat_df.to_markdown() + "\n"
     return texte, resultat_df
@@ -131,31 +133,85 @@ def recherche_elements_neutres_ions_auto(long_onde, delta, seuil, ions, df_eleme
 # Recherche de correspondance longueur d'onde -> éléments
 ###################################################################################################
 def recherche_elements(long_onde, delta, seuil, df_neutres, df_ions):
-    texte_neutres, resultat_df_neutres = recherche_elements_neutres_ions(long_onde, delta,seuil, False, df_neutres)
-    texte_ions, resultat_df_ions = recherche_elements_neutres_ions(long_onde, delta,seuil, True, df_ions)
+    """
+    
+
+    Parameters
+    ----------
+    long_onde : TYPE
+        DESCRIPTION.
+    delta : TYPE
+        DESCRIPTION.
+    seuil : TYPE
+        DESCRIPTION.
+    df_neutres : TYPE
+        DESCRIPTION.
+    df_ions : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    texte_neutres : TYPE
+        DESCRIPTION.
+    texte_ions : TYPE
+        DESCRIPTION.
+    resultat_df_neutres : TYPE
+        DESCRIPTION.
+    resultat_df_ions : TYPE
+        DESCRIPTION.
+
+    """
+    texte_neutres, resultat_df_neutres = recherche_elements_neutres_ions(long_onde, delta,seuil,
+                                                                         False, df_neutres)
+    texte_ions, resultat_df_ions = recherche_elements_neutres_ions(long_onde, delta,seuil,
+                                                                   True, df_ions)
     return texte_neutres, texte_ions, resultat_df_neutres, resultat_df_ions
 
 
 def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, df_elements):
+    """
+    
+
+    Parameters
+    ----------
+    long_onde : TYPE
+        DESCRIPTION.
+    delta : TYPE
+        DESCRIPTION.
+    seuil : TYPE
+        DESCRIPTION.
+    ions : TYPE
+        DESCRIPTION.
+    df_elements : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    texte : TYPE
+        DESCRIPTION.
+    resultat_df : TYPE
+        DESCRIPTION.
+
+    """
     borneinf = long_onde-delta
     bornesup = long_onde+delta
-    if ions == False :
+    if ions is False :
         texte ="--------------------------" + "\n" + "Neutres :" + "\n" + "--------------------------"
     else :
         texte ="--------------------------" + "\n" + "Ions :" + "\n" + "--------------------------"
 
     resultat_df = pd.DataFrame(columns=["Element","Longueur d'onde","I relative"])
-    resultat_df = df_elements[(df_elements["Longueur d'onde"] > borneinf) & 
-                              (df_elements["Longueur d'onde"] < bornesup) & 
+    resultat_df = df_elements[(df_elements["Longueur d'onde"] > borneinf) &
+                              (df_elements["Longueur d'onde"] < bornesup) &
                               (df_elements["I relative"] >= seuil)]
-    
+
     # for i in range(len(df_elements)) : # Pour chaque ième tableau de la liste...
     #     noms_elements = df_elements["Element"].iloc[i]
     #     wavelength = df_elements["Longueur d'onde"].iloc[i]
     #     intensity = df_elements["I relative"].iloc[i]
     #     if ((wavelength > borneinf) & (wavelength < bornesup) & (intensity >= seuil)) == True :
     #         resultat_df.loc[len(resultat_df)] = [noms_elements,wavelength,intensity]
-    
+
     texte = texte + "\n" + resultat_df.to_markdown()+ "\n"
     resultat_df.sort_values(by="I relative",ascending=(False), inplace = True)
     texte = texte + "\n" + resultat_df.to_markdown() + "\n"
@@ -278,4 +334,3 @@ def recherche_elements_neutres_ions(long_onde, delta,seuil, ions, df_elements):
 #     resultat_df.sort_values(by="I relative",ascending=(False), inplace = True)
 #     texte = texte + "\n" + resultat_df.to_markdown() + "\n"
 #     return texte, resultat_df
-

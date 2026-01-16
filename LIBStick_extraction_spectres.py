@@ -5,6 +5,7 @@ Created on Thu Feb  6 12:20:38 2020
 Module outils pour l'extration de parties des spectres et création de spectres moyens
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
 
 
 import sys
@@ -133,6 +134,7 @@ def tableau_brut_transpose_256gris(tableau_brut):
     multiplie les valeurs par 255
     et le transpose de façon à avoir chaque spectre en ligne
     """
+    print(tableau_brut)
     tableau8bits_brut = tableau_brut[:, 1:]
     tableau8bits_brut = tableau8bits_brut*255
     tableau8bits_brut = tableau8bits_brut.transpose()
@@ -238,7 +240,7 @@ def creation_tableau_norm(rep_travail, nom_echantillon, bornes, flag_2D, flag_3D
     Sauvegarde le même tableau mais en dataframe en ajoutant les lambda
     """
     liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, ".tsv")
-    tableau_brut = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers, ".tsv")
+    tableau_brut, liste_inutile = LIBStick_outils.creer_tableau_avec_x_colonne1(liste_fichiers, ".tsv")  # A tester !!!
     tableau8bits_brut = tableau_brut_transpose_256gris(tableau_brut)
     graphique_brut_sauvegarde(tableau8bits_brut)
     enregistre_fichier_point(tableau_brut, "tableau_brut_points.txt")
@@ -352,11 +354,11 @@ def main(rep_travail, tableau_bornes, type_fichier, liste_fichiers, flag_zone2, 
     for i in range(len(liste_fichiers)):
         for bornes in tableau_bornes:
             os.chdir(rep_travail)
-            document = lit_fichier_entre_bornes(liste_fichiers[i], 
-                                                bornes[0], bornes[1], 
+            document = lit_fichier_entre_bornes(liste_fichiers[i],
+                                                bornes[0], bornes[1],
                                                 type_fichier)
             enregistre_spectre(document, rep_travail+"/" +
-                               str(bornes[0])+"_" + str(bornes[1]), 
+                               str(bornes[0])+"_" + str(bornes[1]),
                                liste_fichiers[i])
     for bornes in tableau_bornes:
         os.chdir(rep_script)

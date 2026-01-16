@@ -5,6 +5,7 @@ Created on Thu Apr  2 11:31:54 2020
 Module outils pour les mesures, la comparaison et la classification des spectres
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
 
 
 import os
@@ -28,9 +29,9 @@ def creer_tableau_avec_x(liste, type_fichier, type_traitement):  # données en c
     avec les lambda en colonne 1
     """
     if type_traitement == 0:   # On ne normalise pas les spectres
-        tableau = LIBStick_outils.creer_tableau_avec_x_colonne1(liste, type_fichier)
+        tableau, liste_inutile = LIBStick_outils.creer_tableau_avec_x_colonne1(liste, type_fichier)
     if type_traitement == 1:   # On normalise tous les spectres
-        tableau = LIBStick_outils.creer_tableau_avec_x_colonne1(liste, type_fichier)
+        tableau, liste_inutile = LIBStick_outils.creer_tableau_avec_x_colonne1(liste, type_fichier)
         tableau = LIBStick_outils.normalise_tableau_x_aire(tableau)
         # print(tableau.shape)
     return tableau

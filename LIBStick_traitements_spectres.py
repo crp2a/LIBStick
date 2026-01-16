@@ -5,6 +5,7 @@ Created on Wed May 13 14:41:09 2020
 Module outils pour le pré-traitement des spectres
 @author: yannick
 """
+# pylint: disable=invalid-name, line-too-long, global-statement
 
 
 import os
@@ -108,7 +109,7 @@ try :
             else:
                 minima[i] = np.min(ordonnees[(i-width_min_max):(i+width_min_max)])
             start_window = start_window + 1
-        start_window = (taille_spectre - 2*width_min_max - 1)
+        start_window = taille_spectre - 2*width_min_max - 1
         for i in range(taille_spectre-width_min_max, taille_spectre):   # -- End of spectrum --
             end_window = start_window + 1 + (i % 2)
             if (np.min(ordonnees[start_window:(end_window)])) > minima[i-1]:
@@ -130,7 +131,7 @@ try :
             else:
                 maxima[i] = np.max(minima[i-width_min_max: i+width_min_max])
             start_window = start_window + 1
-        start_window = (taille_spectre - 2*width_min_max - 1)
+        start_window = taille_spectre - 2*width_min_max - 1
         for i in range(taille_spectre - width_min_max, taille_spectre):   # -- End of spectrum --
             end_window = start_window + 1 + (i % 2)
             if np.max(minima[start_window:end_window]) < maxima[i-1]:
@@ -190,7 +191,7 @@ except :
             else:
                 minima[i] = np.min(ordonnees[(i-width_min_max):(i+width_min_max)])
             start_window = start_window + 1
-        start_window = (taille_spectre - 2*width_min_max - 1)
+        start_window = taille_spectre - 2*width_min_max - 1
         for i in range(taille_spectre-width_min_max, taille_spectre):   # -- End of spectrum --
             end_window = start_window + 1 + (i % 2)
             if (np.min(ordonnees[start_window:(end_window)])) > minima[i-1]:
@@ -212,7 +213,7 @@ except :
             else:
                 maxima[i] = np.max(minima[i-width_min_max: i+width_min_max])
             start_window = start_window + 1
-        start_window = (taille_spectre - 2*width_min_max - 1)
+        start_window = taille_spectre - 2*width_min_max - 1
         for i in range(taille_spectre - width_min_max, taille_spectre):   # -- End of spectrum --
             end_window = start_window + 1 + (i % 2)
             if np.max(minima[start_window:end_window]) < maxima[i-1]:
@@ -380,24 +381,34 @@ except:
             enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
 
 
-def execute_en_bloc(rep_travail, type_fichier, tableau_bornes, type_filtre, taille_filtre, ordre,
+def execute_en_bloc(rep_travail, type_fichier, liste_fichiers, tableau_bornes, type_filtre, taille_filtre, ordre,
                     deriv, type_fond, param1, param2, param3, flag_sauve_fond):
     """
     Crée les répertoires de sauvegarde, traite et sauvegarde
     tous les spectres du répertoire en cours (fond en option)
     """
-    liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, type_fichier)
+    # liste_fichiers = LIBStick_outils.creation_liste_fichiers(rep_travail, type_fichier)
+    indices_a_supprimer = []
     repertoire_sauvegarde = creation_sous_repertoire(rep_travail)
     if flag_sauve_fond is True:
         repertoire_sauvegarde_fond = creation_sous_repertoire_fond(rep_travail)
-    for nom_fichier in liste_fichiers:
-        spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
-        spectre = creation_spectre_filtre(spectre, tableau_bornes, 
-                                          type_filtre, taille_filtre, 
-                                          ordre, deriv)
-        fond_continu = creation_fond(spectre, type_fond, 
-                                     param1, param2, param3)
-        spectre = creation_spectre_corrige(spectre, fond_continu)
-        enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
-        if flag_sauve_fond is True:
-            enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
+    for numero, nom_fichier in enumerate(liste_fichiers):
+        try :
+            spectre = LIBStick_outils.lit_spectre(nom_fichier, type_fichier)
+            spectre = creation_spectre_filtre(spectre, tableau_bornes,
+                                              type_filtre, taille_filtre,
+                                              ordre, deriv)
+            fond_continu = creation_fond(spectre, type_fond,
+                                         param1, param2, param3)
+            spectre = creation_spectre_corrige(spectre, fond_continu)
+            enregistre_fichier(spectre, repertoire_sauvegarde, nom_fichier)
+            if flag_sauve_fond is True:
+                enregistre_fichier_fond(fond_continu, repertoire_sauvegarde_fond, nom_fichier)
+        except Exception as e:
+            print(f"Fichier {nom_fichier} : mauvais format ! Supprimé de la liste ! ({e})")
+            indices_a_supprimer.append(numero)
+            continue
+    for indice in sorted(indices_a_supprimer, reverse=True):
+        if indice < len(liste_fichiers):
+            liste_fichiers.pop(indice)
+    return liste_fichiers
