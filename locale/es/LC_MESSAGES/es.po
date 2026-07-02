@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: LIBStick v2.0\n"
-"POT-Creation-Date: 2025-04-02 10:05+0200\n"
-"PO-Revision-Date: 2025-04-02 10:34+0200\n"
+"POT-Creation-Date: 2026-06-16 10:04+0200\n"
+"PO-Revision-Date: 2026-06-16 10:11+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -14,346 +14,440 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SearchPath-0: LIBStick.py\n"
 
-#: LIBStick.py:220 LIBStick.py:5898
+#: LIBStick.py:238 LIBStick.py:6313
 msgid "Attention !"
 msgstr "¡Atención!"
 
-#: LIBStick.py:221
+#: LIBStick.py:239
 msgid "Veuillez redémarrer LIBStick pour retrouver les paramètres par défaut."
 msgstr "Por favor, reinicie LIBStick para restaurar la configuración por defecto."
 
-#: LIBStick.py:558
+#: LIBStick.py:580
 msgid "Choisissez un fichier spectre"
 msgstr "Elegir un archivo de espectro"
 
-#: LIBStick.py:559 LIBStick.py:1526 LIBStick.py:2635 LIBStick.py:3715
-#: LIBStick.py:4605
+#: LIBStick.py:581 LIBStick.py:1607 LIBStick.py:2878 LIBStick.py:3989
+#: LIBStick.py:4908
 msgid "tous"
 msgstr "todos"
 
-#: LIBStick.py:560 LIBStick.py:1527 LIBStick.py:2636 LIBStick.py:3716
-#: LIBStick.py:4606
+#: LIBStick.py:582 LIBStick.py:1608 LIBStick.py:2879 LIBStick.py:3990
+#: LIBStick.py:4909
 msgid "fichiers LIBStick"
 msgstr "ficheros LIBStick"
 
-#: LIBStick.py:561 LIBStick.py:1528 LIBStick.py:2637 LIBStick.py:3717
-#: LIBStick.py:4607
+#: LIBStick.py:583 LIBStick.py:1609 LIBStick.py:2880 LIBStick.py:3991
+#: LIBStick.py:4910
 msgid "fichiers LIBStick moyen"
 msgstr "ficheros LIBStick medios"
 
-#: LIBStick.py:562 LIBStick.py:1529 LIBStick.py:2638 LIBStick.py:3718
-#: LIBStick.py:4608
+#: LIBStick.py:584 LIBStick.py:1610 LIBStick.py:2881 LIBStick.py:3992
+#: LIBStick.py:4911
 msgid "fichiers IVEA"
 msgstr "ficheros IVEA"
 
-#: LIBStick.py:563 LIBStick.py:1530 LIBStick.py:2639 LIBStick.py:3719
-#: LIBStick.py:4609
+#: LIBStick.py:585 LIBStick.py:1611 LIBStick.py:2882 LIBStick.py:3993
+#: LIBStick.py:4912
 msgid "fichiers SciAps"
 msgstr "ficheros SciAps"
 
-#: LIBStick.py:1549 LIBStick.py:1619 LIBStick.py:1622 LIBStick.py:2382
-#: LIBStick.py:6989 LIBStick.py:7565 LIBStick.py:7726
+#: LIBStick.py:1648 LIBStick.py:1742 LIBStick.py:1745 LIBStick.py:2552
+#: LIBStick.py:2625 LIBStick.py:7568 LIBStick.py:8160 LIBStick.py:8330
 msgid "n°"
 msgstr "n°"
 
-#: LIBStick.py:1549 LIBStick.py:1619 LIBStick.py:1622 LIBStick.py:2382
-#: LIBStick.py:6990
+#: LIBStick.py:1648 LIBStick.py:1742 LIBStick.py:1745 LIBStick.py:2552
+#: LIBStick.py:2625 LIBStick.py:7569
 msgid "Pic (nm)"
 msgstr "Pico (nm)"
 
-#: LIBStick.py:1549 LIBStick.py:1619 LIBStick.py:1622 LIBStick.py:2382
-#: LIBStick.py:6991
+#: LIBStick.py:1648 LIBStick.py:1742 LIBStick.py:1745 LIBStick.py:2552
+#: LIBStick.py:2625 LIBStick.py:7570
 msgid "I du pic"
 msgstr "I pico"
 
-#: LIBStick.py:1549 LIBStick.py:1621 LIBStick.py:1624 LIBStick.py:2382
-#: LIBStick.py:6995
+#: LIBStick.py:1648 LIBStick.py:1744 LIBStick.py:1747 LIBStick.py:2552
+#: LIBStick.py:2625 LIBStick.py:7574
 msgid "Type"
 msgstr "Tipo"
 
-#: LIBStick.py:1549 LIBStick.py:1621 LIBStick.py:1624 LIBStick.py:2382
-#: LIBStick.py:2491 LIBStick.py:2497 LIBStick.py:2504 LIBStick.py:2510
-#: LIBStick.py:6996
+#: LIBStick.py:1648 LIBStick.py:1744 LIBStick.py:1747 LIBStick.py:2552
+#: LIBStick.py:2625 LIBStick.py:2734 LIBStick.py:2740 LIBStick.py:2747
+#: LIBStick.py:2753 LIBStick.py:7575
 msgid "Validé"
 msgstr "Validado"
 
-#: LIBStick.py:1645 LIBStick.py:2324 LIBStick.py:2335 LIBStick.py:2487
-#: LIBStick.py:2493
+#: LIBStick.py:1791 LIBStick.py:2567 LIBStick.py:2578 LIBStick.py:2730
+#: LIBStick.py:2736
 msgid "Neutre"
 msgstr "Neutro"
 
-#: LIBStick.py:1646 LIBStick.py:1653 LIBStick.py:2335 LIBStick.py:2357
-#: LIBStick.py:2487 LIBStick.py:2496 LIBStick.py:2497 LIBStick.py:2500
-#: LIBStick.py:2509 LIBStick.py:2510
+#: LIBStick.py:1792 LIBStick.py:1799 LIBStick.py:2578 LIBStick.py:2600
+#: LIBStick.py:2730 LIBStick.py:2739 LIBStick.py:2740 LIBStick.py:2743
+#: LIBStick.py:2752 LIBStick.py:2753
 msgid "Non"
 msgstr "No"
 
-#: LIBStick.py:1652 LIBStick.py:2346 LIBStick.py:2357 LIBStick.py:2500
-#: LIBStick.py:2506
+#: LIBStick.py:1798 LIBStick.py:2589 LIBStick.py:2600 LIBStick.py:2743
+#: LIBStick.py:2749
 msgid "Ion"
 msgstr "Ion"
 
-#: LIBStick.py:2167 LIBStick.py:2324 LIBStick.py:2346 LIBStick.py:2490
-#: LIBStick.py:2491 LIBStick.py:2493 LIBStick.py:2503 LIBStick.py:2504
-#: LIBStick.py:2506
+#: LIBStick.py:2351 LIBStick.py:2567 LIBStick.py:2589 LIBStick.py:2733
+#: LIBStick.py:2734 LIBStick.py:2736 LIBStick.py:2746 LIBStick.py:2747
+#: LIBStick.py:2749
 msgid "Oui"
 msgstr "Sí"
 
-#: LIBStick.py:2523
+#: LIBStick.py:2766
 msgid "Choisissez une localistion et un nom de fichier, sans extension"
 msgstr "Elija una ubicación y un nombre de archivo, sin extensión"
 
-#: LIBStick.py:5610 LIBStick.py:5717
+#: LIBStick.py:5002
+msgid "numero"
+msgstr "número"
+
+#: LIBStick.py:5002
+msgid "nom"
+msgstr "nombre"
+
+#: LIBStick.py:5002 LIBStick.py:5032
+msgid "calcul ACP"
+msgstr "cálculo ACP"
+
+#: LIBStick.py:5002
+#, fuzzy
+#| msgid "Label :"
+msgid "label"
+msgstr "Etiqueta:"
+
+#: LIBStick.py:5993 LIBStick.py:6104
 msgid "Valider"
 msgstr "Validar"
 
-#: LIBStick.py:5688
+#: LIBStick.py:6075
 msgid "Lambda (nm) :"
 msgstr "Lambda (nm) :"
 
-#: LIBStick.py:5689 LIBStick.py:7019
+#: LIBStick.py:6076 LIBStick.py:7598
 msgid "Delta (nm) :"
 msgstr "Delta (nm) :"
 
-#: LIBStick.py:5690 LIBStick.py:7020
+#: LIBStick.py:6077 LIBStick.py:7599
 msgid "Seuil (> I rela.) :"
 msgstr "Umbral (> I rela.) :"
 
-#: LIBStick.py:5712 LIBStick.py:6202
+#: LIBStick.py:6099 LIBStick.py:6701
 msgid "NIST LIBS"
 msgstr "NIST LIBS"
 
-#: LIBStick.py:5824
+#: LIBStick.py:6239
 msgid "Fermer"
 msgstr "Cerrar"
 
-#: LIBStick.py:5899
+#: LIBStick.py:6314
 msgid "Pas d'informations pour cet élément."
 msgstr "No hay información para este elemento."
 
-#: LIBStick.py:6183
+#: LIBStick.py:6691
 msgid "Efface"
 msgstr "Borrar"
 
-#: LIBStick.py:6193 LIBStick.py:7009
+#: LIBStick.py:6706 LIBStick.py:7588
 msgid "Neutres"
 msgstr "Neutral"
 
-#: LIBStick.py:6197
+#: LIBStick.py:6710
 msgid "Ions +"
 msgstr "Iones +"
 
-#: LIBStick.py:6207
+#: LIBStick.py:6714
+msgid "N + I"
+msgstr "N + I"
+
+#: LIBStick.py:6719
 msgid "I relative >= 10%"
 msgstr "I relativo >= 10%"
 
-#: LIBStick.py:6211
+#: LIBStick.py:6723
 msgid "1% <= I rel < 10%"
 msgstr "1% <= I rel < 10%"
 
-#: LIBStick.py:6215
+#: LIBStick.py:6727
 msgid "I relative < 1%"
 msgstr "I relativo < 1%"
 
-#: LIBStick.py:6431
+#: LIBStick.py:6732
+msgid "n lignes :"
+msgstr "n líneas:"
+
+#: LIBStick.py:6959
 msgid "LIBStick pré-traitements"
 msgstr "LIBStick pre-tratamientos"
 
-#: LIBStick.py:6432
+#: LIBStick.py:6960
 msgid "LIBStick détection éléments"
 msgstr "LIBStick detección de elementos"
 
-#: LIBStick.py:6433
+#: LIBStick.py:6961
 msgid "LIBStick extraction"
 msgstr "LIBStick Extracción"
 
-#: LIBStick.py:6434
+#: LIBStick.py:6962
 msgid "LIBStick comparaison"
 msgstr "LIBStick Comparación"
 
-#: LIBStick.py:6435
+#: LIBStick.py:6963
 msgid "LIBStick ACP"
 msgstr "LIBStick ACP"
 
-#: LIBStick.py:6450 LIBStick.py:6734 LIBStick.py:6956 LIBStick.py:7180
-#: LIBStick.py:7462 LIBStick.py:7701
+#: LIBStick.py:6980 LIBStick.py:7310 LIBStick.py:7532 LIBStick.py:7775
+#: LIBStick.py:8057 LIBStick.py:8305
 msgid "Fichier"
 msgstr "Fichero"
 
-#: LIBStick.py:6451
+#: LIBStick.py:6981
 msgid "Sauvegarde des paramètres actuels"
 msgstr "Guardar la configuración actual"
 
-#: LIBStick.py:6453
+#: LIBStick.py:6983
 msgid "Restaure les paramètres par défaut au prochain démarrage"
 msgstr "Restaurar la configuración por defecto en el próximo inicio"
 
-#: LIBStick.py:6455
+#: LIBStick.py:6985
 msgid "Quitter"
 msgstr "Salida"
 
-#: LIBStick.py:6457
+#: LIBStick.py:6987
 msgid "Redémarrer"
 msgstr "Reiniciar"
 
-#: LIBStick.py:6460
+#: LIBStick.py:6990
 msgid "Traitement"
 msgstr "Procesando"
 
-#: LIBStick.py:6462 LIBStick.py:6467 LIBStick.py:6472 LIBStick.py:6477
-#: LIBStick.py:6482
+#: LIBStick.py:6992 LIBStick.py:6997 LIBStick.py:7002 LIBStick.py:7007
+#: LIBStick.py:7012
 msgid "Echelle log y"
 msgstr "Escala Log y"
 
-#: LIBStick.py:6465 LIBStick.py:6935
+#: LIBStick.py:6995 LIBStick.py:7511
 msgid "Détection"
 msgstr "Detección"
 
-#: LIBStick.py:6470 LIBStick.py:7290
+#: LIBStick.py:7000 LIBStick.py:7885
 msgid "Extraction"
 msgstr "Extracción"
 
-#: LIBStick.py:6475
+#: LIBStick.py:7005
 msgid "Comparaison"
 msgstr "Comparación"
 
-#: LIBStick.py:6480 LIBStick.py:7761
+#: LIBStick.py:7010 LIBStick.py:8365
 msgid "ACP"
 msgstr "PCA"
 
-#: LIBStick.py:6485
+#: LIBStick.py:7015
 msgid "Outils"
 msgstr "Herramientas"
 
-#: LIBStick.py:6487
+#: LIBStick.py:7017
 msgid "Zoom auto en y"
 msgstr "Zoom automático en y"
 
-#: LIBStick.py:6488
+#: LIBStick.py:7018
 msgid "Graduations"
 msgstr "Graduaciones"
 
-#: LIBStick.py:6490
+#: LIBStick.py:7020
 msgid "Pas multiple de 10"
 msgstr "Paso múltiplo de 10"
 
-#: LIBStick.py:6492
+#: LIBStick.py:7022
 msgid "Pas multiple de 5"
 msgstr "Paso múltiplo de 5"
 
-#: LIBStick.py:6494
+#: LIBStick.py:7024
 msgid "Pas multiple de 2"
 msgstr "Paso múltiplo de 2"
 
-#: LIBStick.py:6496
+#: LIBStick.py:7026
 msgid "Pas multiple de 1"
 msgstr "Paso múltiplo de 1"
 
-#: LIBStick.py:6500
+#: LIBStick.py:7030
 msgid "Espacement mini 100 pixels"
 msgstr "Espacio mínimo 100 píxeles"
 
-#: LIBStick.py:6502
+#: LIBStick.py:7032
 msgid "Espacement mini 50 pixels"
 msgstr "Espacio mínimo 50 píxeles"
 
-#: LIBStick.py:6504
+#: LIBStick.py:7034
 msgid "Espacement mini 20 pixels"
 msgstr "Espacio mínimo 20 píxeles"
 
-#: LIBStick.py:6508
+#: LIBStick.py:7038
+msgid "Epaisseur 1 pixel"
+msgstr "Grosor: 1 píxel"
+
+#: LIBStick.py:7040
+#, fuzzy
+#| msgid "Espacement mini 20 pixels"
+msgid "Epaisseur 2 pixels"
+msgstr "Espacio mínimo 20 píxeles"
+
+#: LIBStick.py:7042
+msgid "Epaisseur 3 pixels"
+msgstr "Epaisseur 3 pixels"
+
+#: LIBStick.py:7045
+msgid "Epaisseur des marqueurs"
+msgstr "Grosor de los marcadores"
+
+#: LIBStick.py:7047 LIBStick.py:7074
+msgid "1 pixel"
+msgstr "1 píxel"
+
+#: LIBStick.py:7049 LIBStick.py:7076
+msgid "2 pixels"
+msgstr "2 pixels"
+
+#: LIBStick.py:7051 LIBStick.py:7078
+msgid "3 pixels"
+msgstr "3 pixels"
+
+#: LIBStick.py:7053 LIBStick.py:7080
+msgid "4 pixels"
+msgstr "4 pixels"
+
+#: LIBStick.py:7057
+msgid "Font 10"
+msgstr "Fuente 10"
+
+#: LIBStick.py:7059
+msgid "Font 12"
+msgstr "Fuente 12"
+
+#: LIBStick.py:7061
+msgid "Font 14"
+msgstr "Fuente 14"
+
+#: LIBStick.py:7063
+msgid "Font 16"
+msgstr "Fuente 16"
+
+#: LIBStick.py:7067
+msgid "Normal"
+msgstr "Normal"
+
+#: LIBStick.py:7069
+msgid "Gras"
+msgstr "Negrita"
+
+#: LIBStick.py:7072
+#, fuzzy
+#| msgid ""
+#| "Normalisation\n"
+#| "des spectres"
+msgid "Epaisseur des spectres"
+msgstr ""
+"Normalización\n"
+"de los espectros"
+
+#: LIBStick.py:7084
 msgid "Recherche d'éléments"
 msgstr "Buscar elementos"
 
-#: LIBStick.py:6510
+#: LIBStick.py:7086
 msgid "Tableau périodique"
 msgstr "Tabla periódica"
 
-#: LIBStick.py:6514
+#: LIBStick.py:7090
 msgid "Fenetre principale premier plan"
 msgstr "Ventana principal en primer plano"
 
-#: LIBStick.py:6518
+#: LIBStick.py:7094
 msgid "Langue au prochain démarage"
 msgstr "Lengua en el próximo inicio"
 
-#: LIBStick.py:6520
+#: LIBStick.py:7096
 msgid "Français"
 msgstr "Francés"
 
-#: LIBStick.py:6522
+#: LIBStick.py:7098
 msgid "Anglais"
 msgstr "Inglés"
 
-#: LIBStick.py:6524
+#: LIBStick.py:7100
 msgid "Espagnol"
 msgstr "Español"
 
-#: LIBStick.py:6526
+#: LIBStick.py:7102
 msgid "Italien"
 msgstr "Italiano"
 
-#: LIBStick.py:6529
+#: LIBStick.py:7105
 msgid "Style au prochain démarage"
 msgstr "Estilo en el próximo inicio"
 
-#: LIBStick.py:6531
+#: LIBStick.py:7107
 msgid "Couleur de LIBStick"
 msgstr "Color del LIBStick"
 
-#: LIBStick.py:6576
+#: LIBStick.py:7152
 msgid "Aide"
 msgstr "Asistencia"
 
-#: LIBStick.py:6577
+#: LIBStick.py:7153
 msgid "Aide (F1)"
 msgstr "Asistencia (F1)"
 
-#: LIBStick.py:6579
+#: LIBStick.py:7155
 msgid "A propos de LIBStick"
 msgstr "Por cierto del LIBStick"
 
-#: LIBStick.py:6653 LIBStick.py:6871 LIBStick.py:7669
+#: LIBStick.py:7229 LIBStick.py:7447 LIBStick.py:8261
 msgid "Borne inf :"
 msgstr "Límite inf:"
 
-#: LIBStick.py:6654 LIBStick.py:6872 LIBStick.py:7670
+#: LIBStick.py:7230 LIBStick.py:7448 LIBStick.py:8262
 msgid "Borne sup :"
 msgstr "Límite sup:"
 
-#: LIBStick.py:6666
+#: LIBStick.py:7242
 msgid "Filtre :"
 msgstr "Filtro:"
 
-#: LIBStick.py:6667
+#: LIBStick.py:7243
 msgid "Taille :"
 msgstr "Tamaño:"
 
-#: LIBStick.py:6668
+#: LIBStick.py:7244
 msgid "Ordre :"
 msgstr "Orden:"
 
-#: LIBStick.py:6669
+#: LIBStick.py:7245
 msgid "Dérivée :"
 msgstr "Derivado:"
 
-#: LIBStick.py:6681 LIBStick.py:6706
+#: LIBStick.py:7257 LIBStick.py:7282
 msgid "Aucun"
 msgstr "Ninguno"
 
-#: LIBStick.py:6693
+#: LIBStick.py:7269
 msgid "Fond :"
 msgstr "Fondo:"
 
-#: LIBStick.py:6694
+#: LIBStick.py:7270
 msgid "Itérations :"
 msgstr "Iteraciones:"
 
-#: LIBStick.py:6736
+#: LIBStick.py:7312
 msgid "Visu"
 msgstr "Ver"
 
-#: LIBStick.py:6767
+#: LIBStick.py:7343
 msgid ""
 "Appliquer sur\n"
 "tous les fichiers\n"
@@ -363,7 +457,7 @@ msgstr ""
 "los archivos en\n"
 " el directorio"
 
-#: LIBStick.py:6773
+#: LIBStick.py:7349
 msgid ""
 "Sauvegarde du\n"
 "fond continu"
@@ -371,95 +465,101 @@ msgstr ""
 "Registrar\n"
 "fondo continuo"
 
-#: LIBStick.py:6777
+#: LIBStick.py:7353
 msgid "Executer"
 msgstr "Ejecutar"
 
-#: LIBStick.py:6781
+#: LIBStick.py:7357 LIBStick.py:7620
 msgid "Spectre : "
 msgstr "Espectro: "
 
-#: LIBStick.py:6892
+#: LIBStick.py:7468 LIBStick.py:8278
 msgid "Spectre entier"
 msgstr "Espectro completo"
 
-#: LIBStick.py:6901
+#: LIBStick.py:7477
 msgid "Int. rel. mini :"
 msgstr "Mín. rel. int:"
 
-#: LIBStick.py:6902
+#: LIBStick.py:7478
 msgid "Int. rel. maxi :"
 msgstr "Int. rel. máx:"
 
-#: LIBStick.py:6919
+#: LIBStick.py:7495
 msgid "S/N mini :"
 msgstr "S/N mín :"
 
-#: LIBStick.py:6920
+#: LIBStick.py:7496
 msgid "Largeur maxi :"
 msgstr "Anchura máxima :"
 
-#: LIBStick.py:7011
+#: LIBStick.py:7590
 msgid "Ions"
 msgstr "Iones"
 
-#: LIBStick.py:7013
+#: LIBStick.py:7592
 msgid "Les deux"
 msgstr "Los dos"
 
-#: LIBStick.py:7033
+#: LIBStick.py:7612
 msgid "Recherche"
 msgstr "Búsqueda"
 
-#: LIBStick.py:7037
+#: LIBStick.py:7616
+#, fuzzy
+#| msgid "Efface"
+msgid "Efface tout"
+msgstr "Borrar"
+
+#: LIBStick.py:7628
 msgid "Exporte"
 msgstr "Exportar"
 
-#: LIBStick.py:7126
+#: LIBStick.py:7721
 msgid "1ere borne inf (nm)"
 msgstr "1° límite inf (nm)"
 
-#: LIBStick.py:7127
+#: LIBStick.py:7722
 msgid "1ere borne sup (nm)"
 msgstr "1° límite sup (nm)"
 
-#: LIBStick.py:7128
+#: LIBStick.py:7723
 msgid "2de borne inf (nm)"
 msgstr "2° límite inf (nm)"
 
-#: LIBStick.py:7129
+#: LIBStick.py:7724
 msgid "2de borne sup (nm)"
 msgstr "2° límite sup (nm)"
 
-#: LIBStick.py:7153
+#: LIBStick.py:7748
 msgid "2de extraction"
 msgstr "2° extracción"
 
-#: LIBStick.py:7157 LIBStick.py:7437
+#: LIBStick.py:7752 LIBStick.py:8032
 msgid "Reset"
 msgstr "Reiniciar"
 
-#: LIBStick.py:7182 LIBStick.py:7464
+#: LIBStick.py:7777 LIBStick.py:8059
 msgid "Exécute"
 msgstr "Ejecutar"
 
-#: LIBStick.py:7189 LIBStick.py:7471
+#: LIBStick.py:7784 LIBStick.py:8066
 msgid "Sortie 2D"
 msgstr "Salida 2D"
 
-#: LIBStick.py:7194 LIBStick.py:7478
+#: LIBStick.py:7789 LIBStick.py:8073
 msgid "Sortie 3D"
 msgstr "Salida 3D"
 
-#: LIBStick.py:7213 LIBStick.py:7215
+#: LIBStick.py:7808 LIBStick.py:7810
 msgid "x (nm) : "
 msgstr "x (nm) : "
 
-#: LIBStick.py:7214 LIBStick.py:7216
+#: LIBStick.py:7809 LIBStick.py:7811
 msgid "y (n° de spectre) : "
 msgstr "y (# de espectro): "
 
-#: LIBStick.py:7242
+#: LIBStick.py:7837
 msgid ""
 "Image brute\n"
 "spectres non\n"
@@ -469,7 +569,7 @@ msgstr ""
 "espectros no\n"
 "normalizados"
 
-#: LIBStick.py:7248
+#: LIBStick.py:7843
 msgid ""
 "\n"
 " Spectre inclus\n"
@@ -481,15 +581,15 @@ msgstr ""
 "en el espectro\n"
 "promedio"
 
-#: LIBStick.py:7274
+#: LIBStick.py:7869
 msgid "Du spectre n° :"
 msgstr "Desde el espectro #:"
 
-#: LIBStick.py:7275
+#: LIBStick.py:7870
 msgid "Au spectre n° :"
 msgstr "Hasta el espectro #:"
 
-#: LIBStick.py:7296
+#: LIBStick.py:7891
 msgid ""
 "Moyenne des\n"
 "spectres \n"
@@ -499,27 +599,27 @@ msgstr ""
 "espectros \n"
 "normalizados"
 
-#: LIBStick.py:7405
+#: LIBStick.py:8000
 msgid "Num. borne inf (nm)"
 msgstr "Num. límite inf. (nm)"
 
-#: LIBStick.py:7406
+#: LIBStick.py:8001
 msgid "Num. borne sup (nm)"
 msgstr "Num. límite sup. (nm)"
 
-#: LIBStick.py:7407
+#: LIBStick.py:8002
 msgid "Dénom. borne inf (nm)"
 msgstr "Denom. límite inf. (nm)"
 
-#: LIBStick.py:7408
+#: LIBStick.py:8003
 msgid "Dénom. borne sup( nm)"
 msgstr "Denom. límite sup. (nm)"
 
-#: LIBStick.py:7432
+#: LIBStick.py:8027
 msgid "Dénominateur ?"
 msgstr "Denominador ?"
 
-#: LIBStick.py:7519
+#: LIBStick.py:8114
 msgid ""
 "Normalisation\n"
 "des spectres"
@@ -527,11 +627,11 @@ msgstr ""
 "Normalización\n"
 "de los espectros"
 
-#: LIBStick.py:7533
+#: LIBStick.py:8128
 msgid "Statistiques"
 msgstr "Estadísticas"
 
-#: LIBStick.py:7540
+#: LIBStick.py:8135
 msgid ""
 "\n"
 "Position x (nm) : "
@@ -539,7 +639,7 @@ msgstr ""
 "\n"
 "Posición x (nm) : "
 
-#: LIBStick.py:7541
+#: LIBStick.py:8136
 msgid ""
 "Position y \n"
 "(n° de spectre) : "
@@ -547,51 +647,51 @@ msgstr ""
 "Posición y \n"
 "(# de espectro) : "
 
-#: LIBStick.py:7566 LIBStick.py:7727
+#: LIBStick.py:8161 LIBStick.py:8331
 msgid "Nom du spectre"
 msgstr "Nombre del espectro"
 
-#: LIBStick.py:7567
+#: LIBStick.py:8162
 msgid "Rapport zone1/zone2"
 msgstr "Ratio zona1/zona2"
 
-#: LIBStick.py:7728
+#: LIBStick.py:8332
 msgid "Utlisé pour l'ACP :"
 msgstr "Utizado para PCA:"
 
-#: LIBStick.py:7729
+#: LIBStick.py:8333
 msgid "Label :"
 msgstr "Etiqueta:"
 
-#: LIBStick.py:7740
+#: LIBStick.py:8344
 msgid "Spectres normalisés"
 msgstr "Espectros normalizados"
 
-#: LIBStick.py:7746
+#: LIBStick.py:8350
 msgid "Centré reduit"
 msgstr "Centrado reducido"
 
-#: LIBStick.py:7752
+#: LIBStick.py:8356
 msgid "Binning :"
 msgstr "Binning :"
 
-#: LIBStick.py:7765
+#: LIBStick.py:8369
 msgid "+ ind. supp."
 msgstr "+ ind. ad."
 
-#: LIBStick.py:7769
+#: LIBStick.py:8373
 msgid "Ouvre"
 msgstr "Abrir"
 
-#: LIBStick.py:7773
+#: LIBStick.py:8377
 msgid "Sauve"
 msgstr "Guardar"
 
-#: LIBStick.py:7792
+#: LIBStick.py:8396
 msgid "Dimensions : "
 msgstr "Dimensiones: "
 
-#: LIBStick.py:7812
+#: LIBStick.py:8416
 msgid ""
 "Même echelle\n"
 " x et y"
@@ -599,15 +699,15 @@ msgstr ""
 "Misma escala\n"
 " x e y"
 
-#: LIBStick.py:7816
+#: LIBStick.py:8420
 msgid "Diag. éboulis"
 msgstr "Diag. scree"
 
-#: LIBStick.py:7820
+#: LIBStick.py:8424
 msgid "Diag. plotly"
 msgstr "Diag. plotly"
 
-#: LIBStick.py:7823
+#: LIBStick.py:8427
 msgid ""
 "Enregistrer \n"
 "facteurs \n"

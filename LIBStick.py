@@ -20,7 +20,7 @@ import math
 
 import tkinter as tk
 import tkinter.filedialog as fd
-import tkinter.font as font
+import tkinter.font as tkfont
 import tkinter.messagebox as messagebox
 import tkinter.ttk as ttk
 from ttkthemes import ThemedTk
@@ -95,7 +95,7 @@ hauteur_canevas_spectres_L_det = 0
 COULEUR_INTERFACE = "papaya whip"
 # COULEUR_INTERFACE="linen"
 # COULEUR_INTERFACE="light grey"
-LARGEUR_LIGNES = 2
+# LARGEUR_LIGNES = 2
 if NOM_OS == "posix" :
     TAILLE_CASE = [3,2]
 if NOM_OS == "nt" :
@@ -755,17 +755,20 @@ def affiche_position_souris_0_L_trait(event):
     global ligne_position_1_y_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, 
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                                  fill="green", width=epaisseur_lignes.get())
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ratio_y0 = event.y/(hauteur_canevas_spectres+170)
         ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, ratio_y0*hauteur_canevas_spectres,
                                                                   largeur_canevas_spectres, ratio_y0*hauteur_canevas_spectres,
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
     l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
     lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
 
@@ -786,17 +789,20 @@ def affiche_position_souris_motion_0_L_trait(event):
     global flag_premier_lamda_L_trait
     canevas0_L_trait.delete(ligne_position_0_x_L_trait)
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
-    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170, fill="green")
+    ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres+170,
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                                  fill="green", width=epaisseur_lignes.get())
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ratio_y0 = event.y/(hauteur_canevas_spectres+170)
         ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, ratio_y0*hauteur_canevas_spectres,
                                                                   largeur_canevas_spectres, ratio_y0*hauteur_canevas_spectres,
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_trait is False:
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
@@ -889,7 +895,8 @@ def affiche_spectre_L_trait():
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
-        canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+        canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                     width=epaisseur_spectres.get())
     affiche_lignes_spectre_L_trait()
 
     # ajout des graduations
@@ -916,7 +923,7 @@ def affiche_fond_L_trait():
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
         canevas0_L_trait.create_line(spectre[i, 0], spectre[i, 1],
-                                     spectre[i+1, 0], spectre[i+1, 1], fill="blue")
+                                     spectre[i+1, 0], spectre[i+1, 1], fill="blue", width=epaisseur_spectres.get())
     # flag_premier_fond_L_trait = False
 
 
@@ -939,7 +946,8 @@ def affiche_graduation_L_trait():
     # liste_0_textes_grad_L_trait=[]
     for x in liste_graduations_en_pixels :
         liste_0_lignes_grad_L_trait.append(canevas0_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
-                                                                       fill="blue", dash=(1,2)))
+                                                                       fill="blue", dash=(1,2), 
+                                                                       width=epaisseur_graduations.get()))
 
     for texte in liste_0_textes_grad_L_trait :
         canevas0_L_trait.delete(texte)
@@ -956,7 +964,8 @@ def affiche_graduation_L_trait():
     # liste_1_textes_grad_L_trait=[]
     for x in liste_graduations_en_pixels :
         liste_1_lignes_grad_L_trait.append(canevas1_L_trait.create_line(x, 0, x, hauteur_canevas_spectres+170,
-                                                                       fill="blue", dash=(1,2)))
+                                                                       fill="blue", dash=(1,2),
+                                                                       width=epaisseur_graduations.get()))
 
     for texte in liste_1_textes_grad_L_trait :
         canevas1_L_trait.delete(texte)
@@ -970,6 +979,10 @@ def affiche_graduation_L_trait():
 def mise_a_jour_affichage_L_trait() :
     affiche_spectre_L_trait()
     affiche_fond_L_trait()
+    try :
+        affiche_spectre_corrige_L_trait()
+    except :
+        pass
 
 
 def affiche_lignes_spectre_L_trait():
@@ -983,10 +996,10 @@ def affiche_lignes_spectre_L_trait():
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
-    ligne0_1_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
-    ligne0_2_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_trait = canevas0_L_trait.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170,
+                                                    fill="red", width=epaisseur_lignes.get())
+    ligne0_2_L_trait = canevas0_L_trait.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170,
+                                                    fill="red", width=epaisseur_lignes.get())
 
 
 def deplace_lignes_L_trait():
@@ -1005,8 +1018,8 @@ def deplace_ligne0_1_L_trait():
     canevas0_L_trait.delete(ligne0_1_L_trait)
     x_ligne0_1 = ((variable_1_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
-    ligne0_1_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_trait = canevas0_L_trait.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres+170,
+                                                    fill="red", width=epaisseur_lignes.get())
     if variable_1_L_trait.get() >= variable_2_L_trait.get():
         variable_2_L_trait.set(variable_1_L_trait.get())
         deplace_ligne0_2_L_trait()
@@ -1020,8 +1033,8 @@ def deplace_ligne0_2_L_trait():
     canevas0_L_trait.delete(ligne0_2_L_trait)
     x_ligne0_2 = ((variable_2_L_trait.get() -
                    limites_affichage_spectre_L_trait[0])*largeur_canevas_spectres/delta_limites_L_trait)
-    ligne0_2_L_trait = canevas0_L_trait.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170, fill="red", width=LARGEUR_LIGNES)
+    ligne0_2_L_trait = canevas0_L_trait.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres+170,
+                                                    fill="red", width=epaisseur_lignes.get())
     if variable_2_L_trait.get() <= variable_1_L_trait.get():
         variable_1_L_trait.set(variable_2_L_trait.get())
         deplace_ligne0_1_L_trait()
@@ -1189,7 +1202,8 @@ def affiche_spectre_corrige_L_trait():
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_trait[0]) * \
         largeur_canevas_spectres/delta_limites_L_trait
     for i in range(len(spectre) - 1):
-        canevas1_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+        canevas1_L_trait.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                     width=epaisseur_spectres.get())
 
     # ajout des graduations
     affiche_graduation_L_trait()
@@ -1210,20 +1224,21 @@ def affiche_position_souris_1_L_trait(event):
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
     ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
                                                               hauteur_canevas_spectres+170,
-                                                              fill="green")
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ratio_y1 = event.y/(hauteur_canevas_spectres)
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
                                                                   largeur_canevas_spectres,
                                                                   ratio_y1*(hauteur_canevas_spectres+170),
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
-    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
+        ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y, 
                                                                   largeur_canevas_spectres, event.y,
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
 
 
 def affiche_position_souris_motion_1_L_trait(event):
@@ -1244,31 +1259,31 @@ def affiche_position_souris_motion_1_L_trait(event):
     canevas0_L_trait.delete(ligne_position_0_y_L_trait)
     ligne_position_0_x_L_trait = canevas0_L_trait.create_line(event.x, 0, event.x,
                                                               hauteur_canevas_spectres+170,
-                                                              fill="green")
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ratio_y1 = event.y/(hauteur_canevas_spectres)
         ligne_position_0_y_L_trait = canevas0_L_trait.create_line(0, ratio_y1*(hauteur_canevas_spectres+170),
                                                                   largeur_canevas_spectres,
                                                                   ratio_y1*(hauteur_canevas_spectres+170),
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
     canevas1_L_trait.delete(ligne_position_1_x_L_trait)
     canevas1_L_trait.delete(ligne_position_1_y_L_trait)
     ligne_position_1_x_L_trait = canevas1_L_trait.create_line(event.x, 0, event.x,
                                                               hauteur_canevas_spectres,
-                                                              fill="green")
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ligne_position_1_y_L_trait = canevas1_L_trait.create_line(0, event.y,
                                                                   largeur_canevas_spectres, event.y,
-                                                                  fill="green")
+                                                                  fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_trait is False:
         canevas0_L_trait.delete(lambda_texte_spectre_0_L_trait)
         canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
     l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
     lambda_recherche_elements_L_rec.set(l)
-    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
-        event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x, event.y, 
+                                                                  text=str(format(l, "4.1f")), fill="blue")
+    lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x, event.y,
+                                                                  text=str(format(l, "4.1f")), fill="blue")
     lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
     flag_premier_lamda_L_trait = False
 
@@ -1394,10 +1409,12 @@ def zoom_drag_and_drop_0_L_trait(event):
             canevas1_L_trait.delete(lambda_texte_spectre_1_L_trait)
         l = event.x*delta_limites_L_trait/largeur_canevas_spectres+limites_affichage_spectre_L_trait[0]
         lambda_recherche_elements_L_rec.set(l)
-        lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(
-            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
-        lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(
-            event.x, event.y, text=str(format(l, "4.1f")), fill="blue")
+        lambda_texte_spectre_0_L_trait = canevas0_L_trait.create_text(event.x, event.y,
+                                                                      text=str(format(l, "4.1f")),
+                                                                      fill="blue")
+        lambda_texte_spectre_1_L_trait = canevas1_L_trait.create_text(event.x, event.y,
+                                                                      text=str(format(l, "4.1f")),
+                                                                      fill="blue")
         lambda_texte_L_trait.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
         flag_premier_lamda_L_trait = False
 
@@ -1645,13 +1662,14 @@ def lit_affiche_spectre_L_det(nom_fichier_seul):
     """
     global spectre_entier_L_det
     global limites_spectre_x_L_det, limites_spectre_y_L_det
-    global minimum_spectre_actuel_L_det, maximum_spectre_actuel_L_det
+    global minimum_y_spectre_actuel_L_det, maximum_y_spectre_actuel_L_det
     os.chdir(rep_travail_L_det)
     spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul,
                                                        type_fichier_L_det.get())
     limites_spectre_x_L_det, limites_spectre_y_L_det = lit_limites_L_det(spectre_entier_L_det)
-    minimum_spectre_actuel_L_det = limites_spectre_y_L_det[0]
-    maximum_spectre_actuel_L_det = limites_spectre_y_L_det[1]
+    actualise_spinbox_zoom_L_det(limites_spectre_x_L_det)
+    minimum_y_spectre_actuel_L_det = limites_spectre_y_L_det[0]
+    maximum_y_spectre_actuel_L_det = limites_spectre_y_L_det[1]
     affiche_spectre_L_det()
 
 
@@ -1666,6 +1684,14 @@ def lit_limites_L_det(spectre):
     limites_spectre_y = np.zeros((2))
     limites_spectre_y[0] = spectre[:, 1].min()             # lit les valeurs min et max du spectre
     limites_spectre_y[1] = spectre[:, 1].max()
+    return limites_spectre_x,limites_spectre_y
+
+
+def actualise_spinbox_zoom_L_det(limites_spectre_x):
+    """
+    Actualise les valeur de zoom dans les spinbox concernées. Uniquement lors de l'ouverture
+    d'un nouveau fichier
+    """
     # fixe les valeurs du zoom à ces valeurs min et max
     variable_zoom_inf_L_det.set(limites_spectre_x[0])
     variable_zoom_sup_L_det.set(limites_spectre_x[1])
@@ -1679,8 +1705,6 @@ def lit_limites_L_det(spectre):
     entree1_L_det.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
     entree2_L_det.configure(from_=limites_spectre_x[0], to=limites_spectre_x[1])
 
-    return limites_spectre_x,limites_spectre_y
-
 
 @timer_decorator
 def detecte_elements_L_det():
@@ -1691,8 +1715,10 @@ def detecte_elements_L_det():
     global dataframe_elem_detect_IDlabels_L_det
     global texte_elem_L_det
     global df_neutres_L_det, df_ions_L_det, flag_df_elements_L_det
+    
     if flag_df_elements_L_det is False :
-        print("creation DF elements")
+        print("Creation DF elements :")
+        print("Passe en mémoire vive le contenu de tous les fichiers NIST dans deux dataframes")
         df_neutres_L_det = LIBStick_recherche_elements.creation_df_elements(False,
                                                                  rep_LIBStick,
                                                                  rep_NIST)
@@ -1701,7 +1727,8 @@ def detecte_elements_L_det():
                                                                  rep_NIST)
         flag_df_elements_L_det = True
     else :
-        print("zappe la creation DF elements")
+        print("Zappe la creation DF elements car déjà en mémoire")
+        
     minimum = spectre_entier_L_det[:,1].min()
     maximum = spectre_entier_L_det[:,1].max()
     texte_elem_L_det = ""
@@ -1777,6 +1804,7 @@ def detecte_elements_L_det():
     for i in range(dataframe_elem_detect_IDlabels_L_det.shape[0]) :
         dataframe_elem_detect_IDlabels_L_det.iloc[i, 0] = i
     dataframe_elem_detect_IDlabels_L_det["ID"] = pd.Series(np.nan)
+    # print(dataframe_elem_detect_IDlabels_L_det)
 
     remplit_treeview_L_det()
     bouton_exporte_L_det.configure(state="enable")
@@ -1815,9 +1843,11 @@ def affiche_position_souris_L_det(event):
     global ligne_position_1_L_det
     canevas0_L_det.delete(ligne_position_x_L_det)
     canevas0_L_det.delete(ligne_position_y_L_det)
-    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det, fill="green")
+    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det,
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                            fill="green", width=epaisseur_lignes.get())
     l = event.x*delta_limites_L_det/largeur_canevas_spectres+limites_affichage_spectre_L_det[0]
     lambda_texte_L_det.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
 
@@ -1838,10 +1868,10 @@ def affiche_position_souris_motion_L_det(event):
     canevas0_L_det.delete(ligne_position_x_L_det)
     canevas0_L_det.delete(ligne_position_y_L_det)
     ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det,
-                                                        fill="green")
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
         ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y,
-                                                            fill="green")
+                                                            fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_det is False:
         canevas0_L_det.delete(lambda_texte_spectre_0_L_det)
     l = event.x*delta_limites_L_det/largeur_canevas_spectres+limites_affichage_spectre_L_det[0]
@@ -1879,7 +1909,7 @@ def affiche_spectre_L_det():
     """
     global limites_affichage_spectre_L_det
     global delta_limites_L_det
-    global minimum_spectre_actuel_L_det, maximum_spectre_actuel_L_det
+    global minimum_y_spectre_actuel_L_det, maximum_y_spectre_actuel_L_det
     global minimum_spectre_lineaire_L_det
     global flag_echelle_log_L_det
     limites_affichage_spectre_L_det[0] = variable_zoom_inf_L_det.get()
@@ -1893,15 +1923,15 @@ def affiche_spectre_L_det():
         coord_y_min = min(coord_zoom_L_det[1],coord_zoom_L_det[3])
         ratio_y_max = (hauteur_canevas_spectres_L_det-coord_y_min)/hauteur_canevas_spectres_L_det
         if  flag_change_fenetre is False :
-            maximum = maximum_spectre_actuel_L_det * ratio_y_max
+            maximum = maximum_y_spectre_actuel_L_det * ratio_y_max
             # maximum = (maximum_spectre_L_comp-minimum_spectre_L_comp) * ratio_y_max
-            maximum_spectre_actuel_L_det = maximum
+            maximum_y_spectre_actuel_L_det = maximum
         else :
-            maximum = maximum_spectre_actuel_L_det
+            maximum = maximum_y_spectre_actuel_L_det
         # minimum_spectre_ancien_L_det = spectre[:, 1].min()
-        # maximum = (maximum_spectre_actuel_L_det-minimum_spectre_ancien_L_det) * \
+        # maximum = (maximum_y_spectre_actuel_L_det-minimum_spectre_ancien_L_det) * \
         #     (hauteur_canevas_spectres_L_det-coord_zoom_L_det[1])/hauteur_canevas_spectres_L_det
-        # maximum_spectre_actuel_L_det = maximum
+        # maximum_y_spectre_actuel_L_det = maximum
 
         delta_limites_L_det = limites_affichage_spectre_L_det[1]-limites_affichage_spectre_L_det[0]
         canevas0_L_det.delete("all")
@@ -1917,7 +1947,7 @@ def affiche_spectre_L_det():
 
     # gestion du zoom avec y personnalisé par les boutons de zoom
     if flag_zoom_auto_y.get() is False and flag_dezoom_L_det is False and flag_bouton_zoom_L_det is True:
-        maximum = maximum_spectre_actuel_L_det
+        maximum = maximum_y_spectre_actuel_L_det
         delta_limites_L_det = limites_affichage_spectre_L_det[1]-limites_affichage_spectre_L_det[0]
         canevas0_L_det.delete("all")
         spectre = np.zeros((0, 2))
@@ -1942,8 +1972,8 @@ def affiche_spectre_L_det():
             spectre[spectre<0] = 0
             minimum_spectre_lineaire_L_det = spectre[:, 1].min()
             spectre[:,1] = np.log(spectre[:,1]-spectre[:, 1].min()+1)
-        minimum_spectre_actuel_L_det = minimum = spectre[:, 1].min()
-        maximum_spectre_actuel_L_det = maximum = spectre[:, 1].max()
+        minimum_y_spectre_actuel_L_det = minimum = spectre[:, 1].min()
+        maximum_y_spectre_actuel_L_det = maximum = spectre[:, 1].max()
 
     # dessin du spectre
     if minimum < 0 :
@@ -1951,7 +1981,8 @@ def affiche_spectre_L_det():
     spectre[:, 1] = (hauteur_canevas_spectres_L_det-(spectre[:, 1] - minimum)*(hauteur_canevas_spectres_L_det)/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     for i in range(len(spectre) - 1):
-        canevas0_L_det.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+        canevas0_L_det.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                   width=epaisseur_spectres.get())
 
     # ajout des graduations etc..
     if flag_spectre_entier_L_det.get() is False :
@@ -1989,7 +2020,8 @@ def affiche_graduation_L_det():
     # liste_0_textes_grad_L_det=[]
     for x in liste_graduations_en_pixels :
         liste_0_lignes_grad_L_det.append(canevas0_L_det.create_line(x, 0, x, hauteur_canevas_spectres_L_det,
-                                                                       fill="blue", dash=(1,2)))
+                                                                       fill="blue", dash=(1,2),
+                                                                       width=epaisseur_graduations.get()))
 
     for texte in liste_0_textes_grad_L_det :
         canevas0_L_det.delete(texte)
@@ -2016,9 +2048,9 @@ def affiche_lignes0_spectre_L_det():
     x_ligne0_1 = (variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     x_ligne0_2 = (variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
     ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
 
 
 def deplace_lignes0_L_det():
@@ -2038,7 +2070,7 @@ def deplace_ligne0_1_L_det():
     canevas0_L_det.delete(ligne0_1_L_det)
     x_ligne0_1 = (variable_1_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     ligne0_1_L_det = canevas0_L_det.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres_L_det,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_1_L_det.get() >= variable_2_L_det.get():
         variable_2_L_det.set(variable_1_L_det.get())
         deplace_ligne0_2_L_det()
@@ -2054,7 +2086,7 @@ def deplace_ligne0_2_L_det():
     canevas0_L_det.delete(ligne0_2_L_det)
     x_ligne0_2 = (variable_2_L_det.get()-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites_L_det
     ligne0_2_L_det = canevas0_L_det.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres_L_det,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_2_L_det.get() <= variable_1_L_det.get():
         variable_1_L_det.set(variable_2_L_det.get())
         deplace_ligne0_1_L_det()
@@ -2088,30 +2120,30 @@ def affiche_lignes1_spectre_L_det():
     global ligne1_1_L_det
     global ligne1_2_L_det
 
-    minimum_spectre = limites_spectre_y_L_det[0]
-    maximum_spectre = limites_spectre_y_L_det[1]
-    minimum_spectre = max(minimum_spectre,0)
-    # if minimum_spectre < 0 :
-    #     minimum_spectre = 0
-    delta_spectre = maximum_spectre - minimum_spectre
+    minimum_spectre = limites_spectre_y_L_det[0]    # minimum du spectre entier en y en cps
+    maximum_spectre = limites_spectre_y_L_det[1]    # maximum du spectre entier n y en cps
+    minimum_spectre = max(minimum_spectre,0)        # si minimum négatif alors =0    
+    delta_spectre = maximum_spectre - minimum_spectre   # delta en y du spectre entier en cps
 
-    minimum_actuel = minimum_spectre_actuel_L_det
-    maximum_actuel = maximum_spectre_actuel_L_det
+    minimum_actuel = minimum_y_spectre_actuel_L_det     # min en y de l'affichage actuel en cps
+    maximum_actuel = maximum_y_spectre_actuel_L_det     # max en y de l'affichage actuel en cps
     if minimum_actuel < 0 :
         minimum_spectre = 0
-    delta_actuel = maximum_actuel - minimum_actuel
+    delta_actuel = maximum_actuel - minimum_actuel      # delta en y de l'affichage actuel en cps
 
-
-    y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
-    y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
-
+    # traduction en cps de la valeur min et max en % :
+    y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre # traduction en cps de la valeur min en %
+    y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre # traduction en cps de la valeur min en %
+    
+    # traduction en pixels de la valeur min et max en % au zoom actuel :
     y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
     y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
 
+    # Tracé des lignes limites hautes et basses
     ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
     ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
 
 
 def deplace_lignes1_L_det():
@@ -2135,12 +2167,10 @@ def deplace_ligne1_1_L_det():
     minimum_spectre = limites_spectre_y_L_det[0]
     maximum_spectre = limites_spectre_y_L_det[1]
     minimum_spectre = max(minimum_spectre,0)
-    # if minimum_spectre < 0 :
-    #     minimum_spectre = 0
     delta_spectre = maximum_spectre - minimum_spectre
 
-    minimum_actuel = minimum_spectre_actuel_L_det
-    maximum_actuel = maximum_spectre_actuel_L_det
+    minimum_actuel = minimum_y_spectre_actuel_L_det
+    maximum_actuel = maximum_y_spectre_actuel_L_det
     if minimum_actuel < 0 :
         minimum_spectre = 0
     delta_actuel = maximum_actuel - minimum_actuel
@@ -2148,7 +2178,7 @@ def deplace_ligne1_1_L_det():
     y1_coups = variable_3_L_det.get()*delta_spectre/100+minimum_spectre
     y_ligne1_1 = hauteur_canevas_spectres_L_det * (1 - ((y1_coups - minimum_spectre) / delta_actuel))
     ligne1_1_L_det = canevas0_L_det.create_line(0, y_ligne1_1, largeur_canevas_spectres, y_ligne1_1,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
 
     if variable_3_L_det.get() >= variable_4_L_det.get():
         variable_4_L_det.set(variable_3_L_det.get())
@@ -2169,12 +2199,10 @@ def deplace_ligne1_2_L_det():
     minimum_spectre = limites_spectre_y_L_det[0]
     maximum_spectre = limites_spectre_y_L_det[1]
     minimum_spectre = max(minimum_spectre,0)
-    # if minimum_spectre < 0 :
-    #     minimum_spectre = 0
     delta_spectre = maximum_spectre - minimum_spectre
 
-    minimum_actuel = minimum_spectre_actuel_L_det
-    maximum_actuel = maximum_spectre_actuel_L_det
+    minimum_actuel = minimum_y_spectre_actuel_L_det
+    maximum_actuel = maximum_y_spectre_actuel_L_det
     if minimum_actuel < 0 :
         minimum_spectre = 0
     delta_actuel = maximum_actuel - minimum_actuel
@@ -2182,7 +2210,7 @@ def deplace_ligne1_2_L_det():
     y2_coups = variable_4_L_det.get()*delta_spectre/100+minimum_spectre
     y_ligne1_2 = hauteur_canevas_spectres_L_det * (1 - ((y2_coups - minimum_spectre) / delta_actuel))
     ligne1_2_L_det = canevas0_L_det.create_line(0, y_ligne1_2, largeur_canevas_spectres, y_ligne1_2,
-                                                fill="red", width=LARGEUR_LIGNES)
+                                                fill="red", width=epaisseur_lignes.get())
 
     if variable_4_L_det.get() <= variable_3_L_det.get():
         variable_3_L_det.set(variable_4_L_det.get())
@@ -2282,7 +2310,9 @@ def affiche_pics_L_det():
             y = hauteur_canevas_spectres_L_det - 10
             liste_pics_L_det.append(canevas0_L_det.create_text(x, y,
                                                                text="X",
-                                                               fill="orange" ))
+                                                               fill="orange",
+                                                               font=tkfont.Font(size=taille_font.get(), 
+                                                                                weight=poids_font.get())))
 
 
 def efface_pic_label_L_det(numero) :
@@ -2326,11 +2356,13 @@ def affiche_pics_labels_L_det():
                     long_onde = float(ligne_tableau.iloc[4])
                     intensite = float(ligne_tableau.iloc[2])
                     x = (long_onde-limites_affichage_spectre_L_det[0])*largeur_canevas_spectres/delta_limites
-                    y = hauteur_canevas_spectres_L_det*(1 - (intensite/maximum_spectre_actuel_L_det)) +10
+                    y = hauteur_canevas_spectres_L_det*(1 - (intensite/maximum_y_spectre_actuel_L_det)) +10
                     # y = hauteur_canevas_spectres_L_det - 20
                     dataframe_elem_detect_IDlabels_L_det.loc[numero, "ID"] = canevas0_L_det.create_text(x, y,
                                                                                                       text=label,
-                                                                                                      fill="orange" )
+                                                                                                      fill="orange",
+                                                                                                      font=tkfont.Font(size=taille_font.get(),
+                                                                                                                       weight=poids_font.get()))
 
 
 ###################################################################################################
@@ -2414,9 +2446,11 @@ def zoom_drag_and_drop_L_det(event):
     global flag_dezoom_L_det
     canevas0_L_det.delete(ligne_position_x_L_det)
     canevas0_L_det.delete(ligne_position_y_L_det)
-    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det, fill="green")
+    ligne_position_x_L_det = canevas0_L_det.create_line(event.x, 0, event.x, hauteur_canevas_spectres_L_det, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_det = canevas0_L_det.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                            fill="green", width=epaisseur_lignes.get())
     coord_zoom_L_det[2] = event.x
     coord_zoom_L_det[3] = event.y
     if coord_zoom_L_det[3] < 0 :
@@ -2478,15 +2512,16 @@ def lit_affiche_spectre_numero_L_det():
     global spectre_entier_L_det
     global nom_fichier_seul_L_det
     global liste_fichiers_L_det, nombre_fichiers_L_det
+    global limites_spectre_x_L_det, limites_spectre_y_L_det
     sauve_flag_zoom_auto_y = flag_zoom_auto_y.get()
     flag_zoom_auto_y.set(True)
     numero = numero_spectre_L_det.get()-1
     nom_fichier_seul_L_det = liste_fichiers_L_det[numero]
     os.chdir(rep_travail_L_det)
     spectre_entier_L_det = LIBStick_outils.lit_spectre(nom_fichier_seul_L_det,
-                                                         type_fichier_L_det.get())
-    #affiche_spectre_L_det()
+                                                       type_fichier_L_det.get())
     try :
+        limites_spectre_x_L_det, limites_spectre_y_L_det = lit_limites_L_det(spectre_entier_L_det)
         affiche_spectre_L_det()
     except Exception as e :
         print(f"Fichier {nom_fichier_seul_L_det} : mauvais format ! Supprimé de la liste ! ({e})")
@@ -2630,7 +2665,7 @@ def selectionne_element_L_det(event) :
             ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
                                                        fill="orange",
                                                        dash=(4, 1),
-                                                       width=LARGEUR_LIGNES)
+                                                       width=epaisseur_lignes.get())
             ligne_element_L_det.append(ligne_element)
 
 
@@ -2648,7 +2683,7 @@ def selectionne_element_up_L_det(event) :
         ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
                                                    fill="orange",
                                                    dash=(4, 1),
-                                                   width=LARGEUR_LIGNES)
+                                                   width=epaisseur_lignes.get())
         ligne_element_L_det.append(ligne_element)
 
 
@@ -2666,7 +2701,7 @@ def selectionne_element_down_L_det(event) :
         ligne_element = canevas0_L_det.create_line(x_ligne, 0, x_ligne, hauteur_canevas_spectres_L_det,
                                                    fill="orange",
                                                    dash=(4, 1),
-                                                   width=LARGEUR_LIGNES)
+                                                   width=epaisseur_lignes.get())
         ligne_element_L_det.append(ligne_element)
 
 
@@ -2947,7 +2982,8 @@ def affiche_spectre_moyen1_L_ext():
     maximum = spectre[:, 1].max()
     spectre[:, 1] = (200-(spectre[:, 1] - minimum)*200/(maximum - minimum))
     for j in range(spectre.shape[0] - 1):
-        canevas3_L_ext.create_line(spectre[j, 0], spectre[j, 1], spectre[j+1, 0], spectre[j+1, 1], width=1, fill="red", smooth=1)
+        canevas3_L_ext.create_line(spectre[j, 0], spectre[j, 1], spectre[j+1, 0], spectre[j+1, 1],
+                                   fill="red", width=epaisseur_spectres.get(), smooth=1)
 
 
 def affiche_spectre_moyen2_L_ext():
@@ -2962,7 +2998,8 @@ def affiche_spectre_moyen2_L_ext():
     maximum = spectre[:, 1].max()
     spectre[:, 1] = (200-(spectre[:, 1] - minimum)*200/(maximum - minimum))
     for j in range(spectre.shape[0] - 1):
-        canevas4_L_ext.create_line(spectre[j, 0], spectre[j, 1], spectre[j+1, 0], spectre[j+1, 1], width=1, fill="blue", smooth=1)
+        canevas4_L_ext.create_line(spectre[j, 0], spectre[j, 1], spectre[j+1, 0], spectre[j+1, 1], 
+                                   fill="blue", width=epaisseur_spectres.get(), smooth=1)
 
 
 ###################################################################################################
@@ -3066,9 +3103,11 @@ def affiche_position_souris_L_ext(event):
     global ligne_position_y_L_ext
     canevas0_L_ext.delete(ligne_position_x_L_ext)
     canevas0_L_ext.delete(ligne_position_y_L_ext)
-    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                            fill="green", width=epaisseur_lignes.get())
     l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
     lambda_texte_L_ext.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
 
@@ -3086,9 +3125,11 @@ def affiche_position_souris_motion_L_ext(event):
     global flag_premier_lamda_L_ext
     canevas0_L_ext.delete(ligne_position_x_L_ext)
     canevas0_L_ext.delete(ligne_position_y_L_ext)
-    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                            fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_ext is False:
         canevas0_L_ext.delete(lambda_texte_spectre_L_ext)
     l = event.x*delta_limites_L_ext/largeur_canevas_spectres+limites_affichage_spectre_L_ext[0]
@@ -3174,7 +3215,8 @@ def affiche_spectre_L_ext():
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext
     for i in range(len(spectre) - 1):
-        canevas0_L_ext.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+        canevas0_L_ext.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                   width=epaisseur_spectres.get())
     affiche_lignes_spectre_L_ext()
 
     # ajout des graduations
@@ -3197,7 +3239,8 @@ def affiche_graduation_L_ext():
     liste_0_lignes_grad_L_ext=[]
     for x in liste_graduations_en_pixels :
         liste_0_lignes_grad_L_ext.append(canevas0_L_ext.create_line(x, 0, x, hauteur_canevas_spectres,
-                                                                   fill="blue", dash=(1,2)))
+                                                                   fill="blue", dash=(1,2),
+                                                                   width=epaisseur_graduations.get()))
 
     for texte in liste_0_textes_grad_L_ext :
         canevas0_L_ext.delete(texte)
@@ -3226,19 +3269,19 @@ def affiche_lignes_spectre_L_ext():
         (variable_1_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
     x_ligne0_2 = (
         (variable_2_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-    ligne0_1_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
-    ligne0_2_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_ext = canevas0_L_ext.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres,
+                                                fill="red", width=epaisseur_lignes.get())
+    ligne0_2_L_ext = canevas0_L_ext.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres,
+                                                fill="red", width=epaisseur_lignes.get())
     if flag_zone2_L_ext.get():
         x_ligne0_3 = (
             (variable_3_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
         x_ligne0_4 = (
             (variable_4_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-        ligne0_3_L_ext = canevas0_L_ext.create_line(
-            x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
-        ligne0_4_L_ext = canevas0_L_ext.create_line(
-            x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_3_L_ext = canevas0_L_ext.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres,
+                                                    fill="blue", width=epaisseur_lignes.get())
+        ligne0_4_L_ext = canevas0_L_ext.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres,
+                                                    fill="blue", width=epaisseur_lignes.get())
 
 
 def deplace_lignes_L_ext():
@@ -3261,8 +3304,8 @@ def deplace_ligne0_1_L_ext():
     canevas0_L_ext.delete(ligne0_1_L_ext)
     x_ligne0_1 = (
         (variable_1_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-    ligne0_1_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_ext = canevas0_L_ext.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres,
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_1_L_ext.get() >= variable_2_L_ext.get():
         variable_2_L_ext.set(variable_1_L_ext.get())
         deplace_ligne0_2_L_ext()
@@ -3276,8 +3319,8 @@ def deplace_ligne0_2_L_ext():
     canevas0_L_ext.delete(ligne0_2_L_ext)
     x_ligne0_2 = (
         (variable_2_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-    ligne0_2_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_2_L_ext = canevas0_L_ext.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, 
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_2_L_ext.get() <= variable_1_L_ext.get():
         variable_1_L_ext.set(variable_2_L_ext.get())
         deplace_ligne0_1_L_ext()
@@ -3292,8 +3335,8 @@ def deplace_ligne0_3_L_ext():
     if flag_zone2_L_ext.get():
         x_ligne0_3 = (
             (variable_3_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-        ligne0_3_L_ext = canevas0_L_ext.create_line(
-            x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_3_L_ext = canevas0_L_ext.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres,
+                                                    fill="blue", width=epaisseur_lignes.get())
         if variable_3_L_ext.get() >= variable_4_L_ext.get():
             variable_4_L_ext.set(variable_3_L_ext.get())
             deplace_ligne0_4_L_ext()
@@ -3308,8 +3351,8 @@ def deplace_ligne0_4_L_ext():
     if flag_zone2_L_ext.get():
         x_ligne0_4 = (
             (variable_4_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-        ligne0_4_L_ext = canevas0_L_ext.create_line(
-            x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_4_L_ext = canevas0_L_ext.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, 
+                                                    fill="blue", width=epaisseur_lignes.get())
         if variable_4_L_ext.get() <= variable_3_L_ext.get():
             variable_3_L_ext.set(variable_4_L_ext.get())
             deplace_ligne0_3_L_ext()
@@ -3339,10 +3382,10 @@ def affiche_lignes_3_4_L_ext():
         (variable_3_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
     x_ligne0_4 = (
         (variable_4_L_ext.get()-limites_affichage_spectre_L_ext[0])*largeur_canevas_spectres/delta_limites_L_ext)
-    ligne0_3_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
-    ligne0_4_L_ext = canevas0_L_ext.create_line(
-        x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+    ligne0_3_L_ext = canevas0_L_ext.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, 
+                                                fill="blue", width=epaisseur_lignes.get())
+    ligne0_4_L_ext = canevas0_L_ext.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, 
+                                                fill="blue", width=epaisseur_lignes.get())
 
 
 def deplace_ligne0_1_return_L_ext(event):
@@ -3460,9 +3503,11 @@ def zoom_drag_and_drop_L_ext(event):
     global flag_dezoom_L_ext
     canevas0_L_ext.delete(ligne_position_x_L_ext)
     canevas0_L_ext.delete(ligne_position_y_L_ext)
-    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ext = canevas0_L_ext.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_ext = canevas0_L_ext.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                            fill="green", width=epaisseur_lignes.get())
     coord_zoom_L_ext[2] = event.x
     coord_zoom_L_ext[3] = event.y
     if coord_zoom_L_ext[3] < 0 :
@@ -4113,10 +4158,11 @@ def affiche_position_souris_L_comp(event):
     global ligne_position_y_L_comp
     canevas0_L_comp.delete(ligne_position_x_L_comp)
     canevas0_L_comp.delete(ligne_position_y_L_comp)
-    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                          fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_comp = canevas0_L_comp.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_comp = canevas0_L_comp.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                              fill="green", width=epaisseur_lignes.get())
     l = event.x*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
     lambda_texte_L_comp.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
 
@@ -4134,10 +4180,11 @@ def affiche_position_souris_motion_L_comp(event):
     global flag_premier_lamda_L_comp
     canevas0_L_comp.delete(ligne_position_x_L_comp)
     canevas0_L_comp.delete(ligne_position_y_L_comp)
-    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres,
+                                                          fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_comp = canevas0_L_comp.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_comp = canevas0_L_comp.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                              fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_comp is False:
         canevas0_L_comp.delete(lambda_texte_spectre_L_comp)
     l = event.x*delta_limites_L_comp/largeur_canevas_spectres+limites_affichage_spectre_L_comp[0]
@@ -4222,7 +4269,8 @@ def affiche_spectre_L_comp():
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp
     for i in range(len(spectre) - 1):
-        canevas0_L_comp.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
+        canevas0_L_comp.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                    width=epaisseur_spectres.get())
     affiche_lignes_spectre_L_comp()
 
     # ajout des graduations
@@ -4245,7 +4293,8 @@ def affiche_graduation_L_comp():
     liste_0_lignes_grad_L_comp=[]
     for x in liste_graduations_en_pixels :
         liste_0_lignes_grad_L_comp.append(canevas0_L_comp.create_line(x, 0, x, hauteur_canevas_spectres,
-                                                                   fill="blue", dash=(1,2)))
+                                                                   fill="blue", dash=(1,2),
+                                                                   width=epaisseur_graduations.get()))
 
     for texte in liste_0_textes_grad_L_comp :
         canevas0_L_comp.delete(texte)
@@ -4274,19 +4323,19 @@ def affiche_lignes_spectre_L_comp():
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
     x_ligne0_2 = ((variable_2_L_comp.get() -
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-    ligne0_1_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
-    ligne0_2_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_comp = canevas0_L_comp.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres,
+                                                  fill="red", width=epaisseur_lignes.get())
+    ligne0_2_L_comp = canevas0_L_comp.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres,
+                                                  fill="red", width=epaisseur_lignes.get())
     if flag_denominateur_L_comp.get():
         x_ligne0_3 = ((variable_3_L_comp.get() -
                        limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
         x_ligne0_4 = ((variable_4_L_comp.get() -
                        limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-        ligne0_3_L_comp = canevas0_L_comp.create_line(
-            x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
-        ligne0_4_L_comp = canevas0_L_comp.create_line(
-            x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_3_L_comp = canevas0_L_comp.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, 
+                                                      fill="blue", width=epaisseur_lignes.get())
+        ligne0_4_L_comp = canevas0_L_comp.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres,
+                                                      fill="blue", width=epaisseur_lignes.get())
 
 
 def deplace_lignes_L_comp():
@@ -4309,8 +4358,8 @@ def deplace_ligne0_1_L_comp():
     canevas0_L_comp.delete(ligne0_1_L_comp)
     x_ligne0_1 = ((variable_1_L_comp.get() -
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-    ligne0_1_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_comp = canevas0_L_comp.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, 
+                                                  fill="red", width=epaisseur_lignes.get())
     if variable_1_L_comp.get() >= variable_2_L_comp.get():
         variable_2_L_comp.set(variable_1_L_comp.get())
         deplace_ligne0_2_L_comp()
@@ -4324,8 +4373,8 @@ def deplace_ligne0_2_L_comp():
     canevas0_L_comp.delete(ligne0_2_L_comp)
     x_ligne0_2 = ((variable_2_L_comp.get() -
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-    ligne0_2_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_2_L_comp = canevas0_L_comp.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, 
+                                                  fill="red", width=epaisseur_lignes.get())
     if variable_2_L_comp.get() <= variable_1_L_comp.get():
         variable_1_L_comp.set(variable_2_L_comp.get())
         deplace_ligne0_1_L_comp()
@@ -4340,8 +4389,8 @@ def deplace_ligne0_3_L_comp():
     if flag_denominateur_L_comp.get():
         x_ligne0_3 = ((variable_3_L_comp.get() -
                        limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-        ligne0_3_L_comp = canevas0_L_comp.create_line(
-            x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_3_L_comp = canevas0_L_comp.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, 
+                                                      fill="blue", width=epaisseur_lignes.get())
         if variable_3_L_comp.get() >= variable_4_L_comp.get():
             variable_4_L_comp.set(variable_3_L_comp.get())
             deplace_ligne0_4_L_comp()
@@ -4356,8 +4405,8 @@ def deplace_ligne0_4_L_comp():
     if flag_denominateur_L_comp.get():
         x_ligne0_4 = ((variable_4_L_comp.get() -
                        limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-        ligne0_4_L_comp = canevas0_L_comp.create_line(
-            x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+        ligne0_4_L_comp = canevas0_L_comp.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres,
+                                                      fill="blue", width=epaisseur_lignes.get())
         if variable_4_L_comp.get() <= variable_3_L_comp.get():
             variable_3_L_comp.set(variable_4_L_comp.get())
             deplace_ligne0_3_L_comp()
@@ -4387,10 +4436,10 @@ def affiche_lignes_3_4_L_comp():
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
     x_ligne0_4 = ((variable_4_L_comp.get() -
                    limites_affichage_spectre_L_comp[0])*largeur_canevas_spectres/delta_limites_L_comp)
-    ligne0_3_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
-    ligne0_4_L_comp = canevas0_L_comp.create_line(
-        x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres, fill="blue", width=LARGEUR_LIGNES)
+    ligne0_3_L_comp = canevas0_L_comp.create_line(x_ligne0_3, 0, x_ligne0_3, hauteur_canevas_spectres, 
+                                                  fill="blue", width=epaisseur_lignes.get())
+    ligne0_4_L_comp = canevas0_L_comp.create_line(x_ligne0_4, 0, x_ligne0_4, hauteur_canevas_spectres,
+                                                  fill="blue", width=epaisseur_lignes.get())
 
 
 def deplace_ligne0_1_return_L_comp(event):
@@ -4508,10 +4557,11 @@ def zoom_drag_and_drop_L_comp(event):
     global flag_dezoom_L_comp
     canevas0_L_comp.delete(ligne_position_x_L_comp)
     canevas0_L_comp.delete(ligne_position_y_L_comp)
-    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_comp = canevas0_L_comp.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                          fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_comp = canevas0_L_comp.create_line(
-            0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_comp = canevas0_L_comp.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                              fill="green", width=epaisseur_lignes.get())
     coord_zoom_L_comp[2] = event.x
     coord_zoom_L_comp[3] = event.y
     if coord_zoom_L_comp[3] < 0 :
@@ -4824,8 +4874,12 @@ def creation_tab_bornes_L_ACP():
     """
     Lecture de(s) Spinbox et création du tableau des bornes de calcul de l'ACP
     """
-    tableau_bornes_L_ACP[0] = variable_1_L_ACP.get()
-    tableau_bornes_L_ACP[1] = variable_2_L_ACP.get()
+    if flag_spectre_entier_L_ACP.get() == False :
+        tableau_bornes_L_ACP[0] = variable_1_L_ACP.get()
+        tableau_bornes_L_ACP[1] = variable_2_L_ACP.get()
+    if flag_spectre_entier_L_ACP.get() == True :
+        tableau_bornes_L_ACP[0] = variable_zoom_inf_L_ACP.get()
+        tableau_bornes_L_ACP[1] = variable_zoom_sup_L_ACP.get()
     return tableau_bornes_L_ACP
 
 
@@ -4997,6 +5051,30 @@ def coupe_dataframe_L_ACP(dataframe, treeview_dataframe, tableau_bornes):
     # print(treeview_dataframe_individus_supp)
     return dataframe_coupe, treeview_dataframe_coupe, dataframe_individus_supp, treeview_dataframe_individus_supp
 
+
+def change_flag_spectre_L_ACP() :
+    """
+    Si la case à cocher est selectionée alors :
+        efface les lignes rouges verticales
+        grise les bormes de limite inf et sup
+    """
+    global flag_nouvelle_ACP_L_ACP
+    if flag_spectre_entier_L_ACP.get() is True :
+        text1_L_ACP.configure(state="disable")
+        text2_L_ACP.configure(state="disable")
+        entree1_L_ACP.configure(state="disable")
+        entree2_L_ACP.configure(state="disable")
+        efface_lignes_spectre_L_ACP()
+    else :
+        text1_L_ACP.configure(state="enable")
+        text2_L_ACP.configure(state="enable")
+        entree1_L_ACP.configure(state="enable")
+        entree2_L_ACP.configure(state="enable")
+        affiche_lignes_spectre_L_ACP()
+        
+    flag_nouvelle_ACP_L_ACP = True
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
+    
 
 def change_flag_3D_L_ACP():
     """
@@ -5266,11 +5344,14 @@ def affiche_position_souris_L_ACP(event):
     global ligne_position_1_L_ACP
     canevas0_L_ACP.delete(ligne_position_x_L_ACP)
     canevas0_L_ACP.delete(ligne_position_y_L_ACP)
-    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
+        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                            fill="green", width=epaisseur_lignes.get())
     canevas1_L_ACP.delete(ligne_position_1_L_ACP)
-    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres,
+                                                        fill="green", width=epaisseur_lignes.get())
     l = event.x*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
     lambda_texte_L_ACP.configure(text="Lambda = " + str(format(l, "4.2f") + " nm"))
 
@@ -5291,10 +5372,13 @@ def affiche_position_souris_motion_L_ACP(event):
     canevas0_L_ACP.delete(ligne_position_x_L_ACP)
     canevas0_L_ACP.delete(ligne_position_y_L_ACP)
     canevas1_L_ACP.delete(ligne_position_1_L_ACP)
-    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
-    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y,
+                                                            fill="green", width=epaisseur_lignes.get())
+    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_premier_lamda_L_ACP is False:
         canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
         canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
@@ -5385,9 +5469,11 @@ def affiche_spectre_L_ACP():
     spectre[:, 1] = (hauteur_canevas_spectres-(spectre[:, 1] - minimum)*hauteur_canevas_spectres/(maximum - minimum))
     spectre[:, 0] = (spectre[:, 0] - limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP
     for i in range(len(spectre) - 1):
-        canevas0_L_ACP.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1])
-    affiche_lignes_spectre_L_ACP()
-
+        canevas0_L_ACP.create_line(spectre[i, 0], spectre[i, 1], spectre[i+1, 0], spectre[i+1, 1],
+                                   width=epaisseur_spectres.get())
+        
+    if flag_spectre_entier_L_ACP.get() is False :
+        affiche_lignes_spectre_L_ACP()
     # ajout des graduations
     affiche_graduation_L_ACP()
     affiche_lignes_element_L_ele()
@@ -5412,7 +5498,8 @@ def affiche_graduation_L_ACP():
     # liste_0_textes_grad_L_ACP=[]
     for x in liste_graduations_en_pixels :
         liste_0_lignes_grad_L_ACP.append(canevas0_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
-                                                                       fill="blue", dash=(1,2)))
+                                                                       fill="blue", dash=(1,2),
+                                                                       width=epaisseur_graduations.get()))
 
     for texte in liste_0_textes_grad_L_ACP :
         canevas0_L_ACP.delete(texte)
@@ -5429,7 +5516,8 @@ def affiche_graduation_L_ACP():
     # liste_1_textes_grad_L_ACP=[]
     for x in liste_graduations_en_pixels :
         liste_1_lignes_grad_L_ACP.append(canevas1_L_ACP.create_line(x, 0, x, hauteur_canevas_spectres,
-                                                                       fill="blue", dash=(1,2)))
+                                                                       fill="blue", dash=(1,2),
+                                                                       width=epaisseur_graduations.get()))
 
     for texte in liste_1_textes_grad_L_ACP :
         canevas1_L_ACP.delete(texte)
@@ -5442,6 +5530,15 @@ def affiche_graduation_L_ACP():
 
 def mise_a_jour_affichage_L_ACP() :
     affiche_spectre_L_ACP()
+    try :
+        affiche_spectres_var_ACP_L_ACP()
+    except :
+        pass
+
+
+def efface_lignes_spectre_L_ACP() :
+    canevas0_L_ACP.delete(ligne0_1_L_ACP)
+    canevas0_L_ACP.delete(ligne0_2_L_ACP)
 
 
 def affiche_lignes_spectre_L_ACP():
@@ -5455,10 +5552,10 @@ def affiche_lignes_spectre_L_ACP():
         (variable_1_L_ACP.get()-limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP)
     x_ligne0_2 = (
         (variable_2_L_ACP.get()-limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP)
-    ligne0_1_L_ACP = canevas0_L_ACP.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
-    ligne0_2_L_ACP = canevas0_L_ACP.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_ACP = canevas0_L_ACP.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, 
+                                                fill="red", width=epaisseur_lignes.get())
+    ligne0_2_L_ACP = canevas0_L_ACP.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, 
+                                                fill="red", width=epaisseur_lignes.get())
 
 
 def deplace_lignes_L_ACP():
@@ -5481,13 +5578,13 @@ def deplace_ligne0_1_L_ACP():
     canevas0_L_ACP.delete(ligne0_1_L_ACP)
     x_ligne0_1 = (
         (variable_1_L_ACP.get()-limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP)
-    ligne0_1_L_ACP = canevas0_L_ACP.create_line(
-        x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_1_L_ACP = canevas0_L_ACP.create_line(x_ligne0_1, 0, x_ligne0_1, hauteur_canevas_spectres,
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_1_L_ACP.get() >= variable_2_L_ACP.get():
         variable_2_L_ACP.set(variable_1_L_ACP.get())
         deplace_ligne0_2_L_ACP()
-    bouton_applique_ind_sup_L_ACP.configure(state="disable")
     flag_nouvelle_ACP_L_ACP = True
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def deplace_ligne0_2_L_ACP():
@@ -5498,13 +5595,13 @@ def deplace_ligne0_2_L_ACP():
     canevas0_L_ACP.delete(ligne0_2_L_ACP)
     x_ligne0_2 = (
         (variable_2_L_ACP.get()-limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP)
-    ligne0_2_L_ACP = canevas0_L_ACP.create_line(
-        x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres, fill="red", width=LARGEUR_LIGNES)
+    ligne0_2_L_ACP = canevas0_L_ACP.create_line(x_ligne0_2, 0, x_ligne0_2, hauteur_canevas_spectres,
+                                                fill="red", width=epaisseur_lignes.get())
     if variable_2_L_ACP.get() <= variable_1_L_ACP.get():
         variable_1_L_ACP.set(variable_2_L_ACP.get())
         deplace_ligne0_1_L_ACP()
-    bouton_applique_ind_sup_L_ACP.configure(state="disable")
     flag_nouvelle_ACP_L_ACP = True
+    bouton_applique_ind_sup_L_ACP.configure(state="disable")
 
 
 def deplace_ligne0_1_return_L_ACP(event):
@@ -5580,24 +5677,27 @@ def affiche_spectres_var_ACP_L_ACP():
     spectre1[:, 0] = (spectre1[:, 0] - limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP
     for i in range(len(spectre1) - 1):
         canevas1_L_ACP.create_line(spectre1[i, 0], spectre1[i, 1],
-                                   spectre1[i+1, 0], spectre1[i+1, 1], fill="red")
+                                   spectre1[i+1, 0], spectre1[i+1, 1], 
+                                   fill="red", width=epaisseur_spectres.get())
 
     spectre2[:, 1] = hauteur_canevas_spectres-(spectre2[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
     spectre2[:, 0] = (spectre2[:, 0] - limites_affichage_spectre_L_ACP[0])*largeur_canevas_spectres/delta_limites_L_ACP
     for i in range(len(spectre2) - 1):
         canevas1_L_ACP.create_line(spectre2[i, 0], spectre2[i, 1],
-                                   spectre2[i+1, 0], spectre2[i+1, 1], fill="blue")
+                                   spectre2[i+1, 0], spectre2[i+1, 1], 
+                                   fill="blue", width=epaisseur_spectres.get())
 
     if flag_3D_L_ACP.get() is True:
         spectre3[:, 1] = hauteur_canevas_spectres-(spectre3[:, 1] - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
         spectre3[:, 0] = (spectre3[:, 0] - limites_affichage_spectre_L_ACP[0]) * \
             largeur_canevas_spectres/delta_limites_L_ACP
         for i in range(len(spectre3) - 1):
-            canevas1_L_ACP.create_line(
-                spectre3[i, 0], spectre3[i, 1], spectre3[i+1, 0], spectre3[i+1, 1], fill="green")
+            canevas1_L_ACP.create_line(spectre3[i, 0], spectre3[i, 1], spectre3[i+1, 0], spectre3[i+1, 1],
+                                       fill="green", width=epaisseur_spectres.get())
 
     y = hauteur_canevas_spectres-(0 - minimum)*hauteur_canevas_spectres/((maximum - minimum)+0.000000001)
-    canevas1_L_ACP.create_line(0, y, largeur_canevas_spectres, y, fill="grey")
+    canevas1_L_ACP.create_line(0, y, largeur_canevas_spectres, y, 
+                               fill="grey", width=epaisseur_spectres.get())
 
     # ajout des graduations
     affiche_graduation_L_ACP()
@@ -5686,10 +5786,13 @@ def zoom_drag_and_drop_L_ACP(event):
     canevas0_L_ACP.delete(ligne_position_x_L_ACP)
     canevas0_L_ACP.delete(ligne_position_y_L_ACP)
     canevas1_L_ACP.delete(ligne_position_1_L_ACP)
-    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+    ligne_position_x_L_ACP = canevas0_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     if flag_zoom_auto_y.get() is False:
-        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y, fill="green")
-    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, fill="green")
+        ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, event.y, largeur_canevas_spectres, event.y, 
+                                                            fill="green", width=epaisseur_lignes.get())
+    ligne_position_1_L_ACP = canevas1_L_ACP.create_line(event.x, 0, event.x, hauteur_canevas_spectres, 
+                                                        fill="green", width=epaisseur_lignes.get())
     coord_zoom_L_ACP[2] = event.x
     coord_zoom_L_ACP[3] = event.y
     if coord_zoom_L_ACP[3] < 0 :
@@ -5704,7 +5807,8 @@ def zoom_drag_and_drop_L_ACP(event):
         fin = coord_zoom_L_ACP[2]*delta_limites_L_ACP/largeur_canevas_spectres+limites_affichage_spectre_L_ACP[0]
         variable_zoom_inf_L_ACP.set(format(debut, "4.1f"))
         variable_zoom_sup_L_ACP.set(format(fin, "4.1f"))
-        # affiche la longueur d'onde :
+        # affiche la longueur d'onde : 
+                
         if flag_premier_lamda_L_ACP is False:
             canevas0_L_ACP.delete(lambda_texte_spectre_0_L_ACP)
             canevas1_L_ACP.delete(lambda_texte_spectre_1_L_ACP)
@@ -5885,7 +5989,7 @@ def ouvre_fenetre_change_tree_label_L_ACP(event):
             entree_label_L_ACP = ttk.Spinbox(frame_label_L_ACP, from_=0, to=20, increment=1, width=200,
                                              textvariable=label_L_ACP, foreground="black")
             entree_label_L_ACP.pack(ipadx=0, ipady=0)
-            buttonFont = font.Font(family='Helvetica', size=math.ceil(30/facteur_echelle_ecran))
+            buttonFont = tkfont.Font(family='Helvetica', size=math.ceil(30/facteur_echelle_ecran))
             bouton_label_L_ACP = tk.Button(frame_label_L_ACP, text=_("Valider"),
                                            font=buttonFont, width=200, height=100,
                                            command=validation_label_L_ACP)
@@ -5956,10 +6060,13 @@ def ouvre_fenetre_recherche_elements_L_rec():
     global flag_fenetre_recherche_elements_ouvert_L_rec
     if flag_fenetre_recherche_elements_ouvert_L_rec  is False :
         fenetre_recherche_elements_L_rec = tk.Toplevel(fenetre_principale)
+        print(largeur_ecran)
         if largeur_ecran <= 1921 :
             fenetre_recherche_elements_L_rec.geometry("660x490")
+            print("largeur écran < 1921 => taille fenetre 660x490")
         else :
             fenetre_recherche_elements_L_rec.geometry("905x640")
+            print("largeur écran > 1921 => taille fenetre 905x640")
         fenetre_recherche_elements_L_rec.configure(bg="black")
         fenetre_recherche_elements_L_rec.resizable(True, True)
         frame_recherche_elements_L_rec = ttk.Frame(fenetre_recherche_elements_L_rec)
@@ -5993,7 +6100,7 @@ def ouvre_fenetre_recherche_elements_L_rec():
                                                 variable=flag_NIST_LIBS_L_ele)
         coche_NIST_LIBS_L_rec.grid(row=3, column=1, columnspan=2)
 
-        buttonFont = font.Font(family='Helvetica', size=math.ceil(15/facteur_echelle_ecran))
+        buttonFont = tkfont.Font(family='Helvetica', size=math.ceil(15/facteur_echelle_ecran))
         bouton_recherche_elements_L_rec = tk.Button(frame_recherche_elements_L_rec, text=_("Valider"),
                                                     font=buttonFont, width=10, bg="black", fg="white",
                                                     command=recherche_elements_L_rec)
@@ -6127,7 +6234,7 @@ def ouvre_fenetre_a_propos_L_aide():
         zone_texte_L_aide.image=logo
         vscroll_bar_texte_L_aide.config(command=zone_texte_L_aide.yview)
 
-        buttonFont = font.Font(family='Helvetica', size=math.ceil(15/facteur_echelle_ecran))
+        buttonFont = tkfont.Font(family='Helvetica', size=math.ceil(15/facteur_echelle_ecran))
         bouton_ferme_fenetre_a_propos_L_aide = tk.Button(frame_a_propos_L_aide,
                                                          text=_("Fermer"), font=buttonFont,
                                                          width=10, bg="black", fg="white",
@@ -6313,6 +6420,8 @@ def affiche_lignes_element_L_ele():
     global liste_0_lignes_element_L_comp
     global liste_0_lignes_element_L_ACP
     global liste_1_lignes_element_L_ACP
+    
+    # epaisseur_lignes = 2
 
     efface_lignes_elements_L_ele()
     ID_onglet = onglets.index("current")
@@ -6332,97 +6441,162 @@ def affiche_lignes_element_L_ele():
     if flag_neutres_ions_L_ele.get() == 2:
         couleur_lignes = "cyan3"
 
-    for ligne_tableau in DataFrame_element_L_ele.itertuples():
-        if float(ligne_tableau[2]) > limites_affichage_spectre[0] and float(ligne_tableau[2]) < limites_affichage_spectre[1]:
-            delta_limites = limites_affichage_spectre[1]-limites_affichage_spectre[0]
-            long_onde = ligne_tableau[2]
-            intensite_relative = ligne_tableau[5]
-            if intensite_relative >= 10 and flag_sup10_L_ele.get() == 1:
-                # affiche_ligne_element(long_onde, canevas0_L_ext)
-                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
-                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
-                    liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, 0,
-                                                                                       x_ligne, hauteur_canevas_spectres+170,
-                                                                                       fill=couleur_lignes, dash=(4, 1)))
-                    liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, 0,
+    if flag_Nlignes_L_ele.get() == False :
+        # print("affiche lignes par I relative")
+        for ligne_tableau in DataFrame_element_L_ele.itertuples():
+            if float(ligne_tableau[2]) > limites_affichage_spectre[0] and float(ligne_tableau[2]) < limites_affichage_spectre[1]:
+                delta_limites = limites_affichage_spectre[1]-limites_affichage_spectre[0]
+                long_onde = ligne_tableau[2]
+                intensite_relative = ligne_tableau[5]
+                if intensite_relative >= 10 and flag_sup10_L_ele.get() == 1:
+                    # affiche_ligne_element(long_onde, canevas0_L_ext)
+                    x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
+                    if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
+                        liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, 0,
+                                                                                           x_ligne, hauteur_canevas_spectres+170,
+                                                                                           fill=couleur_lignes, dash=(4, 1),
+                                                                                           width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, 0,
+                                                                                           x_ligne, hauteur_canevas_spectres,
+                                                                                           fill=couleur_lignes, dash=(4, 1),
+                                                                                           width = epaisseur_lignes.get()))
+                    if ID_onglet == 1 and flag_bouton_efface_L_det is False:
+                        liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, 0,
+                                                                                       x_ligne, hauteur_canevas_spectres_L_det,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
+                        liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres,
-                                                                                       fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 1 and flag_bouton_efface_L_det is False:
-                    liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres_L_det,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
-                    liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
-                    liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, 0,
-                                                                                     x_ligne, hauteur_canevas_spectres,
-                                                                                     fill=couleur_lignes, dash=(4, 1)))
-                if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
-                    liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
-                    liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
-            if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
-                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
-                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
-                    liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)/2,
-                                                                                       x_ligne, hauteur_canevas_spectres+170,
-                                                                                       fill=couleur_lignes, dash=(4, 2)))
-                    liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres/2,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
+                        liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, 0,
+                                                                                         x_ligne, hauteur_canevas_spectres,
+                                                                                         fill=couleur_lignes, dash=(4, 1),
+                                                                                         width = epaisseur_lignes.get()))
+                    if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
+                        liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres,
-                                                                                       fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 1 and flag_bouton_efface_L_det is False:
-                    liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, hauteur_canevas_spectres_L_det/2,
-                                                                                   x_ligne, hauteur_canevas_spectres_L_det,
-                                                                                   fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
-                    liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres/2,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
-                    liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres/2,
-                                                                                     x_ligne, hauteur_canevas_spectres,
-                                                                                     fill=couleur_lignes, dash=(4, 2)))
-                if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
-                    liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres/2,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 2)))
-                    liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
-            if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
-                x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
-                if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
-                    liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*0.825,
-                                                                                       x_ligne, hauteur_canevas_spectres+170,
-                                                                                       fill=couleur_lignes, dash=(4, 3)))
-                    liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres*0.825,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
                                                                                        x_ligne, hauteur_canevas_spectres,
-                                                                                       fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 1 and flag_bouton_efface_L_det is False:
-                    liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, hauteur_canevas_spectres_L_det*0.825,
-                                                                                     x_ligne, hauteur_canevas_spectres_L_det,
-                                                                                     fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
-                    liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres*0.825,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
-                    liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres*0.825,
-                                                                                     x_ligne, hauteur_canevas_spectres,
-                                                                                     fill=couleur_lignes, dash=(4, 3)))
-                if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
-                    liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres*0.825,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 3)))
-                    liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
-                                                                                   x_ligne, hauteur_canevas_spectres,
-                                                                                   fill=couleur_lignes, dash=(4, 1)))
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                if intensite_relative < 10 and intensite_relative >= 1 and flag_sup1_L_ele.get() == 1:
+                    x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
+                    if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
+                        liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)/2,
+                                                                                           x_ligne, hauteur_canevas_spectres+170,
+                                                                                           fill=couleur_lignes, dash=(4, 2),
+                                                                                           width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres/2,
+                                                                                           x_ligne, hauteur_canevas_spectres,
+                                                                                           fill=couleur_lignes, dash=(4, 2),
+                                                                                           width = epaisseur_lignes.get()))
+                    if ID_onglet == 1 and flag_bouton_efface_L_det is False:
+                        liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, hauteur_canevas_spectres_L_det/2,
+                                                                                       x_ligne, hauteur_canevas_spectres_L_det,
+                                                                                       fill=couleur_lignes, dash=(4, 2),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
+                        liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres/2,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 2),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
+                        liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres/2,
+                                                                                         x_ligne, hauteur_canevas_spectres,
+                                                                                         fill=couleur_lignes, dash=(4, 2),
+                                                                                         width = epaisseur_lignes.get()))
+                    if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
+                        liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres/2,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 2),
+                                                                                       width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                if intensite_relative < 1 and flag_inf1_L_ele.get() == 1:
+                    x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
+                    if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
+                        liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*0.825,
+                                                                                           x_ligne, hauteur_canevas_spectres+170,
+                                                                                           fill=couleur_lignes, dash=(4, 3),
+                                                                                           width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres*0.825,
+                                                                                           x_ligne, hauteur_canevas_spectres,
+                                                                                           fill=couleur_lignes, dash=(4, 3),
+                                                                                           width = epaisseur_lignes.get()))
+                    if ID_onglet == 1 and flag_bouton_efface_L_det is False:
+                        liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, hauteur_canevas_spectres_L_det*0.825,
+                                                                                         x_ligne, hauteur_canevas_spectres_L_det,
+                                                                                         fill=couleur_lignes, dash=(4, 3),
+                                                                                         width = epaisseur_lignes.get()))
+                    if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
+                        liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres*0.825,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 3),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
+                        liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres*0.825,
+                                                                                         x_ligne, hauteur_canevas_spectres,
+                                                                                         fill=couleur_lignes, dash=(4, 3),
+                                                                                         width = epaisseur_lignes.get()))
+                    if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
+                        liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres*0.825,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 3),
+                                                                                       width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, 0,
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
 
+    if flag_Nlignes_L_ele.get() == True :
+        # print("affiche n premières lignes")
+        for ligne_tableau in DataFrame_element_L_ele.itertuples():
+            if float(ligne_tableau[2]) > limites_affichage_spectre[0] and float(ligne_tableau[2]) < limites_affichage_spectre[1]:
+                delta_limites = limites_affichage_spectre[1]-limites_affichage_spectre[0]
+                long_onde = ligne_tableau[2]
+                numero_ligne = ligne_tableau[4]
+                intensite_relative = ligne_tableau[5] / 100
+                if numero_ligne <= variable_Nlignes_L_ele.get() :
+                    x_ligne = (long_onde-limites_affichage_spectre[0])*largeur_canevas_spectres/delta_limites
+                    if ID_onglet == 0 and flag_bouton_efface_L_trait is False:
+                        liste_0_lignes_element_L_trait.append(canevas0_L_trait.create_line(x_ligne, (hauteur_canevas_spectres+170)*(1-intensite_relative),
+                                                                                           x_ligne, hauteur_canevas_spectres+170,
+                                                                                           fill=couleur_lignes, dash=(4, 1), width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_trait.append(canevas1_L_trait.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                           x_ligne, hauteur_canevas_spectres,
+                                                                                           fill=couleur_lignes, dash=(4, 1), 
+                                                                                           width = epaisseur_lignes.get()))
+                    if ID_onglet == 1 and flag_bouton_efface_L_det is False:
+                        liste_0_lignes_element_L_det.append(canevas0_L_det.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                       x_ligne, hauteur_canevas_spectres_L_det,
+                                                                                       fill=couleur_lignes, dash=(4, 1),
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 2 and flag_bouton_efface_L_ext is False:
+                        liste_0_lignes_element_L_ext.append(canevas0_L_ext.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 1), 
+                                                                                       width = epaisseur_lignes.get()))
+                    if ID_onglet == 3 and flag_bouton_efface_L_comp is False:
+                        liste_0_lignes_element_L_comp.append(canevas0_L_comp.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                         x_ligne, hauteur_canevas_spectres,
+                                                                                         fill=couleur_lignes, dash=(4, 1), 
+                                                                                         width = epaisseur_lignes.get()))
+                    if ID_onglet == 4 and flag_bouton_efface_L_ACP is False:
+                        liste_0_lignes_element_L_ACP.append(canevas0_L_ACP.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 1), 
+                                                                                       width = epaisseur_lignes.get()))
+                        liste_1_lignes_element_L_ACP.append(canevas1_L_ACP.create_line(x_ligne, hauteur_canevas_spectres*(1-intensite_relative),
+                                                                                       x_ligne, hauteur_canevas_spectres,
+                                                                                       fill=couleur_lignes, dash=(4, 1), 
+                                                                                       width = epaisseur_lignes.get()))
 
 def affiche_lignes_neutres_ions_NIST_L_ele():
     """
@@ -6458,8 +6632,33 @@ def affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele, frame1,
         ligne = ligne_tableau[5]
         colonne = ligne_tableau[6]
         couleur = ligne_tableau[8]
-        case_classification(frame1, nom, symbole,  Z, ligne,
+        case_classification(frame1, nom, symbole, Z, ligne,
                             colonne, couleur, bouton_affichage_L_ele)
+        
+        
+def clic_coche_Nlignes_L_ele() :
+    """
+
+    Returns
+    -------
+    None.
+
+    """
+    if flag_Nlignes_L_ele.get() == True :
+        # print("Affiche les " + str(variable_Nlignes_L_ele.get()) + " premieres lignes")
+        entree_Nlignes_L_ele.configure(state="enable")
+        coche_sup10_L_ele.configure(state="disable")
+        coche_sup1_L_ele.configure(state="disable")
+        coche_inf1_L_ele.configure(state="disable")
+        
+    if flag_Nlignes_L_ele.get() == False :
+        # print("Affiche les lignes par I relative")
+        entree_Nlignes_L_ele.configure(state="disable")
+        coche_sup10_L_ele.configure(state="enable")
+        coche_sup1_L_ele.configure(state="enable")
+        coche_inf1_L_ele.configure(state="enable")
+        
+    affiche_lignes_element_L_ele()
 
 
 def ouvre_fenetre_classification_event_L_ele(event):
@@ -6472,6 +6671,7 @@ def ouvre_fenetre_classification_L_ele():
     """
     global fenetre_classification_L_ele
     global flag_tableau_periodique_ouvert_L_ele
+    global entree_Nlignes_L_ele, coche_sup10_L_ele, coche_sup1_L_ele, coche_inf1_L_ele
     if flag_tableau_periodique_ouvert_L_ele is False:
         fenetre_classification_L_ele = tk.Toplevel(fenetre_principale)
         # if largeur_ecran <= 1281 :
@@ -6485,10 +6685,10 @@ def ouvre_fenetre_classification_L_ele():
         frame1_L_ele.pack()
 
         # bouton_ferme_L_ele = tk.Button(frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1],
-        #                                text=_("Ferme"), font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
+        #                                text=_("Ferme"), font=tkfont.Font(size=TAILLE_FONT_CLASSIFICATION))
         # bouton_ferme_L_ele.configure(command=ferme_fenetre_classification_L_ele)
         bouton_efface_L_ele = tk.Button(frame1_L_ele, width=TAILLE_CASE[0], height=TAILLE_CASE[1],
-                                       text=_("Efface"), font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
+                                        text=_("Efface"), font=tkfont.Font(size=TAILLE_FONT_CLASSIFICATION))
         bouton_efface_L_ele.configure(command=lignes_elements_flag_TRUE_L_ele)
         bouton_efface_L_ele.grid(row=1, column=3, rowspan=3, columnspan=2)
 
@@ -6497,6 +6697,11 @@ def ouvre_fenetre_classification_L_ele():
                                            height=TAILLE_CASE[1])
         bouton_affichage_L_ele.configure(command=affiche_lignes_bouton_central_L_ele)
         bouton_affichage_L_ele.grid(row=1, column=7, rowspan=3, columnspan=2)
+        
+        coche_NIST_LIBS_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("NIST LIBS"),
+                                               variable=flag_NIST_LIBS_L_ele,
+                                               command=affiche_lignes_neutres_ions_NIST_L_ele)
+        coche_NIST_LIBS_L_ele.grid(row=1, column=3, columnspan=3, sticky=tk.W)
 
         coche_El_I_L_ele = ttk.Radiobutton(frame1_L_ele, text=_("Neutres"),
                                                variable=flag_neutres_ions_L_ele, value=1,
@@ -6506,11 +6711,10 @@ def ouvre_fenetre_classification_L_ele():
                                                 variable=flag_neutres_ions_L_ele, value=2,
                                                 command=affiche_lignes_neutres_ions_NIST_L_ele)
         coche_El_II_L_ele.grid(row=2, column=5, columnspan=3, sticky=tk.W)
-
-        coche_NIST_LIBS_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("NIST LIBS"),
-                                               variable=flag_NIST_LIBS_L_ele,
-                                               command=affiche_lignes_neutres_ions_NIST_L_ele)
-        coche_NIST_LIBS_L_ele.grid(row=3, column=5, columnspan=3, sticky=tk.W)
+        coche_El_II_L_ele = ttk.Radiobutton(frame1_L_ele, text=_("N + I"),
+                                                variable=flag_neutres_ions_L_ele, value=3, state="disable",
+                                                command=affiche_lignes_neutres_ions_NIST_L_ele)
+        coche_El_II_L_ele.grid(row=3, column=5, columnspan=3, sticky=tk.W)
 
         coche_sup10_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("I relative >= 10%"),
                                                 variable=flag_sup10_L_ele,
@@ -6524,6 +6728,16 @@ def ouvre_fenetre_classification_L_ele():
                                                variable=flag_inf1_L_ele,
                                                command=affiche_lignes_element_L_ele)
         coche_inf1_L_ele.grid(row=3, column=9, columnspan=4, sticky=tk.W)
+        
+        coche_Nlignes_L_ele = ttk.Checkbutton(frame1_L_ele, text=_("n lignes :"),
+                                               variable=flag_Nlignes_L_ele,
+                                               command=clic_coche_Nlignes_L_ele)
+        coche_Nlignes_L_ele.grid(row=1, column=13, columnspan=2, sticky=tk.W)
+        
+        entree_Nlignes_L_ele = ttk.Spinbox(frame1_L_ele, from_=1, to=100, increment=1,
+                                           textvariable=variable_Nlignes_L_ele, 
+                                           command=affiche_lignes_element_L_ele,width=5, state="disable")
+        entree_Nlignes_L_ele.grid(row=1, column=15, columnspan=2, sticky=tk.W)
 
         DataFrame_tableau_periodique_L_ele = lit_tableau_periodique_L_ele()
         affiche_tableau_periodique_L_ele(DataFrame_tableau_periodique_L_ele,
@@ -6595,7 +6809,7 @@ class case_classification(tk.Button):
                            command=lambda: self.affiche_pics(nom, symbole, Z, couleur,
                                                              bouton_affichage))
         self.configure(width=TAILLE_CASE[0], height=TAILLE_CASE[1])
-        self.config(font=font.Font(size=TAILLE_FONT_CLASSIFICATION))
+        self.config(font=tkfont.Font(size=TAILLE_FONT_CLASSIFICATION))
         self.grid(row=ligne, column=colonne)
 
     def affiche_pics(self, nom, symbole, Z, couleur, bouton_affichage):
@@ -6612,7 +6826,7 @@ class case_classification(tk.Button):
         texte = "     "+str(Z)+"\n"+symbole
         bouton_affichage.configure(text=texte, bg=couleur,
                                    width=TAILLE_CASE[0], height=TAILLE_CASE[1])
-        bouton_affichage.config(font=font.Font(size=TAILLE_FONT_CLASSIFICATION,
+        bouton_affichage.config(font=tkfont.Font(size=TAILLE_FONT_CLASSIFICATION,
                                                weight="bold"))
         DataFrame_element_L_ele = lit_element_L_ele(symbole)
         lignes_elements_flag_FALSE_L_ele()
@@ -6639,7 +6853,12 @@ hauteur_ecran = fenetre_principale.winfo_screenheight()
 # print(largeur_ecran_mm)
 # print(hauteur_ecran_mm)
 
-default_font = font.nametofont("TkDefaultFont")
+default_font = tkfont.nametofont("TkDefaultFont")
+print("Police par défaut au démarage :")
+print("   family :", default_font.cget("family"))
+print("   size   :", default_font.cget("size"))
+print("   weight :", default_font.cget("weight"))
+print("===============================")
 default_font.configure(size=11)
 facteur_echelle_ecran = (default_font.measure("abcdef")) / 46
 
@@ -6650,8 +6869,6 @@ if largeur_ecran <= 1370 :
     largeur_canevas_spectres = largeur_canevas_spectres_reference = 1000
     hauteur_canevas_spectres =  hauteur_canevas_spectres_reference = 200
     hauteur_canevas_spectres_L_det = 290
-    # taille_police = math.ceil(11/facteur_echelle_ecran)
-    # TAILLE_FONT_CLASSIFICATION = math.ceil(8/facteur_echelle_ecran)
     taille_police = math.ceil(10/facteur_echelle_ecran)
     TAILLE_FONT_CLASSIFICATION = math.ceil(10/facteur_echelle_ecran)
     default_font.configure(size=taille_police)
@@ -6754,6 +6971,8 @@ menu_comparaison = tk.Menu(barre_menus)
 menu_ACP = tk.Menu(barre_menus)
 menu_outils = tk.Menu(barre_menus)
 sous_menu_graduations = tk.Menu(menu_outils)
+sous_menu_epaisseur_traits = tk.Menu(menu_outils)
+sous_menu_epaisseur_spectres = tk.Menu(menu_outils)
 sous_menu_langue = tk.Menu(menu_outils)
 sous_menu_style = tk.Menu(menu_outils)
 menu_aide = tk.Menu(barre_menus)
@@ -6813,6 +7032,52 @@ sous_menu_graduations.add_radiobutton(label=_("Espacement mini 100 pixels"), val
 sous_menu_graduations.add_radiobutton(label=_("Espacement mini 50 pixels"), value=50, variable=espacement_en_pixels,
                                  command=mise_a_jour_affichage_onglet_actif)
 sous_menu_graduations.add_radiobutton(label=_("Espacement mini 20 pixels"), value=20, variable=espacement_en_pixels,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_separator()
+epaisseur_graduations = tk.IntVar(value=2)
+sous_menu_graduations.add_radiobutton(label=_("Epaisseur 1 pixel"), value=1, variable=epaisseur_graduations,
+                                      command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Epaisseur 2 pixels"), value=2, variable=epaisseur_graduations,
+                                      command=mise_a_jour_affichage_onglet_actif)
+sous_menu_graduations.add_radiobutton(label=_("Epaisseur 3 pixels"), value=3, variable=epaisseur_graduations,
+                                      command=mise_a_jour_affichage_onglet_actif)
+
+menu_outils.add_cascade(label=_("Epaisseur des marqueurs"), menu=sous_menu_epaisseur_traits)
+epaisseur_lignes = tk.IntVar(value=2)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("1 pixel"), value=1, variable=epaisseur_lignes,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("2 pixels"), value=2, variable=epaisseur_lignes,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("3 pixels"), value=3, variable=epaisseur_lignes,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("4 pixels"), value=4, variable=epaisseur_lignes,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_separator()
+taille_font = tk.IntVar(value=12)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Font 10"), value=10, variable=taille_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Font 12"), value=12, variable=taille_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Font 14"), value=14, variable=taille_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Font 16"), value=16, variable=taille_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_separator()
+poids_font = tk.StringVar(value="normal")
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Normal"), value="normal", variable=poids_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_traits.add_radiobutton(label=_("Gras"), value="bold", variable=poids_font,
+                                 command=mise_a_jour_affichage_onglet_actif)
+
+menu_outils.add_cascade(label=_("Epaisseur des spectres"), menu=sous_menu_epaisseur_spectres)
+epaisseur_spectres = tk.IntVar(value=1)
+sous_menu_epaisseur_spectres.add_radiobutton(label=_("1 pixel"), value=1, variable=epaisseur_spectres,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_spectres.add_radiobutton(label=_("2 pixels"), value=2, variable=epaisseur_spectres,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_spectres.add_radiobutton(label=_("3 pixels"), value=3, variable=epaisseur_spectres,
+                                 command=mise_a_jour_affichage_onglet_actif)
+sous_menu_epaisseur_spectres.add_radiobutton(label=_("4 pixels"), value=4, variable=epaisseur_spectres,
                                  command=mise_a_jour_affichage_onglet_actif)
 
 menu_outils.add_separator()
@@ -7214,7 +7479,7 @@ text4_L_det = ttk.Label(frame1_L_det, text=_("Int. rel. maxi :"))
 text3_L_det.grid(row=3, column=1, sticky=tk.E)
 text4_L_det.grid(row=3, column=3, sticky=tk.E)
 
-variable_3_L_det = tk.DoubleVar(value=10)
+variable_3_L_det = tk.DoubleVar(value=5)
 variable_4_L_det = tk.DoubleVar(value=100)
 entree3_L_det = ttk.Spinbox(frame1_L_det, from_=0, to=99, increment=1,
                             textvariable=variable_3_L_det,
@@ -7336,7 +7601,7 @@ text7_L_det.grid(row=6, column=1)
 text8_L_det.grid(row=7, column=1)
 
 delta_recherche_elements_L_det = tk.DoubleVar(value=0.2)
-seuil_recherche_elements_L_det = tk.IntVar(value=1)
+seuil_recherche_elements_L_det = tk.IntVar(value=5)
 entree7_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=5, increment=0.1, width=5,
                             textvariable=delta_recherche_elements_L_det, foreground="black")
 entree8_L_det = ttk.Spinbox(frame2_1_L_det, from_=0.1, to=100, increment=1, width=5,
@@ -7992,23 +8257,32 @@ canevas0_L_ACP.grid(row=1, column=1, columnspan=6, sticky="nsew")
 ligne_position_x_L_ACP = canevas0_L_ACP.create_line(0, 0, 0, hauteur_canevas_spectres, fill="white")
 ligne_position_y_L_ACP = canevas0_L_ACP.create_line(0, 0, largeur_canevas_spectres, 0, fill="white")
 
-lambda_texte_L_ACP = ttk.Label(frame1_L_ACP,
-                               text="Lambda = " + str(format(lambda_texte_spectre_0_L_ACP, "4.2f") + " nm"))
-lambda_texte_L_ACP.grid(row=2, column=6)
 
-text1_L_ACP = ttk.Label(frame1_L_ACP, text=_("Borne inf :"))
-text2_L_ACP = ttk.Label(frame1_L_ACP, text=_("Borne sup :"))
+text1_L_ACP = ttk.Label(frame1_L_ACP, text=_("Borne inf :"), state="disable")
+text2_L_ACP = ttk.Label(frame1_L_ACP, text=_("Borne sup :"), state="disable")
 text1_L_ACP.grid(row=2, column=1, sticky=tk.E)
 text2_L_ACP.grid(row=2, column=3, sticky=tk.E)
 
 variable_1_L_ACP = tk.DoubleVar(value=tableau_bornes_L_ACP[0])
 variable_2_L_ACP = tk.DoubleVar(value=tableau_bornes_L_ACP[1])
 entree1_L_ACP = ttk.Spinbox(frame1_L_ACP, from_=198, to=1013, increment=0.5, textvariable=variable_1_L_ACP,
-                            command=deplace_ligne0_1_L_ACP, width=5, foreground="black")
+                            command=deplace_ligne0_1_L_ACP, 
+                            width=5, foreground="black", state="disable")
 entree2_L_ACP = ttk.Spinbox(frame1_L_ACP, from_=198, to=1013, increment=0.5, textvariable=variable_2_L_ACP,
-                            command=deplace_ligne0_2_L_ACP, width=5, foreground="black")
+                            command=deplace_ligne0_2_L_ACP, 
+                            width=5, foreground="black", state="disable")
 entree1_L_ACP.grid(row=2, column=2, sticky=tk.W)
 entree2_L_ACP.grid(row=2, column=4, sticky=tk.W)
+
+flag_spectre_entier_L_ACP = tk.BooleanVar(value=True)
+coche_spectre_entier_L_ACP = ttk.Checkbutton(frame1_L_ACP, text=_("Spectre entier"),
+                                             variable=flag_spectre_entier_L_ACP,
+                                             command=change_flag_spectre_L_ACP)
+coche_spectre_entier_L_ACP.grid(row=2, column=5)
+
+lambda_texte_L_ACP = ttk.Label(frame1_L_ACP,
+                               text="Lambda = " + str(format(lambda_texte_spectre_0_L_ACP, "4.2f") + " nm"))
+lambda_texte_L_ACP.grid(row=2, column=6)
 
 # bouton_reset_L_ACP=ttk.Button(frame1_L_ACP, text="Reset", command=reset_tableau_L_ACP, width=8)
 # bouton_reset_L_ACP.grid(row=2, column=6, rowspan=2)
@@ -8218,8 +8492,11 @@ flag_neutres_ions_L_ele = tk.IntVar(value=1)
 flag_NIST_LIBS_L_ele = tk.IntVar(value=1)
 
 flag_sup10_L_ele = tk.IntVar(value=1)
-flag_sup1_L_ele = tk.IntVar(value=1)
+flag_sup1_L_ele = tk.IntVar(value=0)
 flag_inf1_L_ele = tk.IntVar(value=0)
+
+flag_Nlignes_L_ele = tk.BooleanVar(value=False)
+variable_Nlignes_L_ele = tk.IntVar(value=5)
 
 
 

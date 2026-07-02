@@ -257,8 +257,8 @@ def creer_dataframe_x_tableau_en_colonnes(tableau_en_colonnes, liste):
     à partir d'un tableau de spectres en colonnes
     """
     #    liste[0:0] = ["Lambda (nm)"]
-    print (tableau_en_colonnes.shape)
-    print (len(liste))
+    # print (tableau_en_colonnes.shape)
+    # print (len(liste))
     dataframe = pd.DataFrame(np.transpose(tableau_en_colonnes[:, 1:]),
                              index=liste,
                              columns=tableau_en_colonnes[:, 0])

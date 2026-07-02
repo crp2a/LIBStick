@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Feb  6 12:20:38 2020
-Module outils pour l'extration de parties des spectres et création de spectres moyens
+Module outils pour l'extration de parties des spectres et création de spectres moyens et traces
 @author: yannick
 """
 # pylint: disable=invalid-name, line-too-long, global-statement
@@ -291,8 +291,10 @@ def creation_spectre_moyen_avec_x_tableau_bool(tableau_norm, liste_bool):
         if liste_bool[i-1] is False:
             # print("supprime : " + str(i))
             tableau_extrait = np.delete(tableau_extrait, i-1, axis=1)
-    spectre_moyen = tableau_extrait.sum(axis=1)
-    spectre_moyen = spectre_moyen/tableau_extrait.shape[1]
+    # spectre_moyen = tableau_extrait.sum(axis=1)
+    # spectre_moyen = spectre_moyen/tableau_extrait.shape[1]
+    spectre_moyen = tableau_extrait.mean(axis=1)
+    # spectre_moyen = tableau_extrait.max(axis=1)
     spectre_moyen = np.column_stack((tableau_abscisses, spectre_moyen))
     return spectre_moyen
 
@@ -335,6 +337,60 @@ def creation_spectre_moyen_main(rep_travail, nom_echantillon, bornes, liste_bool
     enregistre_spectre_moyen(spectre_moyen, nom_echantillon, bornes,
                              flag_spectres_normalises_moyenne)
     return spectre_moyen
+
+
+###################################################################################################
+# Création spectre traces
+###################################################################################################
+# x sur la première colonne
+def creation_spectre_traces_avec_x_tableau_bool(tableau_norm, liste_bool):
+    """
+    Crée un spectre traces à l'aide des spectres sélectionnés
+    """
+    tableau_abscisses = tableau_norm[:, 0]
+    tableau_extrait = tableau_norm[:, 1:]
+    for i in range(len(liste_bool), 0, -1):
+        if liste_bool[i-1] is False:
+            # print("supprime : " + str(i))
+            tableau_extrait = np.delete(tableau_extrait, i-1, axis=1)
+    spectre_traces = tableau_extrait.max(axis=1)
+    spectre_traces = np.column_stack((tableau_abscisses, spectre_traces))
+    return spectre_traces
+
+
+def enregistre_spectre_traces(spectre_traces, nom_echantillon, bornes,
+                             flag_spectres_normalises_traces):
+    """
+    enregistre le spectre traces au format tsv  avec l'extension .mean
+    et le suffixe _spectre_traces_norm_ ou _spectre_traces_
+    ainsi que les bornes inf et sup
+    """
+    if flag_spectres_normalises_traces is True:
+        nom_fichier = nom_echantillon+"_spectre_traces_norm_" + \
+            str(bornes[0])+"_"+str(bornes[1])+".mean"
+    else:
+        nom_fichier = nom_echantillon+"_spectre_traces_" + str(bornes[0])+"_"+str(bornes[1])+".mean"
+    nom_fichier = str(np.char.replace(nom_fichier, " ", "_"))
+    np.savetxt(nom_fichier, spectre_traces, delimiter="\t", newline="\n")
+
+
+def creation_spectre_traces_main(rep_travail, nom_echantillon, bornes, liste_bool,
+                                flag_spectres_normalises_traces):
+    """
+    Normalise ou non les spectres
+    puis crée le spectre traces à l'aide des spectres sélectionnés
+    puis enregistre le spectre traces
+    et retourne le spectre traces
+    """
+    os.chdir(rep_travail)
+    tableau = np.loadtxt("tableau_brut_points.txt", delimiter="\t",
+                            dtype=float, encoding="Latin-1")
+    if flag_spectres_normalises_traces is True:
+        tableau = LIBStick_outils.normalise_tableau_x_aire(tableau)
+    spectre_traces = creation_spectre_traces_avec_x_tableau_bool(tableau, liste_bool)
+    enregistre_spectre_traces(spectre_traces, nom_echantillon, bornes,
+                             flag_spectres_normalises_traces)
+    return spectre_traces
 
 
 ###################################################################################################
